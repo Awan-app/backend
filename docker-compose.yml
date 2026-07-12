@@ -10,7 +10,7 @@ services:
       MYSQL_PASSWORD: ${BACKEND_DATABASE_PASSWORD:-ezdo}
       MYSQL_ROOT_PASSWORD: ${BACKEND_DATABASE_ROOT_PASSWORD:-ezdo}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
