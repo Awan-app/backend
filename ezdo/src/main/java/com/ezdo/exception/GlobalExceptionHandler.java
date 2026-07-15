@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +22,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException e) {
-        List<Map<String, String>> fieldErrors = e.getBindingResult().getFieldErrors().stream()
-                .map(fe -> Map.of(
-                        "field", fe.getField(),
-                        "message", fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value"
-                ))
+        List<Map<String, Object>> fieldErrors = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> {
+                    Map<String, Object> errorMap = new HashMap<>();
+                    errorMap.put("field", fe.getField());
+                    errorMap.put("message", fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value");
+                    errorMap.put("rejectedValue", fe.getRejectedValue());
+                    return errorMap;
+                })
                 .toList();
 
         return buildErrorResponse(
                 "Validation failed",
-                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                HttpStatus.UNPROCESSABLE_CONTENT.value(),
                 "VALIDATION_ERROR",
                 Map.of("errors", fieldErrors)
         );

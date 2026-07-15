@@ -78,10 +78,10 @@ public class OtpService {
         // Send OTP email (raw code only leaves the server here)
         emailService.sendOtpEmail(email, rawCode);
 
-        return new OtpResponse("ok", expirySeconds, resendCooldownSeconds);
+        return new OtpResponse(expirySeconds, resendCooldownSeconds);
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = OtpVerificationException.class)
     public VerificationCode verifyOtp(String email, String code) {
         // Find latest unconsumed, unlocked code for this email
         VerificationCode vc = verificationCodeRepository
@@ -107,15 +107,15 @@ public class OtpService {
                 vc.setLocked(true);
                 verificationCodeRepository.save(vc);
                 throw new OtpVerificationException(
-                        "Too many failed attempts. This OTP is now locked. Please request a new one.",
-                        ErrorCodes.OTP_LOCKED
+                    "Too many failed attempts. This OTP is now locked. Please request a new one.",
+                    ErrorCodes.OTP_LOCKED
                 );
             }
             verificationCodeRepository.save(vc);
             throw new OtpVerificationException(
-                    "Invalid OTP code.",
-                    ErrorCodes.OTP_INVALID_CODE,
-                    Map.of("remaining_attempts", maxAttempts - vc.getAttempts())
+                "Invalid OTP code.",
+                ErrorCodes.OTP_INVALID_CODE,
+                Map.of("remaining_attempts", maxAttempts - vc.getAttempts())
             );
         }
 

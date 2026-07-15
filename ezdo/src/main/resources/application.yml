@@ -54,4 +54,4 @@ ezdo:
   refresh-token:
     expiry-days: 30
   mail:
-    from: ${EZDO_MAIL_FROM:noreply@ezdo.com}
+    from: ${EZDO_MAIL_FROM:noreply@awan.com}

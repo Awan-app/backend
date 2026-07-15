@@ -25,11 +25,9 @@ public class AuthService {
 
     @Transactional
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
-        System.out.println("verifyyyyyyyyyyyy");
         // Verify the OTP code
         otpService.verifyOtp(request.email(), request.code());
 
-        System.out.println("aaaaaaaaaaaaaaaaa");
         // Find or create user
         boolean isNewUser;
         User user = userRepository.findByEmail(request.email()).orElse(null);
@@ -38,9 +36,6 @@ public class AuthService {
             user = new User();
             user.setEmail(request.email());
             user.setNew(true);
-            isNewUser = true;
-        } else {
-            isNewUser = user.isNew();
         }
 
         // Set email verified if not already
@@ -48,21 +43,22 @@ public class AuthService {
             user.setEmailVerifiedAt(Instant.now());
         }
 
-        user = userRepository.saveAndFlush(user);
-        System.out.println("fffffffffffffffffffffff");
-        System.out.println(user.getId());
+        user = userRepository.save(user);
+
         // Generate tokens
         String accessToken = jwtService.generateAccessToken(user);
         RefreshTokenService.RefreshTokenResult refreshResult =
                 refreshTokenService.createRefreshToken(user.getId(), request.deviceId());
 
         return new VerifyOtpResponse(
-                "ok",
-                isNewUser,
                 accessToken,
                 jwtService.getAccessTokenExpirySeconds(),
                 refreshResult.rawToken(),
-                new UserDto(user.getId(), user.getEmail())
+                new UserDto(
+                    user.getId(),
+                    user.getEmail(),
+                    user.isNew()
+                )
         );
     }
 
