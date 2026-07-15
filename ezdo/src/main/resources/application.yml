@@ -4,11 +4,22 @@ server:
 spring:
   application:
     name: ezdo
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}        # e.g., smtp.mailtrap.io, smtp.gmail.com
+    port: ${SPRING_MAIL_PORT:1025}             # e.g., 2525, 587
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: true
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ezdo}
-    username: ${SPRING_DATASOURCE_USERNAME:ezdo}
-    password: ${SPRING_DATASOURCE_PASSWORD:ezdo}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/awan}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -19,6 +30,7 @@ spring:
         format_sql: true
         highlight_sql: true
 
+
 logging:
   level:
     org:
@@ -27,3 +39,19 @@ logging:
         orm:
           jdbc:
             bind: TRACE
+
+ezdo:
+  jwt:
+    secret: ${EZDO_JWT_SECRET:default-dev-secret-change-in-production-32chars!}
+    access-token-expiry-seconds: 900
+  otp:
+    pepper: ${EZDO_OTP_PEPPER:default-dev-pepper-change-in-production!}
+    expiry-seconds: 300
+    resend-cooldown-seconds: 30
+    max-attempts: 5
+    rate-limit-max: 3
+    rate-limit-window-minutes: 10
+  refresh-token:
+    expiry-days: 30
+  mail:
+    from: ${EZDO_MAIL_FROM:noreply@ezdo.com}
