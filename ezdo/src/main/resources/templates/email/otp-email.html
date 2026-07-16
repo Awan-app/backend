@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="margin:0; padding:0; background-color:#f4f4f4; font-family:Arial, sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; margin:40px auto; background:#ffffff; border-radius:8px; overflow:hidden;">
+    <tr>
+        <td style="background-color:#0F6E56; padding:24px; text-align:center;">
+<!--            <img src="cid:ezdoLogo" alt="EZDO" width="120" style="display:block; margin:0 auto;" />-->
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:32px; text-align:center;">
+            <h2 style="color:#1F2937; margin-top:0;">Your verification code</h2>
+            <p style="color:#555555; font-size:15px;">Enter this code to continue signing in to EZDO.</p>
+            <div style="font-size:32px; font-weight:bold; letter-spacing:6px; color:#0F6E56; margin:24px 0;">
+                <span th:text="${code}">483920</span>
+            </div>
+            <p style="color:#888888; font-size:13px;">This code expires in 5 minutes. If you didn't request this, you can ignore this email.</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="background-color:#fafafa; padding:16px; text-align:center;">
+            <p style="color:#aaaaaa; font-size:12px; margin:0;">© 2026 EZDO. All rights reserved.</p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

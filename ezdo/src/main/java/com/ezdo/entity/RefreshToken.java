@@ -12,33 +12,33 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "verification_codes",
-        indexes = @Index(name = "idx_verification_codes_email", columnList = "email")
-)
-public class VerificationCode {
+@Table(name = "refresh_tokens", indexes = {
+        @Index(name = "idx_refresh_tokens_user_id", columnList = "userId"),
+        @Index(name = "idx_refresh_tokens_token_hash", columnList = "tokenHash")
+})
+public class RefreshToken {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    private String email;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
-    @Column(name = "code_hash", nullable = false)
-    private String codeHash;
+    @Column(name = "device_id", nullable = false)
+    private UUID deviceId;
+
+    @Column(name = "token_hash", nullable = false)
+    private String tokenHash;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
+    @Column(name = "revoked_at")
+    private Instant revokedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
-
-    private int attempts = 0;
-
-    private boolean consumed = false;
-
-    private boolean locked = false;
 
     @PrePersist
     protected void onCreate() {
