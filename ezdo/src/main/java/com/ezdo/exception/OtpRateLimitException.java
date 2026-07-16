@@ -9,7 +9,7 @@ public class OtpRateLimitException extends ApplicationException {
             "Too many OTP requests. Please try again later.",
             429,
             ErrorCodes.OTP_RATE_LIMIT_EXCEEDED,
-            Map.of("retry_after_seconds", retryAfterSeconds)
+            Map.of("retryAfterSeconds", retryAfterSeconds)
         );
     }
 }

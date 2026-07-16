@@ -115,7 +115,7 @@ public class OtpService {
             throw new OtpVerificationException(
                 "Invalid OTP code.",
                 ErrorCodes.OTP_INVALID_CODE,
-                Map.of("remaining_attempts", maxAttempts - vc.getAttempts())
+                Map.of("remainingAttempts", maxAttempts - vc.getAttempts())
             );
         }
 
