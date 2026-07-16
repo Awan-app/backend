@@ -5,16 +5,16 @@ spring:
   application:
     name: ezdo
   mail:
-    host: ${SPRING_MAIL_HOST:localhost}        # e.g., smtp.mailtrap.io, smtp.gmail.com
-    port: ${SPRING_MAIL_PORT:1025}             # e.g., 2525, 587
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:1025}
     username: ${SPRING_MAIL_USERNAME:}
     password: ${SPRING_MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
-          auth: false
+          auth: ${SPRING_MAIL_AUTH:false}
           starttls:
-            enable: true
+            enable: ${SPRING_MAIL_STARTTLS:false}
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/awan}
@@ -29,7 +29,6 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
-
 
 logging:
   level:

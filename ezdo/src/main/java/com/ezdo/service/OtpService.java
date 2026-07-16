@@ -85,17 +85,17 @@ public class OtpService {
     public VerificationCode verifyOtp(String email, String code) {
         // Find latest unconsumed, unlocked code for this email
         VerificationCode vc = verificationCodeRepository
-                .findFirstByEmailAndConsumedFalseAndLockedFalseOrderByCreatedAtDesc(email)
-                .orElseThrow(() -> new OtpVerificationException(
-                        "No valid OTP found for this email. Please request a new one.",
-                        ErrorCodes.OTP_EXPIRED_OR_NOT_FOUND
-                ));
+            .findFirstByEmailAndConsumedFalseAndLockedFalseOrderByCreatedAtDesc(email)
+            .orElseThrow(() -> new OtpVerificationException(
+                "No valid OTP found for this email. Please request a new one.",
+                ErrorCodes.OTP_EXPIRED_OR_NOT_FOUND
+            ));
 
         // Check expiry
         if (vc.getExpiresAt().isBefore(Instant.now())) {
             throw new OtpVerificationException(
-                    "OTP has expired. Please request a new one.",
-                    ErrorCodes.OTP_EXPIRED_OR_NOT_FOUND
+                "OTP has expired. Please request a new one.",
+                ErrorCodes.OTP_EXPIRED_OR_NOT_FOUND
             );
         }
 

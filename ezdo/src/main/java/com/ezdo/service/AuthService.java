@@ -2,6 +2,7 @@ package com.ezdo.service;
 
 import com.ezdo.dto.*;
 import com.ezdo.entity.User;
+import com.ezdo.exception.OtpVerificationException;
 import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AuthService {
         return otpService.requestOtp(request.email());
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = OtpVerificationException.class)
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
         // Verify the OTP code
         otpService.verifyOtp(request.email(), request.code());
