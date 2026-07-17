@@ -21,6 +21,11 @@ public class ErrorCodes {
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
+    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+
+    // Onboarding / User
+    public static final String ONBOARDING_ALREADY_COMPLETED = "ONBOARDING_ALREADY_COMPLETED";
+    public static final String INVALID_TIMEZONE = "INVALID_TIMEZONE";
 
     // Fallback
     public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
