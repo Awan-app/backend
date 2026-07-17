@@ -1,7 +1,14 @@
 package com.ezdo.exception;
 
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -37,6 +45,89 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNPROCESSABLE_CONTENT.value(),
                 "VALIDATION_ERROR",
                 Map.of("errors", fieldErrors)
+        );
+    }
+
+    // Covers @Validated on @RequestParam / @PathVariable (bean validation outside the request body)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException e) {
+        List<Map<String, Object>> errors = e.getConstraintViolations().stream()
+            .map(cv -> {
+                Map<String, Object> m = new HashMap<>();
+                m.put("field", cv.getPropertyPath().toString());
+                m.put("message", cv.getMessage());
+                m.put("rejectedValue", cv.getInvalidValue());
+                return m;
+            })
+            .toList();
+
+        return buildErrorResponse(
+            "Validation failed",
+            HttpStatus.UNPROCESSABLE_CONTENT.value(),
+            ErrorCodes.VALIDATION_ERROR,
+            Map.of("errors", errors)
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleMalformedBody(HttpMessageNotReadableException e) {
+        return buildErrorResponse(
+            "Malformed or missing request body",
+            HttpStatus.BAD_REQUEST.value(),
+            ErrorCodes.MALFORMED_REQUEST_BODY,
+            Map.of()
+        );
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return buildErrorResponse(
+            e.getMessage(),
+            HttpStatus.METHOD_NOT_ALLOWED.value(),
+            ErrorCodes.METHOD_NOT_ALLOWED,
+            Map.of()
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException e) {
+        return buildErrorResponse(
+            "You do not have permission to perform this action",
+            HttpStatus.FORBIDDEN.value(),
+            ErrorCodes.ACCESS_DENIED,
+            Map.of()
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthenticationException(AuthenticationException e) {
+        return buildErrorResponse(
+            "Authentication failed",
+            HttpStatus.UNAUTHORIZED.value(),
+            ErrorCodes.AUTHENTICATION_FAILED,
+            Map.of()
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        log.warn("Data integrity violation", e);
+        return buildErrorResponse(
+            "The request could not be completed due to a data conflict",
+            HttpStatus.CONFLICT.value(),
+            ErrorCodes.DATA_INTEGRITY_VIOLATION,
+            Map.of()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGenericException(Exception e) {
+        log.error("Unhandled exception", e);
+        return buildErrorResponse(
+            "An unexpected error occurred",
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            ErrorCodes.INTERNAL_SERVER_ERROR,
+            Map.of()
         );
     }
 
