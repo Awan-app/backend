@@ -6,6 +6,25 @@ public class ErrorCodes {
 
     public static final String SOMETHING_NOT_FOUND = "SOMETHING_NOT_FOUND";
 
+    // Request / validation
+    public static final String VALIDATION_ERROR = "VALIDATION_ERROR";
+    public static final String MALFORMED_REQUEST_BODY = "MALFORMED_REQUEST_BODY";
+    public static final String MISSING_PARAMETER = "MISSING_PARAMETER";
+    public static final String TYPE_MISMATCH = "TYPE_MISMATCH";
+    public static final String ROUTE_NOT_FOUND = "ROUTE_NOT_FOUND";
+    public static final String METHOD_NOT_ALLOWED = "METHOD_NOT_ALLOWED";
+    public static final String MEDIA_TYPE_NOT_SUPPORTED = "MEDIA_TYPE_NOT_SUPPORTED";
+
+    // Security
+    public static final String ACCESS_DENIED = "ACCESS_DENIED";
+    public static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+
+    // Persistence
+    public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
+
+    // Fallback
+    public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
+
     // Auth - OTP
     public static final String OTP_RATE_LIMIT_EXCEEDED = "OTP_RATE_LIMIT_EXCEEDED";
     public static final String OTP_EXPIRED_OR_NOT_FOUND = "OTP_EXPIRED_OR_NOT_FOUND";
