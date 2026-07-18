@@ -1,20 +1,22 @@
 package com.ezdo.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "preferences")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Preferences {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @OneToOne
@@ -22,30 +24,21 @@ public class Preferences {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
     private String timezone;
 
-    @Column(nullable = false)
-    private LocalTime workingHoursStart;
+    /** Minutes */
+    private Integer preferredSessionDuration;
 
-    @Column(nullable = false)
-    private LocalTime workingHoursEnd;
+    /** Minutes */
+    private Integer bufferBetweenSessions;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "preferences_work_days", joinColumns = @JoinColumn(name = "preferences_id"))
+    @Column(name = "wakeup_time")
+    private LocalTime wakeupTime;
+
+    @Column(name = "sleep_time")
+    private LocalTime sleepTime;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "day_of_week")
-    private Set<DayOfWeek> workDays = new HashSet<>();
-
-    @Column(nullable = false)
-    private Duration preferredSessionDuration;
-
-    @Column(nullable = false)
-    private Duration maxDailyWorkload;
-
-    @Column(nullable = false)
-    private Duration bufferBetweenSessions;
-
-    @Column(nullable = false)
-    private boolean allowTaskSplitting = true;
+    @Column(name = "scheduling_type")
+    private SchedulingType schedulingType;
 }

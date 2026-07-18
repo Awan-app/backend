@@ -13,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "refresh_tokens", indexes = {
-        @Index(name = "idx_refresh_tokens_user_id", columnList = "userId"),
-        @Index(name = "idx_refresh_tokens_token_hash", columnList = "tokenHash")
+    @Index(name = "idx_refresh_tokens_user_id", columnList = "userId"),
+    @Index(name = "idx_refresh_tokens_token_hash", columnList = "tokenHash")
 })
 public class RefreshToken {
 
