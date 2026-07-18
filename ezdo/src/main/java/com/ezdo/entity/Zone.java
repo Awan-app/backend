@@ -52,6 +52,6 @@ public class Zone {
 
     // --- belongs_to (1:N) ---
     @Builder.Default
-    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "zone")
     private List<Session> sessions = new ArrayList<>();
 }
