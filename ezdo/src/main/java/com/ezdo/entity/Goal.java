@@ -37,6 +37,10 @@ public class Goal {
     @Builder.Default
     private Instant createdAt = Instant.now();
 
+    @Builder.Default
+    @Column(name = "is_inbox", nullable = false)
+    private Boolean inbox = false;
+
     // --- creates (N side) ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
