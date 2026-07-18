@@ -3,6 +3,7 @@ package com.ezdo.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -30,4 +31,14 @@ public class Preferences {
 
     /** Minutes */
     private Integer bufferBetweenSessions;
+
+    @Column(name = "wakeup_time")
+    private LocalTime wakeupTime;
+
+    @Column(name = "sleep_time")
+    private LocalTime sleepTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scheduling_type")
+    private SchedulingType schedulingType;
 }

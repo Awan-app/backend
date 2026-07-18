@@ -22,10 +22,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
     private String lastName;
 
     @Column(nullable = false, unique = true)
@@ -46,7 +44,7 @@ public class User {
     @Column(name = "is_new")
     private Boolean isNew = true;
 
-    @Column(name = "email verified at")
+    @Column(name = "email_verified_at")
     private Instant emailVerifiedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)

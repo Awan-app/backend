@@ -14,6 +14,8 @@ public class ErrorCodes {
     public static final String ROUTE_NOT_FOUND = "ROUTE_NOT_FOUND";
     public static final String METHOD_NOT_ALLOWED = "METHOD_NOT_ALLOWED";
     public static final String MEDIA_TYPE_NOT_SUPPORTED = "MEDIA_TYPE_NOT_SUPPORTED";
+    public static final String INVALID_SLEEP_SCHEDULE = "INVALID_SLEEP_SCHEDULE";
+    public static final String INSUFFICIENT_POINTS = "INSUFFICIENT_POINTS";
 
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";
@@ -21,6 +23,11 @@ public class ErrorCodes {
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
+    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+
+    // Onboarding / User
+    public static final String ONBOARDING_ALREADY_COMPLETED = "ONBOARDING_ALREADY_COMPLETED";
+    public static final String INVALID_TIMEZONE = "INVALID_TIMEZONE";
 
     // Fallback
     public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";

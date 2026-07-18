@@ -7,6 +7,7 @@ import com.ezdo.entity.Template;
 import com.ezdo.entity.User;
 import com.ezdo.exception.DayInvalidException;
 import com.ezdo.exception.TemplateNotFoundException;
+import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.TemplateRepository;
 import com.ezdo.repository.UserRepository;
@@ -27,9 +28,8 @@ public class TemplateService {
 
     public TemplateResponse createTemplate(UUID userId , CreateTemplateRequest createTemplateRequest){
 
-        //TODO:update it by using UserNotfoundException
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new TemplateNotFoundException(userId));
+                .orElseThrow(UserNotFoundException::new);
 
         if (templateRepository.existsByUserIdAndDaysOfWeekIn(
                 userId,
