@@ -28,7 +28,8 @@ public class OnboardingService {
 
     @Transactional
     public UserProfileResponse completeOnboarding(UUID userId, OnboardingRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
 
         if (!Boolean.TRUE.equals(user.getIsNew())) {
             throw new OnboardingAlreadyCompletedException();
@@ -49,9 +50,13 @@ public class OnboardingService {
         } catch (DateTimeException ex) {
             throw new InvalidTimezoneException();
         }
+
         preferences.setTimezone(request.timezone());
         preferences.setPreferredSessionDuration(request.preferredSessionDuration());
         preferences.setBufferBetweenSessions(request.bufferBetweenSessions());
+        preferences.setWakeupTime(request.wakeupTime());
+        preferences.setSleepTime(request.sleepTime());
+        preferences.setSchedulingType(request.schedulingType());
 
         userRepository.save(user);
 

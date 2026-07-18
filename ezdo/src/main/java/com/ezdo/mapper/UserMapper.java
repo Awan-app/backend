@@ -1,5 +1,6 @@
 package com.ezdo.mapper;
 
+import com.ezdo.dto.PreferencesResponse;
 import com.ezdo.dto.UpdateProfileRequest;
 import com.ezdo.dto.UserProfileResponse;
 import com.ezdo.entity.Preferences;
@@ -19,12 +20,15 @@ public class UserMapper {
         }
 
         Preferences p = user.getPreferences();
-        UserProfileResponse.PreferencesDto prefDto = null;
+        PreferencesResponse preferencesResponse = null;
         if (p != null) {
-            prefDto = new UserProfileResponse.PreferencesDto(
-                    p.getTimezone(),
-                    p.getPreferredSessionDuration(),
-                    p.getBufferBetweenSessions()
+            preferencesResponse = new PreferencesResponse(
+                p.getTimezone(),
+                p.getPreferredSessionDuration(),
+                p.getBufferBetweenSessions(),
+                p.getWakeupTime(),
+                p.getSleepTime(),
+                p.getSchedulingType()
             );
         }
 
@@ -37,7 +41,7 @@ public class UserMapper {
                 user.getPoints(),
                 user.getStreak(),
                 user.getMaxStreak(),
-                prefDto
+                preferencesResponse
         );
     }
 

@@ -12,11 +12,6 @@ public record UserProfileResponse(
         Integer points,
         Integer streak,
         Integer maxStreak,
-        PreferencesDto preferences
+        PreferencesResponse preferences
 ) {
-    public record PreferencesDto(
-            String timezone,
-            Integer preferredSessionDuration,
-            Integer bufferBetweenSessions
-    ) {}
 }
