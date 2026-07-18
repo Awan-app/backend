@@ -41,7 +41,7 @@ public class Session {
     private SessionStatus status = SessionStatus.SCHEDULED;
 
     @Builder.Default
-    private Boolean locked = false;
+    private boolean locked = false;
 
     // --- belongs_to (N side) ---
     @ManyToOne(fetch = FetchType.LAZY)

@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -43,6 +45,9 @@ public class User {
     @Builder.Default
     @Column(name = "is_new")
     private Boolean isNew = true;
+
+    @Column(name = "email verified at")
+    private Instant emailVerifiedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

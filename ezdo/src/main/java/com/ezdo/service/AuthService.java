@@ -36,7 +36,7 @@ public class AuthService {
         if (user == null) {
             user = new User();
             user.setEmail(request.email());
-            user.setNew(true);
+            user.setIsNew(true);
         }
 
         // Set email verified if not already
@@ -58,7 +58,7 @@ public class AuthService {
                 new UserDto(
                     user.getId(),
                     user.getEmail(),
-                    user.isNew()
+                    user.getIsNew() != null ? user.getIsNew() : false
                 )
         );
     }
