@@ -18,6 +18,8 @@ public class ErrorCodes {
     public static final String TASK_CYCLIC_DEPENDENCY = "TASK_CYCLIC_DEPENDENCY";
     public static final String DUPLICATE_TEMP_ID = "DUPLICATE_TEMP_ID";
     public static final String UNKNOWN_TEMP_ID = "UNKNOWN_TEMP_ID";
+    public static final String INVALID_SLEEP_SCHEDULE = "INVALID_SLEEP_SCHEDULE";
+    public static final String INSUFFICIENT_POINTS = "INSUFFICIENT_POINTS";
 
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";
@@ -25,6 +27,11 @@ public class ErrorCodes {
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
+    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+
+    // Onboarding / User
+    public static final String ONBOARDING_ALREADY_COMPLETED = "ONBOARDING_ALREADY_COMPLETED";
+    public static final String INVALID_TIMEZONE = "INVALID_TIMEZONE";
 
     // Fallback
     public static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
