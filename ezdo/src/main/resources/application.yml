@@ -42,7 +42,7 @@ logging:
 ezdo:
   jwt:
     secret: ${EZDO_JWT_SECRET:default-dev-secret-change-in-production-32chars!}
-    access-token-expiry-seconds: 900
+    access-token-expiry-seconds: 86400
   otp:
     pepper: ${EZDO_OTP_PEPPER:default-dev-pepper-change-in-production!}
     expiry-seconds: 300
