@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/day")
+@RequestMapping("/api/v1/template-overrides")
 @RequiredArgsConstructor
 public class TemplateOverrideController {
 
@@ -32,20 +32,21 @@ public class TemplateOverrideController {
     }
 
     @GetMapping("/{overrideId}")
-    public ResponseEntity<TemplateOverrideResponse> get(@PathVariable UUID overrideId) {
-        return ResponseEntity.ok(templateOverrideService.getById(overrideId));
+    public ResponseEntity<TemplateOverrideResponse> get(@AuthenticationPrincipal UUID userId, @PathVariable UUID overrideId) {
+        return ResponseEntity.ok(templateOverrideService.getById(userId, overrideId));
     }
 
     @PutMapping("/{overrideId}")
     public ResponseEntity<TemplateOverrideResponse> update(
+            @AuthenticationPrincipal UUID userId,
             @PathVariable UUID overrideId,
             @Valid @RequestBody TemplateOverrideRequest request) {
-        return ResponseEntity.ok(templateOverrideService.updateTemplate(overrideId, request));
+        return ResponseEntity.ok(templateOverrideService.updateTemplate(userId, overrideId, request));
     }
 
     @DeleteMapping("/{overrideId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID overrideId) {
-        templateOverrideService.delete(overrideId);
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UUID userId, @PathVariable UUID overrideId) {
+        templateOverrideService.delete(userId, overrideId);
         return ResponseEntity.noContent().build();
     }
 

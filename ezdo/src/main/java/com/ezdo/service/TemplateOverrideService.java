@@ -7,8 +7,12 @@ import com.ezdo.dto.UpdateTemplateRequest;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.User;
+import com.ezdo.dto.ZoneRequest;
+import com.ezdo.entity.Zone;
+import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
+import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.UserRepository;
@@ -26,16 +30,33 @@ public class TemplateOverrideService {
 
     private final TemplateOverrideRepository templateOverrideRepository;
     private final UserRepository userRepository;
+    private final ZoneMapper zoneMapper;
 
     public TemplateOverrideResponse create(UUID userId , TemplateOverrideRequest templateOverrideRequest){
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new TemplateNotFoundException(userId));
+                .orElseThrow(()->new UserNotFoundException());
 
         TemplateOverride override = TemplateOverride.builder().
                 name(templateOverrideRequest.name())
                 .dateOfDay(templateOverrideRequest.dateOfDay())
                 .user(user)
                 . build();
+
+        if (templateOverrideRequest.zones() != null) {
+            for (ZoneRequest zr : templateOverrideRequest.zones()) {
+                if (zr.startTime() == null || zr.endTime() == null || !zr.endTime().isAfter(zr.startTime())) {
+                    throw new InvalidZoneTimeRangeException(zr.startTime(), zr.endTime());
+                }
+                Zone zone = Zone.builder()
+                        .name(zr.name())
+                        .startTime(zr.startTime())
+                        .endTime(zr.endTime())
+                        .color(zr.color())
+                        .templateOverride(override)
+                        .build();
+                override.getZones().add(zone);
+            }
+        }
 
         return toResponse(templateOverrideRepository.save(override));
     }
@@ -48,23 +69,23 @@ public class TemplateOverrideService {
     }
 
     @Transactional(readOnly = true)
-    public TemplateOverrideResponse getById(UUID overrideId){
-        return toResponse(templateOverrideRepository.findById(overrideId)
+    public TemplateOverrideResponse getById(UUID userId, UUID overrideId){
+        return toResponse(templateOverrideRepository.findByIdAndUserId(overrideId, userId)
                 .orElseThrow(() -> new TemplateOverrideNotFoundException(overrideId)));
 
     }
 
-    public TemplateOverrideResponse updateTemplate(UUID overrideId, TemplateOverrideRequest request) {
-        TemplateOverride override = templateOverrideRepository.findById(overrideId)
-                .orElseThrow(()-> new TemplateNotFoundException(overrideId));
+    public TemplateOverrideResponse updateTemplate(UUID userId, UUID overrideId, TemplateOverrideRequest request) {
+        TemplateOverride override = templateOverrideRepository.findByIdAndUserId(overrideId, userId)
+                .orElseThrow(()-> new TemplateOverrideNotFoundException(overrideId));
 
         override.setName(request.name());
         override.setDateOfDay(request.dateOfDay());
         return toResponse(override);
     }
 
-    public void delete(UUID templateOverrideId) {
-        templateOverrideRepository.delete(templateOverrideRepository.findById(templateOverrideId)
+    public void delete(UUID userId, UUID templateOverrideId) {
+        templateOverrideRepository.delete(templateOverrideRepository.findByIdAndUserId(templateOverrideId, userId)
                 .orElseThrow(() -> new TemplateOverrideNotFoundException(templateOverrideId)));
     }
 
@@ -72,6 +93,6 @@ public class TemplateOverrideService {
         return new TemplateOverrideResponse(o.getId(),
                 o.getName(),
                 o.getDateOfDay(),
-                o.getZones().stream().map(ZoneMapper::toZoneResponse).toList());
+                o.getZones().stream().map(zoneMapper::toZoneResponse).toList());
     }
 }
