@@ -22,7 +22,7 @@ public class TemplateOverrideController {
 
     @PostMapping
     public ResponseEntity<TemplateOverrideResponse> create(@AuthenticationPrincipal UUID userId,
-            @Valid @RequestBody TemplateOverrideRequest request) {
+                                                           @Valid @RequestBody TemplateOverrideRequest request) {
         return ResponseEntity.ok(templateOverrideService.create(userId, request));
     }
 
@@ -38,9 +38,9 @@ public class TemplateOverrideController {
 
     @PutMapping("/{overrideId}")
     public ResponseEntity<TemplateOverrideResponse> update(
-            @AuthenticationPrincipal UUID userId,
-            @PathVariable UUID overrideId,
-            @Valid @RequestBody TemplateOverrideRequest request) {
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID overrideId,
+        @Valid @RequestBody TemplateOverrideRequest request) {
         return ResponseEntity.ok(templateOverrideService.updateTemplate(userId, overrideId, request));
     }
 
