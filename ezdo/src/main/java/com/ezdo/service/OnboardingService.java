@@ -23,7 +23,6 @@ import java.util.UUID;
 public class OnboardingService {
 
     private final UserRepository userRepository;
-    private final PreferencesRepository preferencesRepository;
     private final UserMapper userMapper;
 
     @Transactional
