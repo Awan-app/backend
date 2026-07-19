@@ -4,9 +4,15 @@ import com.ezdo.entity.SessionStatus;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotNull;
+
 public record SessionRequest(
-        LocalDateTime start ,
-        LocalDateTime end ,
+        @NotNull(message = "Start time is required")
+        LocalDateTime start,
+
+        @NotNull(message = "End time is required")
+        LocalDateTime end,
+
         SessionStatus status
 ) {
 }

@@ -27,8 +27,8 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final ZoneRepository zoneRepository;
 
-    public SessionResponse createSession(UUID zoneId, SessionRequest request) {
-        Zone zone = zoneRepository.findById(zoneId)
+    public SessionResponse createSession(UUID userId, UUID zoneId, SessionRequest request) {
+        Zone zone = zoneRepository.findByIdAndUserId(zoneId, userId)
                 .orElseThrow(() -> new ZoneNotFoundException(zoneId));
         validateTimeRange(request.start(), request.end());
 
@@ -50,13 +50,13 @@ public class SessionService {
     }
 
     @Transactional(readOnly = true)
-    public SessionResponse getById(UUID sessionId) {
-        return toResponse(sessionRepository.findById(sessionId)
+    public SessionResponse getById(UUID userId, UUID sessionId) {
+        return toResponse(sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId)));
     }
 
-    public SessionResponse update(UUID sessionId, SessionRequest request) {
-        Session session = sessionRepository.findById(sessionId)
+    public SessionResponse update(UUID userId, UUID sessionId, SessionRequest request) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId));
 
         if (session.isLocked()) {
@@ -70,8 +70,8 @@ public class SessionService {
         return toResponse(session);
     }
 
-    public SessionResponse updateStatus(UUID sessionId, SessionStatus status) {
-        Session session =  sessionRepository.findById(sessionId)
+    public SessionResponse updateStatus(UUID userId, UUID sessionId, SessionStatus status) {
+        Session session =  sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId));
 
         if (session.isLocked()) {
@@ -81,22 +81,22 @@ public class SessionService {
         return toResponse(session);
     }
 
-    public SessionResponse lock(UUID sessionId) {
-        Session session = sessionRepository.findById(sessionId)
+    public SessionResponse lock(UUID userId, UUID sessionId) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId));
         session.setLocked(true);
         return toResponse(session);
     }
 
-    public SessionResponse unlock(UUID sessionId) {
-        Session session = sessionRepository.findById(sessionId)
+    public SessionResponse unlock(UUID userId, UUID sessionId) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId));
         session.setLocked(false);
         return toResponse(session);
     }
 
-    public void delete(UUID sessionId) {
-        Session session = sessionRepository.findById(sessionId)
+    public void delete(UUID userId, UUID sessionId) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId));
         if (session.isLocked()) {
             throw new SessionLockedException(session.getId());

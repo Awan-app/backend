@@ -14,8 +14,7 @@ import java.util.UUID;
 
 /**
  * A concrete scheduled occurrence within a Zone (belongs_to, N side), which is
- * scheduled_as fulfilling one or more Tasks (M:N — a Session can cover several
- * Tasks, and a Task split across time can span several Sessions).
+ * scheduled_as fulfilling one Task (N:1 — a Session belongs to one Task).
  */
 @Entity
 @Table(name = "sessions")
