@@ -27,6 +27,7 @@ public class Task {
     private String description;
 
     /** Minutes */
+    @Column(nullable = false)
     private Integer estimatedDuration;
 
     @Enumerated(EnumType.STRING)

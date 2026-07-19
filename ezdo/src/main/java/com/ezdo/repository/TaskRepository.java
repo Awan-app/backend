@@ -1,0 +1,24 @@
+package com.ezdo.repository;
+
+import com.ezdo.entity.Task;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+public interface TaskRepository extends JpaRepository<Task, UUID> {
+
+    Optional<Task> findByIdAndGoalUserId(UUID taskId, UUID userId);
+
+    List<Task> findByGoalIdAndGoalUserId(UUID goalId, UUID userId);
+
+    @Query("select d.id from Task t join t.dependsOn d where t.id = :taskId")
+    Set<UUID> findDependsOnIds(@Param("taskId") UUID taskId);
+
+    @Query("select count(t) > 0 from Task t join t.dependsOn d where d.id = :taskId")
+    boolean existsDependentsOf(@Param("taskId") UUID taskId);
+}

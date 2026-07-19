@@ -14,6 +14,10 @@ public class ErrorCodes {
     public static final String ROUTE_NOT_FOUND = "ROUTE_NOT_FOUND";
     public static final String METHOD_NOT_ALLOWED = "METHOD_NOT_ALLOWED";
     public static final String MEDIA_TYPE_NOT_SUPPORTED = "MEDIA_TYPE_NOT_SUPPORTED";
+    public static final String INVALID_OPERATION = "INVALID_OPERATION";
+    public static final String TASK_CYCLIC_DEPENDENCY = "TASK_CYCLIC_DEPENDENCY";
+    public static final String DUPLICATE_TEMP_ID = "DUPLICATE_TEMP_ID";
+    public static final String UNKNOWN_TEMP_ID = "UNKNOWN_TEMP_ID";
     public static final String INVALID_SLEEP_SCHEDULE = "INVALID_SLEEP_SCHEDULE";
     public static final String INSUFFICIENT_POINTS = "INSUFFICIENT_POINTS";
 
@@ -23,7 +27,6 @@ public class ErrorCodes {
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
-    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
 
     // Onboarding / User
     public static final String ONBOARDING_ALREADY_COMPLETED = "ONBOARDING_ALREADY_COMPLETED";
@@ -42,4 +45,9 @@ public class ErrorCodes {
     public static final String REFRESH_TOKEN_INVALID = "REFRESH_TOKEN_INVALID";
     public static final String REFRESH_TOKEN_EXPIRED = "REFRESH_TOKEN_EXPIRED";
     public static final String REFRESH_TOKEN_REUSE_DETECTED = "REFRESH_TOKEN_REUSE_DETECTED";
+
+    // Not Found
+    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+    public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";
+    public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
 }
