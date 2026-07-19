@@ -46,6 +46,16 @@ public class ErrorCodes {
     public static final String REFRESH_TOKEN_EXPIRED = "REFRESH_TOKEN_EXPIRED";
     public static final String REFRESH_TOKEN_REUSE_DETECTED = "REFRESH_TOKEN_REUSE_DETECTED";
 
+    //zone-template
+    public static final String TEMPLATE_NOT_FOUND = "TEMPLATE_NOT_FOUND";
+    public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATEOVERRIDE_NOT_FOUND";
+    public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
+    public static final String DAY_NOT_FOUND = "DAY_NOT_FOUND";
+    public static final String DAY_ALREADY_ASSIGNED = "DAY_ALREADY_ASSIGNED";
+
+
+    public static final String SESSION_NOT_FOUND = "SESSION_NOT_FOUND";
+
     // Not Found
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
     public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";

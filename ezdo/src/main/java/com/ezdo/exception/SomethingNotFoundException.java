@@ -3,6 +3,7 @@ package com.ezdo.exception;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * This exception class is just for guidance as an example

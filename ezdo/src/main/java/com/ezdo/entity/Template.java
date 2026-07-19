@@ -23,8 +23,8 @@ public class Template {
     @Column(nullable = false)
     private String name;
 
-    @Builder.Default
-    private Instant createdAt = Instant.now();
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
@@ -45,4 +45,9 @@ public class Template {
     @Builder.Default
     @OneToMany(mappedBy = "template", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Zone> zones = new ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+    }
 }

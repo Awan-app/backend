@@ -33,8 +33,8 @@ public class TemplateOverride {
     @Column(nullable = false)
     private String name;
 
-    @Builder.Default
-    private Instant createdAt = Instant.now();
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
     @Column(nullable = false)
     private LocalDate dateOfDay; // FEAT: AI can suggest making it as default...
@@ -48,4 +48,9 @@ public class TemplateOverride {
     @Builder.Default
     @OneToMany(mappedBy = "templateOverride", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Zone> zones = new ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+    }
 }
