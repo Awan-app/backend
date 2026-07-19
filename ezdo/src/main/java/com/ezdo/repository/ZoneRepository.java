@@ -18,4 +18,12 @@ public interface ZoneRepository extends JpaRepository<Zone , UUID> {
     List<Zone> findByTemplateId(UUID templateId);
     List<Zone> findByTemplateOverrideId(UUID templateOverrideId);
 
+    @Query("""
+        SELECT z FROM Zone z 
+        LEFT JOIN z.template t 
+        LEFT JOIN z.templateOverride o 
+        WHERE z.id = :id AND (t.user.id = :userId OR o.user.id = :userId)
+    """)
+    Optional<Zone> findByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
+
 }

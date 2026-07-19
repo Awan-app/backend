@@ -16,23 +16,25 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/zone")
+@RequestMapping("/api/v1/zones")
 public class ZoneController {
 
     private final ZoneService zoneService;
 
     @PostMapping("/template/{templateId}")
     public ResponseEntity<ZoneResponse> addToTemplate(
+            @AuthenticationPrincipal UUID userId,
             @PathVariable UUID templateId,
             @Valid @RequestBody ZoneRequest request) {
-        return ResponseEntity.ok(zoneService.addZoneToTemplate(templateId, request));
+        return ResponseEntity.ok(zoneService.addZoneToTemplate(userId, templateId, request));
     }
 
     @PostMapping("/override/{overrideId}")
     public ResponseEntity<ZoneResponse> addToOverride(
+            @AuthenticationPrincipal UUID userId,
             @PathVariable UUID overrideId,
             @Valid @RequestBody ZoneRequest request) {
-        return ResponseEntity.ok(zoneService.addZoneToOverride(overrideId, request));
+        return ResponseEntity.ok(zoneService.addZoneToOverride(userId, overrideId, request));
     }
 
     @GetMapping("/template/{templateId}")
@@ -46,8 +48,8 @@ public class ZoneController {
     }
 
     @GetMapping("/{zoneId}")
-    public ResponseEntity<ZoneResponse> get(@PathVariable UUID zoneId) {
-        return ResponseEntity.ok(zoneService.getById(zoneId));
+    public ResponseEntity<ZoneResponse> get(@AuthenticationPrincipal UUID userId, @PathVariable UUID zoneId) {
+        return ResponseEntity.ok(zoneService.getById(userId, zoneId));
     }
 
     @GetMapping("/date")
@@ -62,14 +64,15 @@ public class ZoneController {
 
     @PutMapping("/{zoneId}")
     public ResponseEntity<ZoneResponse> update(
+            @AuthenticationPrincipal UUID userId,
             @PathVariable UUID zoneId,
             @Valid @RequestBody ZoneRequest request) {
-        return ResponseEntity.ok(zoneService.update(zoneId, request));
+        return ResponseEntity.ok(zoneService.update(userId, zoneId, request));
     }
 
     @DeleteMapping("/{zoneId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID zoneId) {
-        zoneService.delete(zoneId);
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UUID userId, @PathVariable UUID zoneId) {
+        zoneService.delete(userId, zoneId);
         return ResponseEntity.noContent().build();
     }
 }

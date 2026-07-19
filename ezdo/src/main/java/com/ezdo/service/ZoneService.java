@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.ezdo.mapper.ZoneMapper.toZoneResponse;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,9 +32,10 @@ public class ZoneService {
     private final ZoneRepository zoneRepository;
     private final TemplateRepository templateRepository;
     private final TemplateOverrideRepository templateOverrideRepository;
+    private final ZoneMapper zoneMapper;
 
-    public ZoneResponse addZoneToTemplate(UUID templateId, ZoneRequest request) {
-        Template template = templateRepository.findById(templateId)
+    public ZoneResponse addZoneToTemplate(UUID userId, UUID templateId, ZoneRequest request) {
+        Template template = templateRepository.findByIdAndUserId(templateId, userId)
                 .orElseThrow(()->new TemplateNotFoundException(templateId));
         validateTimeRange(request.startTime(), request.endTime());
 
@@ -48,12 +47,12 @@ public class ZoneService {
                 .template(template)
                 .build();
 
-        return toZoneResponse(zoneRepository.save(zone));
+        return zoneMapper.toZoneResponse(zoneRepository.save(zone));
 
     }
 
-    public ZoneResponse addZoneToOverride(UUID overrideId, ZoneRequest request) {
-        TemplateOverride override = templateOverrideRepository.findById(overrideId)
+    public ZoneResponse addZoneToOverride(UUID userId, UUID overrideId, ZoneRequest request) {
+        TemplateOverride override = templateOverrideRepository.findByIdAndUserId(overrideId, userId)
                 .orElseThrow(()-> new TemplateOverrideNotFoundException(overrideId));
         validateTimeRange(request.startTime(), request.endTime());
 
@@ -65,20 +64,20 @@ public class ZoneService {
                 .templateOverride(override)
                 .build();
 
-        return toZoneResponse(zoneRepository.save(zone));
+        return zoneMapper.toZoneResponse(zoneRepository.save(zone));
     }
 
     @Transactional(readOnly = true)
     public List<ZoneResponse> getByTemplate(UUID templateId) {
         return zoneRepository.findByTemplateId(templateId).stream()
-                .map(ZoneMapper::toZoneResponse)
+                .map(zoneMapper::toZoneResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ZoneResponse> getByOverride(UUID overrideId) {
         return zoneRepository.findByTemplateOverrideId(overrideId).stream()
-                .map(ZoneMapper::toZoneResponse)
+                .map(zoneMapper::toZoneResponse)
                 .toList();
     }
 
@@ -89,29 +88,29 @@ public class ZoneService {
 
         if (override.isPresent()) {
             return override.get().getZones().stream()
-                    .map(ZoneMapper::toZoneResponse)
+                    .map(zoneMapper::toZoneResponse)
                     .toList();
         }
 
         DayOfWeek dayOfWeek = date.getDayOfWeek();
 
         Template template = templateRepository
-                .findByWeeklyTemplateIdAndDayOfWeekWithZones(userId, dayOfWeek)
+                .findByUserIdAndDayOfWeekWithZones(userId, dayOfWeek)
                 .orElseThrow(() -> new ZoneNotFoundException(userId));
 
         return template.getZones().stream()
-                .map(ZoneMapper::toZoneResponse)
+                .map(zoneMapper::toZoneResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public ZoneResponse getById(UUID zoneId) {
-        return toZoneResponse(zoneRepository.findById(zoneId)
+    public ZoneResponse getById(UUID userId, UUID zoneId) {
+        return zoneMapper.toZoneResponse(zoneRepository.findByIdAndUserId(zoneId, userId)
                 .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
-    public ZoneResponse update(UUID zoneId, ZoneRequest request) {
-        Zone zone = zoneRepository.findById(zoneId)
+    public ZoneResponse update(UUID userId, UUID zoneId, ZoneRequest request) {
+        Zone zone = zoneRepository.findByIdAndUserId(zoneId, userId)
                 .orElseThrow(() -> new ZoneNotFoundException(zoneId));
 
         validateTimeRange(request.startTime(), request.endTime());
@@ -120,11 +119,11 @@ public class ZoneService {
         zone.setStartTime(request.startTime());
         zone.setEndTime(request.endTime());
         zone.setColor(request.color());
-        return toZoneResponse(zone);
+        return zoneMapper.toZoneResponse(zone);
     }
 
-    public void delete(UUID zoneId) {
-        zoneRepository.delete(zoneRepository.findById(zoneId)
+    public void delete(UUID userId, UUID zoneId) {
+        zoneRepository.delete(zoneRepository.findByIdAndUserId(zoneId, userId)
                 .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
