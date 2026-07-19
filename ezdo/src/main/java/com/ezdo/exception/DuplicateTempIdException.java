@@ -9,7 +9,7 @@ public class DuplicateTempIdException extends ApplicationException {
     public DuplicateTempIdException(String tempId) {
         super(
             "Duplicate tempId: " + tempId,
-            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.CONFLICT.value(),
             ErrorCodes.DUPLICATE_TEMP_ID,
             Map.of(
                 "tempId", tempId

@@ -54,7 +54,7 @@ public class TaskController {
     public ResponseEntity<Void> delete(@AuthenticationPrincipal UUID userId,
                                        @PathVariable UUID taskId,
                                        @RequestParam(defaultValue = "false") boolean cascade) {
-        taskService.deleteTask(taskId, taskId, cascade);
+        taskService.deleteTask(userId, taskId, cascade);
         return ResponseEntity.noContent().build();
     }
 

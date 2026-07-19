@@ -4,6 +4,7 @@ import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
 import com.ezdo.dto.goal.GoalUpdateRequest;
 import com.ezdo.dto.goal.TaskInfoResponse;
+import com.ezdo.dto.task.BulkAddTasksRequest;
 import com.ezdo.entity.GoalStatus;
 import com.ezdo.service.GoalService;
 import com.ezdo.service.TaskService;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,9 +43,10 @@ public class GoalController {
         @AuthenticationPrincipal UUID userId,
         @RequestParam(required = false) GoalStatus status,
         @RequestParam(defaultValue = "false") boolean includeInbox,
-        Pageable pageable
+        @RequestParam(defaultValue = "false") boolean expand,
+        @PageableDefault Pageable pageable
     ) {
-        return goalService.listGoals(userId, status, includeInbox, pageable);
+        return goalService.listGoals(userId, status, includeInbox, expand, pageable);
     }
 
     @GetMapping("/inbox")
@@ -68,6 +71,13 @@ public class GoalController {
         @PathVariable UUID goalId
     ) {
         return taskService.listTasksForGoal(userId, goalId);
+    }
+
+    @PostMapping("/{goalId}/tasks/bulk")
+    public List<TaskInfoResponse> bulkAdd(@AuthenticationPrincipal UUID userId,
+                                          @PathVariable UUID goalId,
+                                          @Valid @RequestBody BulkAddTasksRequest req) {
+        return goalService.bulkAddTasks(userId, goalId, req);
     }
 
     @PatchMapping("/{goalId}")

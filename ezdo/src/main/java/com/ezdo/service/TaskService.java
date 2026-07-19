@@ -8,12 +8,12 @@ import com.ezdo.dto.task.TaskMoveRequest;
 import com.ezdo.entity.Goal;
 import com.ezdo.entity.Task;
 import com.ezdo.entity.TaskStatus;
-import com.ezdo.exception.GoalNotFoundException;
-import com.ezdo.exception.InvalidOperationException;
-import com.ezdo.exception.TaskNotFoundException;
+import com.ezdo.entity.User;
+import com.ezdo.exception.*;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.TaskRepository;
+import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final GoalRepository goalRepository;
     private final GoalService goalService;
+    private final UserRepository userRepository;
     private final TaskMapper taskMapper;
 
     @Transactional
@@ -36,18 +37,23 @@ public class TaskService {
             .orElseThrow(() -> new GoalNotFoundException(request.goalId()))
             : goalService.getOrCreateInbox(userId);
 
+        Integer duration = request.estimatedDuration();
+        if (duration == null) {
+            duration = findUser(userId).getPreferences().getPreferredSessionDuration();
+        }
+
         Task task = Task.builder()
             .goal(goal)
             .title(request.title())
             .description(request.description())
-            .estimatedDuration(request.estimatedDuration())
+            .estimatedDuration(duration)
             .mandatory(Boolean.TRUE.equals(request.mandatory()))
             .estimatedPoints(request.estimatedPoints() != null ? request.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(request.allowTaskSplitting()))
             .status(TaskStatus.SCHEDULED)
             .build();
 
-        return taskMapper.toInfoResponse(task);
+        return taskMapper.toInfoResponse(taskRepository.save(task));
     }
 
     @Transactional(readOnly = true)
@@ -115,7 +121,7 @@ public class TaskService {
     public void addDependency(UUID userId, UUID taskId, TaskDependencyRequest request) {
         UUID dependsOnId = request.dependsOnTaskId();
         if (taskId.equals(dependsOnId)) {
-            throw new InvalidOperationException("A task cannot depend on itself");
+            throw new TaskCyclicDependencyException("A task cannot depend on itself");
         }
         Task task = getOwnedTask(userId, taskId);
         Task dependsOn = getOwnedTask(userId, dependsOnId);
@@ -124,7 +130,7 @@ public class TaskService {
             throw new InvalidOperationException("Dependencies must be within the same goal");
         }
         if (wouldCreateCycle(taskId, dependsOnId)) {
-            throw new InvalidOperationException("This dependency would create a cycle");
+            throw new TaskCyclicDependencyException("This dependency would create a cycle");
         }
         task.getDependsOn().add(dependsOn);
     }
@@ -149,6 +155,11 @@ public class TaskService {
         return task.getDependentTasks().stream()
             .map(taskMapper::toInfoResponse)
             .toList();
+    }
+
+    private User findUser(UUID userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     private Task getOwnedTask(UUID userId, UUID taskId) {

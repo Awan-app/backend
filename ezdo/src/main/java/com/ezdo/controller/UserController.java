@@ -25,7 +25,10 @@ public class UserController {
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<UserProfileResponse> updateProfile(@AuthenticationPrincipal UUID userId, @RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<UserProfileResponse> updateProfile(
+        @AuthenticationPrincipal UUID userId,
+        @Valid @RequestBody UpdateProfileRequest request
+    ) {
         return ResponseEntity.ok(userService.updateProfile(userId, request));
     }
 

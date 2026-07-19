@@ -27,7 +27,6 @@ public class ErrorCodes {
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
-    public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
 
     // Onboarding / User
     public static final String ONBOARDING_ALREADY_COMPLETED = "ONBOARDING_ALREADY_COMPLETED";
