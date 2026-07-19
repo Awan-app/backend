@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/template")
+@RequestMapping("/api/v1/templates")
 @RequiredArgsConstructor
 public class TemplateController {
 
@@ -34,8 +34,8 @@ public class TemplateController {
     }
 
     @GetMapping("/{templateId}")
-    public ResponseEntity<TemplateResponse>get(@PathVariable UUID templateId){
-        return ResponseEntity.ok(templateService.getTemplateById(templateId));
+    public ResponseEntity<TemplateResponse>get(@AuthenticationPrincipal UUID userId, @PathVariable UUID templateId){
+        return ResponseEntity.ok(templateService.getTemplateById(userId, templateId));
     }
 
     @PutMapping("/{templateId}")
@@ -46,8 +46,8 @@ public class TemplateController {
     }
 
     @DeleteMapping("/{templateId}")
-    public ResponseEntity<Void>delete(@PathVariable UUID templateId){
-        templateService.deleteTemplate(templateId);
+    public ResponseEntity<Void>delete(@AuthenticationPrincipal UUID userId, @PathVariable UUID templateId){
+        templateService.deleteTemplate(userId, templateId);
         return ResponseEntity.noContent().build();
 
     }

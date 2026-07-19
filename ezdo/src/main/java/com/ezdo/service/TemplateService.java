@@ -5,7 +5,10 @@ import com.ezdo.dto.TemplateResponse;
 import com.ezdo.dto.UpdateTemplateRequest;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.User;
+import com.ezdo.dto.ZoneRequest;
+import com.ezdo.entity.Zone;
 import com.ezdo.exception.DayInvalidException;
+import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.ZoneMapper;
@@ -25,24 +28,39 @@ public class TemplateService {
 
     private final TemplateRepository templateRepository;
     private final UserRepository userRepository;
+    private final ZoneMapper zoneMapper;
 
     public TemplateResponse createTemplate(UUID userId , CreateTemplateRequest createTemplateRequest){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        if (templateRepository.existsByUserIdAndDaysOfWeekIn(
-                userId,
-                createTemplateRequest.daysOfWeek())) {
-
-            throw new DayInvalidException(createTemplateRequest.daysOfWeek());
+        if (createTemplateRequest.daysOfWeek() != null && !createTemplateRequest.daysOfWeek().isEmpty()) {
+            if (templateRepository.existsByUserIdAndDaysOfWeekIn(
+                    userId,
+                    createTemplateRequest.daysOfWeek())) {
+                throw new DayInvalidException(createTemplateRequest.daysOfWeek());
+            }
         }
 
         Template template = Template.builder()
                 .name(createTemplateRequest.name())
-                .daysOfWeek(createTemplateRequest.daysOfWeek())
+                .daysOfWeek(createTemplateRequest.daysOfWeek() != null ? createTemplateRequest.daysOfWeek() : java.util.Collections.emptySet())
                 .user(user)
                 .build();
+
+        if (createTemplateRequest.zones() != null) {
+            for (ZoneRequest zr : createTemplateRequest.zones()) {
+                Zone zone = Zone.builder()
+                        .name(zr.name())
+                        .startTime(zr.startTime())
+                        .endTime(zr.endTime())
+                        .color(zr.color())
+                        .template(template)
+                        .build();
+                template.getZones().add(zone);
+            }
+        }
 
        return toResponse(templateRepository.save(template));
 
@@ -56,14 +74,14 @@ public class TemplateService {
     }
 
     @Transactional(readOnly = true)
-    public TemplateResponse getTemplateById(UUID templateId) {
-       Template template = templateRepository.findById(templateId)
+    public TemplateResponse getTemplateById(UUID userId, UUID templateId) {
+       Template template = templateRepository.findByIdAndUserId(templateId, userId)
                 .orElseThrow(() -> new TemplateNotFoundException(templateId));
         return toResponse(template);
     }
 
     public TemplateResponse updateTemplate( UUID userId, UUID templateId, UpdateTemplateRequest request) {
-        Template template = templateRepository.findById(templateId)
+        Template template = templateRepository.findByIdAndUserId(templateId, userId)
                 .orElseThrow(()-> new TemplateNotFoundException(templateId));
 
         if (templateRepository.existsByUserIdAndIdNotAndDaysOfWeekIn(
@@ -79,16 +97,29 @@ public class TemplateService {
         return toResponse(template);
     }
 
-    public void deleteTemplate(UUID templateId) {
-        Template template = templateRepository.findById(templateId)
+    public void deleteTemplate(UUID userId, UUID templateId) {
+        Template template = templateRepository.findByIdAndUserId(templateId, userId)
                         .orElseThrow(()-> new TemplateNotFoundException(templateId));
         templateRepository.delete(template);
     }
+
+//    private void reassignDays(UUID userId, java.util.Set<java.time.DayOfWeek> days, UUID excludeTemplateId) {
+//        List<Template> conflictingTemplates = templateRepository.findTemplatesWithConflictingDays(userId, days);
+//        for (Template t : conflictingTemplates) {
+//            if (excludeTemplateId != null && t.getId().equals(excludeTemplateId)) {
+//                continue;
+//            }
+//            t.getDaysOfWeek().removeAll(days);
+//            if (t.getDaysOfWeek().isEmpty()) {
+//                templateRepository.delete(t);
+//            }
+//        }
+//    }
 
     private TemplateResponse toResponse(Template t) {
         return new TemplateResponse(t.getId(),
                 t.getName(),
                 t.getDaysOfWeek(),
-                t.getZones().stream().map(ZoneMapper::toZoneResponse).toList());
+                t.getZones().stream().map(zoneMapper::toZoneResponse).toList());
     }
 }

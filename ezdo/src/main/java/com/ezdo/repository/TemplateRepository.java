@@ -19,6 +19,10 @@ import java.util.function.Function;
 
 public interface TemplateRepository extends JpaRepository<Template, UUID> {
     List<Template> findByUserId(UUID userId);
+    Optional<Template> findByIdAndUserId(UUID id, UUID userId);
+
+    @Query("SELECT t FROM Template t JOIN t.daysOfWeek d WHERE t.user.id = :userId AND d IN :days")
+    List<Template> findTemplatesWithConflictingDays(UUID userId, Set<DayOfWeek> days);
 
     @Query("""
 SELECT COUNT(t) > 0
@@ -48,9 +52,9 @@ AND d IN :daysOfWeek
     FROM Template t
     JOIN FETCH t.zones
     JOIN t.daysOfWeek d
-    WHERE t.id = :templateId
+    WHERE t.user.id = :userId
       AND d = :dayOfWeek
 """)
-    Optional<Template> findByWeeklyTemplateIdAndDayOfWeekWithZones(@Param("templateId") UUID templateId, @Param("dayOfWeek") DayOfWeek dayOfWeek);
+    Optional<Template> findByUserIdAndDayOfWeekWithZones(@Param("userId") UUID userId, @Param("dayOfWeek") DayOfWeek dayOfWeek);
 
 }

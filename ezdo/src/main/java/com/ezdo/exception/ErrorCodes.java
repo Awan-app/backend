@@ -48,6 +48,9 @@ public class ErrorCodes {
     public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATEOVERRIDE_NOT_FOUND";
     public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
     public static final String DAY_NOT_FOUND = "DAY_NOT_FOUND";
+    public static final String DAY_ALREADY_ASSIGNED = "DAY_ALREADY_ASSIGNED";
+
+
     public static final String SESSION_NOT_FOUND = "SESSION_NOT_FOUND";
 
 }
