@@ -25,12 +25,12 @@ public interface TemplateRepository extends JpaRepository<Template, UUID> {
     List<Template> findTemplatesWithConflictingDays(UUID userId, Set<DayOfWeek> days);
 
     @Query("""
-SELECT COUNT(t) > 0
-FROM Template t
-JOIN t.daysOfWeek d
-WHERE t.user.id = :userId
-AND d IN :days
-""")
+        SELECT COUNT(t) > 0
+        FROM Template t
+        JOIN t.daysOfWeek d
+        WHERE t.user.id = :userId
+        AND d IN :days
+    """)
     boolean existsByUserIdAndDaysOfWeekIn(UUID userId , Set<DayOfWeek> days);
 
 

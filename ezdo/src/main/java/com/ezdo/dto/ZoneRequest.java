@@ -6,15 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ZoneRequest(
-        @NotBlank(message = "Zone name is required")
-        String name,
+    @NotBlank(message = "Zone name is required")
+    String name,
 
-        @NotNull(message = "Start time is required")
-        LocalTime startTime,
+    @NotNull(message = "Start time is required")
+    LocalTime startTime,
 
-        @NotNull(message = "End time is required")
-        LocalTime endTime,
+    @NotNull(message = "End time is required")
+    LocalTime endTime,
 
-        String color
+    String color
 ) {
 }

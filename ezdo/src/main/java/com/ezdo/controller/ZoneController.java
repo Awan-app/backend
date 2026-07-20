@@ -21,44 +21,18 @@ public class ZoneController {
 
     private final ZoneService zoneService;
 
-    @PostMapping("/template/{templateId}")
-    public ResponseEntity<ZoneResponse> addToTemplate(
-            @AuthenticationPrincipal UUID userId,
-            @PathVariable UUID templateId,
-            @Valid @RequestBody ZoneRequest request) {
-        return ResponseEntity.ok(zoneService.addZoneToTemplate(userId, templateId, request));
-    }
-
-    @PostMapping("/override/{overrideId}")
-    public ResponseEntity<ZoneResponse> addToOverride(
-            @AuthenticationPrincipal UUID userId,
-            @PathVariable UUID overrideId,
-            @Valid @RequestBody ZoneRequest request) {
-        return ResponseEntity.ok(zoneService.addZoneToOverride(userId, overrideId, request));
-    }
-
-    @GetMapping("/template/{templateId}")
-    public ResponseEntity<List<ZoneResponse>> getByTemplate(@PathVariable UUID templateId) {
-        return ResponseEntity.ok(zoneService.getByTemplate(templateId));
-    }
-
-    @GetMapping("/override/{overrideId}")
-    public ResponseEntity<List<ZoneResponse>> getByOverride(@PathVariable UUID overrideId) {
-        return ResponseEntity.ok(zoneService.getByOverride(overrideId));
-    }
-
     @GetMapping("/{zoneId}")
     public ResponseEntity<ZoneResponse> get(@AuthenticationPrincipal UUID userId, @PathVariable UUID zoneId) {
         return ResponseEntity.ok(zoneService.getById(userId, zoneId));
     }
 
-    @GetMapping("/date")
+    @GetMapping("/date/{date}")
     public ResponseEntity<List<ZoneResponse>> getZonesByDate(
-            @AuthenticationPrincipal UUID userId,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate date) {
-
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate date
+    ) {
         return ResponseEntity.ok(zoneService.getZonesByDate(userId, date));
     }
 

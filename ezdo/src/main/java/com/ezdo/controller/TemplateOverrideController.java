@@ -2,10 +2,12 @@ package com.ezdo.controller;
 
 import com.ezdo.dto.TemplateOverrideRequest;
 import com.ezdo.dto.TemplateOverrideResponse;
+import com.ezdo.dto.ZoneRequest;
+import com.ezdo.dto.ZoneResponse;
 import com.ezdo.service.TemplateOverrideService;
+import com.ezdo.service.ZoneService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +21,20 @@ import java.util.UUID;
 public class TemplateOverrideController {
 
     private final TemplateOverrideService templateOverrideService;
+    private final ZoneService zoneService;
 
     @PostMapping
     public ResponseEntity<TemplateOverrideResponse> create(@AuthenticationPrincipal UUID userId,
                                                            @Valid @RequestBody TemplateOverrideRequest request) {
         return ResponseEntity.ok(templateOverrideService.create(userId, request));
+    }
+
+    @PostMapping("/{overrideId}/zones")
+    public ResponseEntity<ZoneResponse> addToOverride(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID overrideId,
+        @Valid @RequestBody ZoneRequest request) {
+        return ResponseEntity.ok(zoneService.addZoneToOverride(userId, overrideId, request));
     }
 
     @GetMapping
@@ -36,11 +47,16 @@ public class TemplateOverrideController {
         return ResponseEntity.ok(templateOverrideService.getById(userId, overrideId));
     }
 
+    @GetMapping("/{overrideId}/zones")
+    public ResponseEntity<List<ZoneResponse>> getByOverride(@AuthenticationPrincipal UUID userId,
+                                                            @PathVariable UUID overrideId) {
+        return ResponseEntity.ok(zoneService.getByTemplateOverride(userId, overrideId));
+    }
+
     @PutMapping("/{overrideId}")
-    public ResponseEntity<TemplateOverrideResponse> update(
-        @AuthenticationPrincipal UUID userId,
-        @PathVariable UUID overrideId,
-        @Valid @RequestBody TemplateOverrideRequest request) {
+    public ResponseEntity<TemplateOverrideResponse> update(@AuthenticationPrincipal UUID userId,
+                                                           @PathVariable UUID overrideId,
+                                                           @Valid @RequestBody TemplateOverrideRequest request) {
         return ResponseEntity.ok(templateOverrideService.updateTemplate(userId, overrideId, request));
     }
 
@@ -49,6 +65,4 @@ public class TemplateOverrideController {
         templateOverrideService.delete(userId, overrideId);
         return ResponseEntity.noContent().build();
     }
-
-
 }

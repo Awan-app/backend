@@ -4,7 +4,7 @@
     "name": "Awan",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "38465583",
-    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** \u2013 no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing/invalid/expired JWT |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse \u2013 all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
+    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** \u2013 no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing/invalid/expired JWT |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse \u2013 all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
   },
   "item": [
     {
@@ -1315,6 +1315,580 @@
       ]
     },
     {
+      "name": "Templates",
+      "description": "Weekly recurring schedule templates. Each template defines a set of days-of-week it applies to and contains time-block zones.\n\n**Day Conflict Rule:** A day-of-week can only belong to ONE template. Creating/updating a template with a day already assigned to another template is rejected with `DAY_ALREADY_ASSIGNED`.",
+      "item": [
+        {
+          "name": "Create Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"TUESDAY\",\n    \"WEDNESDAY\",\n    \"THURSDAY\",\n    \"FRIDAY\"\n  ],\n  \"zones\": [\n    {\n      \"name\": \"Morning Focus\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"11:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"Afternoon Work\",\n      \"startTime\": \"13:00:00\",\n      \"endTime\": \"17:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates"
+              ]
+            },
+            "description": "Create a new weekly template with optional zones.\n\n**Request Body:**\n- `name` (string, required) \u2013 Template name.\n- `daysOfWeek` (Set of DayOfWeek, optional) \u2013 Days this template applies to. Values: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. Each day can only belong to one template.\n- `zones` (array, optional) \u2013 Max 50 zones. Each item:\n  - `name` (string, required) \u2013 Zone name.\n  - `startTime` (LocalTime, required) \u2013 Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) \u2013 Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) \u2013 Hex color code (e.g., `#4CAF50`).\n\n**Response (200):** `TemplateResponse`\n- `id` (UUID) \u2013 Template ID.\n- `name` (string) \u2013 Template name.\n- `daysOfWeek` (Set of DayOfWeek) \u2013 Active days.\n- `zones` (array) \u2013 List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2013 Missing/ invalid fields.\n- `DAY_ALREADY_ASSIGNED` (409) \u2013 One or more days are already used by another template.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"template-uuid-here\",\n  \"name\": \"Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"TUESDAY\",\n    \"WEDNESDAY\",\n    \"THURSDAY\",\n    \"FRIDAY\"\n  ],\n  \"zones\": [\n    {\n      \"id\": \"zone-uuid-1\",\n      \"name\": \"Morning Focus\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"11:00:00\",\n      \"color\": \"#4CAF50\",\n      \"templateId\": \"template-uuid-here\",\n      \"templateOverrideId\": null\n    },\n    {\n      \"id\": \"zone-uuid-2\",\n      \"name\": \"Afternoon Work\",\n      \"startTime\": \"13:00:00\",\n      \"endTime\": \"17:00:00\",\n      \"color\": \"#2196F3\",\n      \"templateId\": \"template-uuid-here\",\n      \"templateOverrideId\": null\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates"
+              ]
+            },
+            "description": "List all templates for the authenticated user.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `TemplateResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT."
+          }
+        },
+        {
+          "name": "Get Template",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates/{{templateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates",
+                "{{templateId}}"
+              ]
+            },
+            "description": "Get a single template by ID with its zones.\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Response (200):** `TemplateResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found or does not belong to user."
+          }
+        },
+        {
+          "name": "Update Template",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"WEDNESDAY\",\n    \"FRIDAY\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates/{{templateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates",
+                "{{templateId}}"
+              ]
+            },
+            "description": "Update template name and days-of-week. Zones are managed separately.\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 New name.\n- `daysOfWeek` (Set of DayOfWeek, required) \u2013 New set of days.\n\n**Note:** Updating to a day that's already assigned to another template will be rejected.\n\n**Response (200):** `TemplateResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `DAY_ALREADY_ASSIGNED` (409) \u2013 One or more days already belong to another template."
+          }
+        },
+        {
+          "name": "Delete Template",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates/{{templateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates",
+                "{{templateId}}"
+              ]
+            },
+            "description": "Delete a template and all its zones (cascaded).\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Response:** `204 No Content`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found / not owned."
+          }
+        },
+        {
+          "name": "Add Zone to Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Evening Review\",\n  \"startTime\": \"18:00:00\",\n  \"endTime\": \"19:00:00\",\n  \"color\": \"#FF9800\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates/{{templateId}}/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates",
+                "{{templateId}}",
+                "zones"
+              ]
+            },
+            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) \u2013 Zone ID.\n- `name` (string) \u2013 Zone name.\n- `startTime` (LocalTime) \u2013 Start time.\n- `endTime` (LocalTime) \u2013 End time.\n- `color` (string or null) \u2013 Hex color.\n- `templateId` (UUID or null) \u2013 Parent template ID.\n- `templateOverrideId` (UUID or null) \u2013 Parent override ID (null for template zones).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"zone-uuid-3\",\n  \"name\": \"Evening Review\",\n  \"startTime\": \"18:00:00\",\n  \"endTime\": \"19:00:00\",\n  \"color\": \"#FF9800\",\n  \"templateId\": \"template-uuid-here\",\n  \"templateOverrideId\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Template Zones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/templates/{{templateId}}/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "templates",
+                "{{templateId}}",
+                "zones"
+              ]
+            },
+            "description": "Get all zones for a template. Only returns zones if the template belongs to you.\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found or does not belong to user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Template Overrides",
+      "description": "One-off schedule overrides for a specific date. When both a template and an override exist for the same date, the override takes priority.\n\nEach override has its own set of zones independent of the template's zones.",
+      "item": [
+        {
+          "name": "Create Override",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-25\",\n  \"zones\": [\n    {\n      \"name\": \"Leisure Morning\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"Family Time\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"18:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides"
+              ]
+            },
+            "description": "Create a one-off override for a specific date with optional zones.\n\n**Request Body:**\n- `name` (string, optional) \u2013 Override name.\n- `dateOfDay` (LocalDate, required) \u2013 The date this override applies to. Format: `YYYY-MM-DD`.\n- `zones` (array, optional) \u2013 Zones for this override. Each item:\n  - `name` (string, required) \u2013 Zone name.\n  - `startTime` (LocalTime, required) \u2013 Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) \u2013 Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `TemplateOverrideResponse`\n- `id` (UUID) \u2013 Override ID.\n- `name` (string) \u2013 Override name.\n- `dateOfDay` (LocalDate) \u2013 The target date.\n- `zones` (array) \u2013 List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"override-uuid-here\",\n  \"name\": \"Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-25\",\n  \"zones\": [\n    {\n      \"id\": \"zone-uuid-4\",\n      \"name\": \"Leisure Morning\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#E91E63\",\n      \"templateId\": null,\n      \"templateOverrideId\": \"override-uuid-here\"\n    },\n    {\n      \"id\": \"zone-uuid-5\",\n      \"name\": \"Family Time\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"18:00:00\",\n      \"color\": \"#9C27B0\",\n      \"templateId\": null,\n      \"templateOverrideId\": \"override-uuid-here\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Overrides",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides"
+              ]
+            },
+            "description": "List all template overrides for the authenticated user.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `TemplateOverrideResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT."
+          }
+        },
+        {
+          "name": "Get Override",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides/{{overrideId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides",
+                "{{overrideId}}"
+              ]
+            },
+            "description": "Get a single override by ID with its zones.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Response (200):** `TemplateOverrideResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found or does not belong to user."
+          }
+        },
+        {
+          "name": "Update Override",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-26\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides/{{overrideId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides",
+                "{{overrideId}}"
+              ]
+            },
+            "description": "Update the name and/or date of an override. Zones are managed separately.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Request Body:**\n- `name` (string, optional) \u2013 New name.\n- `dateOfDay` (LocalDate, required) \u2013 New date. Format: `YYYY-MM-DD`.\n\n**Response (200):** `TemplateOverrideResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields."
+          }
+        },
+        {
+          "name": "Delete Override",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides/{{overrideId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides",
+                "{{overrideId}}"
+              ]
+            },
+            "description": "Delete an override and all its zones (cascaded).\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Response:** `204 No Content`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found / not owned."
+          }
+        },
+        {
+          "name": "Add Zone to Override",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Extra Slot\",\n  \"startTime\": \"20:00:00\",\n  \"endTime\": \"21:00:00\",\n  \"color\": \"#00BCD4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides/{{overrideId}}/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides",
+                "{{overrideId}}",
+                "zones"
+              ]
+            },
+            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+          }
+        },
+        {
+          "name": "Get Override Zones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/template-overrides/{{overrideId}}/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "template-overrides",
+                "{{overrideId}}",
+                "zones"
+              ]
+            },
+            "description": "Get all zones for an override. Only returns zones if the override belongs to you.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found or does not belong to user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Zones",
+      "description": "Time blocks that belong to either a Template (recurring) or a Template Override (one-off). Zones define the user's available time slots, which are later realized as Sessions.\n\n**Zone Resolution:** When fetching zones by date (`GET /zones/date/{date}`), the system first checks if a Template Override exists for that date (highest priority). If not, it falls back to the Template matching the day-of-week. If neither exists, returns an empty list.",
+      "item": [
+        {
+          "name": "Get Zone",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "zones",
+                "{{zoneId}}"
+              ]
+            },
+            "description": "Get a single zone by ID.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) \u2013 Zone identifier.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) \u2013 Zone ID.\n- `name` (string) \u2013 Zone name.\n- `startTime` (LocalTime) \u2013 Start time.\n- `endTime` (LocalTime) \u2013 End time.\n- `color` (string or null) \u2013 Hex color.\n- `templateId` (UUID or null) \u2013 Parent template ID (null if belongs to an override).\n- `templateOverrideId` (UUID or null) \u2013 Parent override ID (null if belongs to a template).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) \u2013 Zone not found or does not belong to user."
+          }
+        },
+        {
+          "name": "Get Zones by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/zones/date/2026-07-20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "zones",
+                "date",
+                "2026-07-20"
+              ]
+            },
+            "description": "Get the effective zones for a specific date. Resolution order:\n1. If a **Template Override** exists for this date \u2192 return its zones.\n2. Else if a **Template** matches the day-of-week \u2192 return its zones.\n3. Otherwise \u2192 return empty list.\n\n**Path Parameters:**\n- `date` (LocalDate, required) \u2013 Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format (must be `YYYY-MM-DD`)."
+          }
+        },
+        {
+          "name": "Update Zone",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Focus Time\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"color\": \"#673AB7\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "zones",
+                "{{zoneId}}"
+              ]
+            },
+            "description": "Update a zone's name, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) \u2013 Zone identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) \u2013 Zone not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+          }
+        },
+        {
+          "name": "Delete Zone",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "zones",
+                "{{zoneId}}"
+              ]
+            },
+            "description": "Delete a zone.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) \u2013 Zone identifier.\n\n**Response:** `204 No Content`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) \u2013 Zone not found / not owned."
+          }
+        }
+      ]
+    },
+    {
       "name": "System",
       "description": "Health check and utility endpoints.",
       "item": [
@@ -1394,6 +1968,18 @@
     },
     {
       "key": "dependsOnTaskId",
+      "value": ""
+    },
+    {
+      "key": "templateId",
+      "value": ""
+    },
+    {
+      "key": "overrideId",
+      "value": ""
+    },
+    {
+      "key": "zoneId",
       "value": ""
     }
   ]

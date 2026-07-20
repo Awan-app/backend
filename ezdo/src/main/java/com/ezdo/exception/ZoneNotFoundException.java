@@ -7,12 +7,12 @@ public class ZoneNotFoundException extends ApplicationException{
 
     public ZoneNotFoundException(UUID zoneId) {
         super(
-                "Zone with id=" + zoneId + " not found",
-                404,
-                ErrorCodes.ZONE_NOT_FOUND,
-                Map.of(
-                        "zoneId", zoneId
-                )
+            "Zone with id=" + zoneId + " not found",
+            404,
+            ErrorCodes.ZONE_NOT_FOUND,
+            Map.of(
+                    "zoneId", zoneId
+            )
         );
     }
 }

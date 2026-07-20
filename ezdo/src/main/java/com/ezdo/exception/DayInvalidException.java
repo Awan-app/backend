@@ -10,12 +10,12 @@ public class DayInvalidException extends ApplicationException{
 
     public DayInvalidException(Set<DayOfWeek> days) {
         super(
-                "The following days already belong to another weekly template" + days + " not found",
-                HttpStatus.CONFLICT.value(),
-                ErrorCodes.DAY_ALREADY_ASSIGNED,
-                Map.of(
-                        "days", days
-                )
+            "The following days already belong to another weekly template " + days,
+            HttpStatus.CONFLICT.value(),
+            ErrorCodes.DAY_ALREADY_ASSIGNED,
+            Map.of(
+                "days", days
+            )
         );
     }
 }
