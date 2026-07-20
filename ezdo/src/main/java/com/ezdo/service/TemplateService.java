@@ -11,6 +11,7 @@ import com.ezdo.exception.DayInvalidException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
+import java.time.LocalTime;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.TemplateRepository;
 import com.ezdo.repository.UserRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -30,34 +32,32 @@ public class TemplateService {
     private final UserRepository userRepository;
     private final ZoneMapper zoneMapper;
 
-    public TemplateResponse createTemplate(UUID userId , CreateTemplateRequest createTemplateRequest){
-
+    public TemplateResponse createTemplate(UUID userId, CreateTemplateRequest request){
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (createTemplateRequest.daysOfWeek() != null && !createTemplateRequest.daysOfWeek().isEmpty()) {
-            if (templateRepository.existsByUserIdAndDaysOfWeekIn(
-                    userId,
-                    createTemplateRequest.daysOfWeek())) {
-                throw new DayInvalidException(createTemplateRequest.daysOfWeek());
+        if (request.daysOfWeek() != null && !request.daysOfWeek().isEmpty()) {
+            if (templateRepository.existsByUserIdAndDaysOfWeekIn(userId, request.daysOfWeek())) {
+                throw new DayInvalidException(request.daysOfWeek());
             }
         }
 
         Template template = Template.builder()
-                .name(createTemplateRequest.name())
-                .daysOfWeek(createTemplateRequest.daysOfWeek() != null ? createTemplateRequest.daysOfWeek() : java.util.Collections.emptySet())
-                .user(user)
-                .build();
+            .name(request.name())
+            .daysOfWeek(request.daysOfWeek() != null ? request.daysOfWeek() : Set.of())
+            .user(user)
+            .build();
 
-        if (createTemplateRequest.zones() != null) {
-            for (ZoneRequest zr : createTemplateRequest.zones()) {
+        if (request.zones() != null) {
+            for (ZoneRequest zr : request.zones()) {
+                validateTimeRange(zr.startTime(), zr.endTime());
                 Zone zone = Zone.builder()
-                        .name(zr.name())
-                        .startTime(zr.startTime())
-                        .endTime(zr.endTime())
-                        .color(zr.color())
-                        .template(template)
-                        .build();
+                    .name(zr.name())
+                    .startTime(zr.startTime())
+                    .endTime(zr.endTime())
+                    .color(zr.color())
+                    .template(template)
+                    .build();
                 template.getZones().add(zone);
             }
         }
@@ -69,26 +69,26 @@ public class TemplateService {
     @Transactional(readOnly = true)
     public List<TemplateResponse> getTemplatesByUser(UUID userId) {
         return templateRepository.findByUserId(userId).stream()
-                .map(this::toResponse)
-                .toList();
+            .map(this::toResponse)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public TemplateResponse getTemplateById(UUID userId, UUID templateId) {
        Template template = templateRepository.findByIdAndUserId(templateId, userId)
-                .orElseThrow(() -> new TemplateNotFoundException(templateId));
+            .orElseThrow(() -> new TemplateNotFoundException(templateId));
         return toResponse(template);
     }
 
     public TemplateResponse updateTemplate( UUID userId, UUID templateId, UpdateTemplateRequest request) {
         Template template = templateRepository.findByIdAndUserId(templateId, userId)
-                .orElseThrow(()-> new TemplateNotFoundException(templateId));
+            .orElseThrow(()-> new TemplateNotFoundException(templateId));
 
         if (templateRepository.existsByUserIdAndIdNotAndDaysOfWeekIn(
-                userId ,
-                templateId ,
-                request.daysOfWeek())) {
-
+            userId,
+            templateId,
+            request.daysOfWeek())
+        ) {
             throw new DayInvalidException(request.daysOfWeek());
         }
 
@@ -99,7 +99,7 @@ public class TemplateService {
 
     public void deleteTemplate(UUID userId, UUID templateId) {
         Template template = templateRepository.findByIdAndUserId(templateId, userId)
-                        .orElseThrow(()-> new TemplateNotFoundException(templateId));
+            .orElseThrow(()-> new TemplateNotFoundException(templateId));
         templateRepository.delete(template);
     }
 
@@ -116,10 +116,19 @@ public class TemplateService {
 //        }
 //    }
 
+    private void validateTimeRange(LocalTime start, LocalTime end) {
+        if (start == null || end == null || !end.isAfter(start)) {
+            throw new InvalidZoneTimeRangeException(start, end);
+        }
+    }
+
     private TemplateResponse toResponse(Template t) {
         return new TemplateResponse(t.getId(),
-                t.getName(),
-                t.getDaysOfWeek(),
-                t.getZones().stream().map(zoneMapper::toZoneResponse).toList());
+            t.getName(),
+            t.getDaysOfWeek(),
+            t.getZones().stream()
+                .map(zoneMapper::toZoneResponse)
+                .toList()
+        );
     }
 }

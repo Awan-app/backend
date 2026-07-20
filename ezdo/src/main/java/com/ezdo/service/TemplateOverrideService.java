@@ -2,15 +2,11 @@ package com.ezdo.service;
 
 import com.ezdo.dto.TemplateOverrideRequest;
 import com.ezdo.dto.TemplateOverrideResponse;
-import com.ezdo.dto.TemplateResponse;
-import com.ezdo.dto.UpdateTemplateRequest;
-import com.ezdo.entity.Template;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.User;
 import com.ezdo.dto.ZoneRequest;
 import com.ezdo.entity.Zone;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
-import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.ZoneMapper;
@@ -34,7 +30,7 @@ public class TemplateOverrideService {
 
     public TemplateOverrideResponse create(UUID userId , TemplateOverrideRequest templateOverrideRequest){
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         TemplateOverride override = TemplateOverride.builder().
                 name(templateOverrideRequest.name())
@@ -48,12 +44,12 @@ public class TemplateOverrideService {
                     throw new InvalidZoneTimeRangeException(zr.startTime(), zr.endTime());
                 }
                 Zone zone = Zone.builder()
-                        .name(zr.name())
-                        .startTime(zr.startTime())
-                        .endTime(zr.endTime())
-                        .color(zr.color())
-                        .templateOverride(override)
-                        .build();
+                    .name(zr.name())
+                    .startTime(zr.startTime())
+                    .endTime(zr.endTime())
+                    .color(zr.color())
+                    .templateOverride(override)
+                    .build();
                 override.getZones().add(zone);
             }
         }
