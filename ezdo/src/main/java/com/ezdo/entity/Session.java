@@ -49,6 +49,6 @@ public class Session {
 
     // --- scheduled_as (N side) ---
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_id")
+    @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 }

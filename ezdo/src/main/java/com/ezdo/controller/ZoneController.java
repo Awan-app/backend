@@ -1,7 +1,9 @@
 package com.ezdo.controller;
 
+import com.ezdo.dto.SessionResponse;
 import com.ezdo.dto.ZoneRequest;
 import com.ezdo.dto.ZoneResponse;
+import com.ezdo.service.SessionService;
 import com.ezdo.service.ZoneService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +22,19 @@ import java.util.UUID;
 public class ZoneController {
 
     private final ZoneService zoneService;
+    private final SessionService sessionService;
 
     @GetMapping("/{zoneId}")
     public ResponseEntity<ZoneResponse> get(@AuthenticationPrincipal UUID userId, @PathVariable UUID zoneId) {
         return ResponseEntity.ok(zoneService.getById(userId, zoneId));
+    }
+
+    @GetMapping("/{zoneId}/sessions")
+    public ResponseEntity<List<SessionResponse>> getByZone(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID zoneId
+    ) {
+        return ResponseEntity.ok(sessionService.getByZone(zoneId, userId));
     }
 
     @GetMapping("/date/{date}")
