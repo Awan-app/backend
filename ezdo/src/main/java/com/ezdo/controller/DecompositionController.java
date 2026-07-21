@@ -1,0 +1,38 @@
+package com.ezdo.controller;
+
+import com.ezdo.dto.ai.ChatMessage;
+import com.ezdo.dto.ai.ChatReply;
+import com.ezdo.dto.goal.GoalInfoResponse;
+import com.ezdo.service.GoalDecompositionService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/ai")
+@RequiredArgsConstructor
+public class DecompositionController {
+
+    private final GoalDecompositionService decompositionService;
+
+    @PostMapping("/goal-decompose")
+    public ChatReply sendMessage(
+            @AuthenticationPrincipal UUID userId,
+            @Valid @RequestBody ChatMessage request
+    ) {
+        return decompositionService.processMessage(userId, request);
+    }
+
+    @PostMapping("/goal-decompose/{sessionId}/confirm")
+    public ResponseEntity<GoalInfoResponse> confirm(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable UUID sessionId
+    ) {
+        GoalInfoResponse result = decompositionService.confirmDecomposition(userId, sessionId);
+        return ResponseEntity.ok(result);
+    }
+}
