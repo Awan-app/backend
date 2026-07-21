@@ -4,13 +4,11 @@ import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
-import com.ezdo.entity.Zone;
 import com.ezdo.exception.InvalidSessionTimeRangeException;
 import com.ezdo.exception.SessionLockedException;
 import com.ezdo.exception.SessionNotFoundException;
-import com.ezdo.exception.ZoneNotFoundException;
+import com.ezdo.mapper.SessionMapper;
 import com.ezdo.repository.SessionRepository;
-import com.ezdo.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,34 +23,26 @@ import java.util.UUID;
 public class SessionService {
 
     private final SessionRepository sessionRepository;
-    private final ZoneRepository zoneRepository;
+    private final SessionMapper sessionMapper;
 
-    public SessionResponse createSession(UUID userId, UUID zoneId, SessionRequest request) {
-        Zone zone = zoneRepository.findByIdAndUserId(zoneId, userId)
-                .orElseThrow(() -> new ZoneNotFoundException(zoneId));
-        validateTimeRange(request.start(), request.end());
-
-        Session session = Session.builder()
-                .start(request.start())
-                .end(request.end())
-                .status(request.status() != null ? request.status() : SessionStatus.SCHEDULED)
-                .zone(zone)
-                .build();
-
-        return toResponse(sessionRepository.save(session));
+    @Transactional(readOnly = true)
+    public List<SessionResponse> getByTask(UUID taskId, UUID userId) {
+        return sessionRepository.findByTaskIdAndUserId(taskId, userId).stream()
+                .map(sessionMapper::toResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<SessionResponse> getByZone(UUID zoneId) {
-        return sessionRepository.findByZoneId(zoneId).stream()
-                .map(this::toResponse)
+    public List<SessionResponse> getByZone(UUID zoneId, UUID userId) {
+        return sessionRepository.findByZoneIdAndUserId(zoneId, userId).stream()
+                .map(sessionMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public SessionResponse getById(UUID userId, UUID sessionId) {
-        return toResponse(sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(()->new SessionNotFoundException(sessionId)));
+        return sessionMapper.toResponse(sessionRepository.findByIdAndUserId(sessionId, userId)
+                .orElseThrow(() -> new SessionNotFoundException(sessionId)));
     }
 
     public SessionResponse update(UUID userId, UUID sessionId, SessionRequest request) {
@@ -67,37 +57,37 @@ public class SessionService {
         session.setStart(request.start());
         session.setEnd(request.end());
         if (request.status() != null) session.setStatus(request.status());
-        return toResponse(session);
+        return sessionMapper.toResponse(session);
     }
 
     public SessionResponse updateStatus(UUID userId, UUID sessionId, SessionStatus status) {
         Session session =  sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(()->new SessionNotFoundException(sessionId));
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
         if (session.isLocked()) {
             throw new SessionLockedException(session.getId());
         }
         session.setStatus(status);
-        return toResponse(session);
+        return sessionMapper.toResponse(session);
     }
 
     public SessionResponse lock(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(()->new SessionNotFoundException(sessionId));
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
         session.setLocked(true);
-        return toResponse(session);
+        return sessionMapper.toResponse(session);
     }
 
     public SessionResponse unlock(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(()->new SessionNotFoundException(sessionId));
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
         session.setLocked(false);
-        return toResponse(session);
+        return sessionMapper.toResponse(session);
     }
 
     public void delete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(()->new SessionNotFoundException(sessionId));
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
         if (session.isLocked()) {
             throw new SessionLockedException(session.getId());
         }
@@ -108,10 +98,5 @@ public class SessionService {
         if (start == null || end == null || !end.isAfter(start)) {
             throw new InvalidSessionTimeRangeException(start, end);
         }
-    }
-
-
-    private SessionResponse toResponse(Session s) {
-        return new SessionResponse(s.getId(), s.getStart(), s.getEnd(), s.getStatus(), s.isLocked(), s.getZone().getId());
     }
 }

@@ -5,6 +5,10 @@ import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
 import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
+import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.task.TaskWithSessionsRequest;
+import com.ezdo.dto.task.TaskWithSessionsResponse;
+import com.ezdo.service.SessionService;
 import com.ezdo.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +26,30 @@ import java.util.UUID;
 public class TaskController {
 
     private final TaskService taskService;
+    private final SessionService sessionService;
 
     @PostMapping
     public ResponseEntity<TaskInfoResponse> create(@AuthenticationPrincipal UUID userId,
                                                    @Valid @RequestBody TaskCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(taskService.createTask(userId, request));
+    }
+
+    @PostMapping("/with-sessions")
+    public ResponseEntity<TaskWithSessionsResponse> createWithSessions(
+        @AuthenticationPrincipal UUID userId,
+        @Valid @RequestBody TaskWithSessionsRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(taskService.createTaskWithSessions(userId, request));
+    }
+
+    @GetMapping("/{taskId}/sessions")
+    public ResponseEntity<List<SessionResponse>> getSessions(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID taskId
+    ) {
+        return ResponseEntity.ok(sessionService.getByTask(taskId, userId));
     }
 
     @GetMapping("/{taskId}")

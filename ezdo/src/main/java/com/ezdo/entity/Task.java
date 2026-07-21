@@ -65,6 +65,6 @@ public class Task {
 
     // --- scheduled_as (1:N) — inverse side, owned by Session ---
     @Builder.Default
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Session> sessions = new HashSet<>();
 }
