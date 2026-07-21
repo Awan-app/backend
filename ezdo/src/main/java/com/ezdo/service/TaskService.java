@@ -5,19 +5,27 @@ import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
 import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
+import com.ezdo.dto.task.TaskWithSessionsRequest;
+import com.ezdo.dto.task.TaskWithSessionsResponse;
 import com.ezdo.entity.Goal;
+import com.ezdo.entity.Session;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.entity.Task;
 import com.ezdo.entity.TaskStatus;
 import com.ezdo.entity.User;
+import com.ezdo.entity.Zone;
 import com.ezdo.exception.*;
+import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -28,7 +36,9 @@ public class TaskService {
     private final GoalRepository goalRepository;
     private final GoalService goalService;
     private final UserRepository userRepository;
+    private final ZoneRepository zoneRepository;
     private final TaskMapper taskMapper;
+    private final SessionMapper sessionMapper;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -54,6 +64,54 @@ public class TaskService {
             .build();
 
         return taskMapper.toInfoResponse(taskRepository.save(task));
+    }
+
+    @Transactional
+    public TaskWithSessionsResponse createTaskWithSessions(UUID userId, TaskWithSessionsRequest request) {
+        TaskCreateRequest taskReq = request.task();
+        Goal goal = (taskReq.goalId() != null)
+            ? goalRepository.findByIdAndUserId(taskReq.goalId(), userId)
+            .orElseThrow(() -> new GoalNotFoundException(taskReq.goalId()))
+            : goalService.getOrCreateInbox(userId);
+
+        Integer duration = taskReq.estimatedDuration();
+        if (duration == null) {
+            duration = findUser(userId).getPreferences().getPreferredSessionDuration();
+        }
+
+        Task task = Task.builder()
+            .goal(goal)
+            .title(taskReq.title())
+            .description(taskReq.description())
+            .estimatedDuration(duration)
+            .mandatory(Boolean.TRUE.equals(taskReq.mandatory()))
+            .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
+            .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
+            .status(TaskStatus.SCHEDULED)
+            .build();
+
+        for (var sessionReq : request.sessions()) {
+            Zone zone = null;
+            if (sessionReq.zoneId() != null) {
+                zone = zoneRepository.findByIdAndUserId(sessionReq.zoneId(), userId)
+                    .orElseThrow(() -> new ZoneNotFoundException(sessionReq.zoneId()));
+            }
+            validateSessionTimeRange(sessionReq.start(), sessionReq.end());
+            Session session = Session.builder()
+                .start(sessionReq.start())
+                .end(sessionReq.end())
+                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                .zone(zone)
+                .task(task)
+                .build();
+            task.getSessions().add(session);
+        }
+
+        Task saved = taskRepository.save(task);
+        return new TaskWithSessionsResponse(
+            taskMapper.toInfoResponse(saved),
+            saved.getSessions().stream().map(sessionMapper::toResponse).toList()
+        );
     }
 
     @Transactional(readOnly = true)
@@ -155,6 +213,12 @@ public class TaskService {
         return task.getDependentTasks().stream()
             .map(taskMapper::toInfoResponse)
             .toList();
+    }
+
+    private void validateSessionTimeRange(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null || !end.isAfter(start)) {
+            throw new InvalidSessionTimeRangeException(start, end);
+        }
     }
 
     private User findUser(UUID userId) {

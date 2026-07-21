@@ -10,15 +10,28 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SessionRepository extends JpaRepository<Session , UUID> {
-    List<Session> findByZoneId (UUID zoneId);
+    @Query("""
+        SELECT s FROM Session s
+        JOIN s.task t
+        JOIN t.goal g
+        WHERE t.id = :taskId AND g.user.id = :userId
+    """)
+    List<Session> findByTaskIdAndUserId(@Param("taskId") UUID taskId, @Param("userId") UUID userId);
 
     @Query("""
-        SELECT s FROM Session s 
-        JOIN s.zone z 
-        LEFT JOIN z.template t 
-        LEFT JOIN z.templateOverride o 
-        WHERE s.id = :id AND (t.user.id = :userId OR o.user.id = :userId)
+        SELECT s FROM Session s
+        JOIN s.task t
+        JOIN t.goal g
+        WHERE s.id = :id AND g.user.id = :userId
     """)
     Optional<Session> findByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
+    @Query("""
+        SELECT s FROM Session s
+        JOIN s.zone z
+        LEFT JOIN z.template t
+        LEFT JOIN z.templateOverride o
+        WHERE z.id = :zoneId AND (t.user.id = :userId OR o.user.id = :userId)
+    """)
+    List<Session> findByZoneIdAndUserId(@Param("zoneId") UUID zoneId, @Param("userId") UUID userId);
 }
