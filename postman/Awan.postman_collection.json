@@ -4,7 +4,7 @@
     "name": "Awan",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "38465583",
-    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** \u2013 no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing/invalid/expired JWT |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse \u2013 all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `SESSION_NOT_FOUND` | 404 | Session not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
+    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** \u2013 no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing/invalid/expired JWT |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse \u2013 all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `SESSION_NOT_FOUND` | 404 | Session not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `ZONE_OVERLAP` | 409 | Zone time range overlaps with an existing zone |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
   },
   "item": [
     {
@@ -948,7 +948,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\"task-uuid-1\"]\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
             }
           ]
         },
@@ -1148,7 +1148,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
             }
           ]
         },
@@ -1407,6 +1407,97 @@
       "description": "Session CRUD operations. Sessions are concrete scheduled occurrences within a task (and optionally a zone).\n\n**Session Statuses:** `SCHEDULED` (default on create), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Locking:** Locked sessions cannot be updated, have their status changed, or be deleted.",
       "item": [
         {
+          "name": "Get Sessions by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/date/{{date}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "date",
+                "{{date}}"
+              ]
+            },
+            "description": "Get all sessions for a specific date, sorted by start time ascending.\n\n**Path Parameters:**\n- `date` (LocalDate, required) \u2013 Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `SessionResponse`\n- `id` (UUID) \u2013 Session ID.\n- `start` (ISO datetime) \u2013 Session start.\n- `end` (ISO datetime) \u2013 Session end.\n- `status` (string) \u2013 `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) \u2013 Whether session is locked.\n- `zoneId` (UUID or null) \u2013 Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format (must be `YYYY-MM-DD`)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-22T09:00:00\",\n    \"end\": \"2026-07-22T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Sessions by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/range?startDate=2026-07-20&endDate=2026-07-22",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-07-20",
+                  "description": "Start date (inclusive). Format: YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-07-22",
+                  "description": "End date (inclusive). Format: YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "Get all sessions within a date range, grouped by date and sorted by start time ascending within each group.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | \u2014 | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | \u2014 | End date (inclusive). Format: `YYYY-MM-DD`. |\n\n**Response (200):** Map of `LocalDate` to `SessionResponse[]`\n- Keys are dates in ascending order.\n- Each value is an array of `SessionResponse` sorted by `start` ascending:\n  - `id` (UUID) \u2013 Session ID.\n  - `start` (ISO datetime) \u2013 Session start.\n  - `end` (ISO datetime) \u2013 Session end.\n  - `status` (string) \u2013 `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n  - `locked` (boolean) \u2013 Whether session is locked.\n  - `zoneId` (UUID or null) \u2013 Associated zone.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) \u2013 Required query parameter missing.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format.\n- `INVALID_OPERATION` (400) \u2013 `endDate` is before `startDate`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"2026-07-20\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n      \"start\": \"2026-07-20T09:00:00\",\n      \"end\": \"2026-07-20T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n    }\n  ],\n  \"2026-07-22\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:30:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    },\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440004\",\n      \"start\": \"2026-07-22T14:00:00\",\n      \"end\": \"2026-07-22T15:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440005\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
           "name": "Get Session",
           "request": {
             "method": "GET",
@@ -1441,7 +1532,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1489,7 +1580,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1536,7 +1627,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1576,7 +1667,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": true,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": true,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1616,7 +1707,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1846,7 +1937,7 @@
                 "zones"
               ]
             },
-            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) \u2013 Zone ID.\n- `name` (string) \u2013 Zone name.\n- `startTime` (LocalTime) \u2013 Start time.\n- `endTime` (LocalTime) \u2013 End time.\n- `color` (string or null) \u2013 Hex color.\n- `templateId` (UUID or null) \u2013 Parent template ID.\n- `templateOverrideId` (UUID or null) \u2013 Parent override ID (null for template zones).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) \u2013 Template identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) \u2013 Zone ID.\n- `name` (string) \u2013 Zone name.\n- `startTime` (LocalTime) \u2013 Start time.\n- `endTime` (LocalTime) \u2013 End time.\n- `color` (string or null) \u2013 Hex color.\n- `templateId` (UUID or null) \u2013 Parent template ID.\n- `templateOverrideId` (UUID or null) \u2013 Parent override ID (null for template zones).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) \u2013 Template not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) \u2013 Zone time range overlaps with an existing zone in this template."
           },
           "response": [
             {
@@ -2082,7 +2173,7 @@
                 "zones"
               ]
             },
-            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) \u2013 Override identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) \u2013 Override not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) \u2013 Zone time range overlaps with an existing zone in this override."
           }
         },
         {
@@ -2178,7 +2269,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
             }
           ]
         },
@@ -2194,7 +2285,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/zones/date/2026-07-20",
+              "raw": "{{baseUrl}}/v1/zones/date/{{date}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2202,10 +2293,10 @@
                 "v1",
                 "zones",
                 "date",
-                "2026-07-20"
+                "{{date}}"
               ]
             },
-            "description": "Get the effective zones for a specific date. Resolution order:\n1. If a **Template Override** exists for this date \u2192 return its zones.\n2. Else if a **Template** matches the day-of-week \u2192 return its zones.\n3. Otherwise \u2192 return empty list.\n\n**Path Parameters:**\n- `date` (LocalDate, required) \u2013 Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format (must be `YYYY-MM-DD`)."
+            "description": "Get the effective zones for a specific date, sorted by startTime ascending. Resolution order:\n1. If a **Template Override** exists for this date \u2192 return its zones.\n2. Else if a **Template** matches the day-of-week \u2192 return its zones.\n3. Otherwise \u2192 return empty list.\n\n**Path Parameters:**\n- `date` (LocalDate, required) \u2013 Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format (must be `YYYY-MM-DD`)."
           }
         },
         {
@@ -2239,7 +2330,7 @@
                 "{{zoneId}}"
               ]
             },
-            "description": "Update a zone's name, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) \u2013 Zone identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) \u2013 Zone not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`."
+            "description": "Update a zone's name, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) \u2013 Zone identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 Zone name.\n- `startTime` (LocalTime, required) \u2013 Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) \u2013 Must be after `startTime`.\n- `color` (string, optional) \u2013 Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) \u2013 Zone not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) \u2013 `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) \u2013 Zone time range overlaps with an existing zone in the same template or override."
           }
         },
         {
@@ -2362,6 +2453,14 @@
     {
       "key": "zoneId",
       "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    },
+    {
+      "key": "date",
+      "value": "2026-07-22"
     }
   ]
 }
