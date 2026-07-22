@@ -9,6 +9,7 @@ import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.ZoneNotFoundException;
+import com.ezdo.exception.ZoneOverlapException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.TemplateRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +41,7 @@ public class ZoneService {
             .orElseThrow(() -> new TemplateNotFoundException(templateId));
 
         validateTimeRange(request.startTime(), request.endTime());
+        validateNoOverlap(userId, request.startTime(), request.endTime(), templateId, null);
 
         Zone zone = Zone.builder()
             .name(request.name())
@@ -56,6 +59,7 @@ public class ZoneService {
             .orElseThrow(() -> new TemplateOverrideNotFoundException(overrideId));
 
         validateTimeRange(request.startTime(), request.endTime());
+        validateNoOverlap(userId, request.startTime(), request.endTime(), null, overrideId);
 
         Zone zone = Zone.builder()
             .name(request.name())
@@ -101,6 +105,7 @@ public class ZoneService {
         if (override.isPresent()) {
             return override.get().getZones().stream()
                 .map(zoneMapper::toZoneResponse)
+                .sorted(Comparator.comparing(ZoneResponse::startTime))
                 .toList();
         }
 
@@ -112,6 +117,7 @@ public class ZoneService {
         return template.map(value -> value
                 .getZones().stream()
                 .map(zoneMapper::toZoneResponse)
+                .sorted(Comparator.comparing(ZoneResponse::startTime))
                 .toList())
             .orElseGet(List::of);
     }
@@ -127,6 +133,11 @@ public class ZoneService {
                 .orElseThrow(() -> new ZoneNotFoundException(zoneId));
 
         validateTimeRange(request.startTime(), request.endTime());
+        if (zone.getTemplate() != null) {
+            validateNoOverlap(userId, request.startTime(), request.endTime(), zone.getTemplate().getId(), null, zoneId);
+        } else if (zone.getTemplateOverride() != null) {
+            validateNoOverlap(userId, request.startTime(), request.endTime(), null, zone.getTemplateOverride().getId(), zoneId);
+        }
 
         zone.setName(request.name());
         zone.setStartTime(request.startTime());
@@ -143,6 +154,28 @@ public class ZoneService {
     private void validateTimeRange(LocalTime start, LocalTime end) {
         if (start == null || end == null || !end.isAfter(start)) {
             throw new InvalidZoneTimeRangeException(start, end);
+        }
+    }
+
+    private void validateNoOverlap(UUID userId, LocalTime startTime, LocalTime endTime, UUID templateId, UUID overrideId) {
+        validateNoOverlap(userId, startTime, endTime, templateId, overrideId, null);
+    }
+
+    private void validateNoOverlap(UUID userId, LocalTime startTime, LocalTime endTime, UUID templateId, UUID overrideId, UUID excludeZoneId) {
+        List<Zone> existingZones;
+        if (templateId != null) {
+            existingZones = zoneRepository.findByTemplateIdAndTemplateUserId(templateId, userId);
+        } else {
+            existingZones = zoneRepository.findByTemplateOverrideIdAndTemplateOverrideUserId(overrideId, userId);
+        }
+
+        for (Zone existing : existingZones) {
+            if (existing.getId().equals(excludeZoneId)) {
+                continue;
+            }
+            if (startTime.isBefore(existing.getEndTime()) && endTime.isAfter(existing.getStartTime())) {
+                throw new ZoneOverlapException(startTime, endTime);
+            }
         }
     }
 }
