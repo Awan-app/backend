@@ -46,9 +46,9 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getByDate(UUID userId, LocalDate date) {
-        LocalDateTime dayStart = date.atStartOfDay();
-        LocalDateTime nextDayStart = date.plusDays(1).atStartOfDay();
-        return sessionRepository.findByUserIdAndDate(userId, dayStart, nextDayStart).stream()
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        return sessionRepository.findByUserIdAndDateRange(userId, start, end).stream()
                 .map(sessionMapper::toResponse)
                 .toList();
     }

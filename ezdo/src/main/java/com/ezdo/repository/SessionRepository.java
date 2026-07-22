@@ -41,19 +41,6 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         JOIN s.task t
         JOIN t.goal g
         WHERE g.user.id = :userId
-          AND s.start >= :dayStart
-          AND s.start < :nextDayStart
-        ORDER BY s.start ASC
-    """)
-    List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
-                                     @Param("dayStart") LocalDateTime dayStart,
-                                     @Param("nextDayStart") LocalDateTime nextDayStart);
-
-    @Query("""
-        SELECT s FROM Session s
-        JOIN s.task t
-        JOIN t.goal g
-        WHERE g.user.id = :userId
           AND s.start >= :startDate
           AND s.start < :endDate
         ORDER BY s.start ASC
