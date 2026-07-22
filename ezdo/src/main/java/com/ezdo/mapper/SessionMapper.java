@@ -15,7 +15,8 @@ public class SessionMapper {
             s.getEnd(),
             s.getStatus(),
             s.isLocked(),
-            s.getZone() != null ? s.getZone().getId() : null
+            s.getZone() != null ? s.getZone().getId() : null,
+            s.getTask().getId()
         );
     }
 }
