@@ -59,6 +59,7 @@ public class ErrorCodes {
     // AI / Decomposition
     public static final String GOAL_DECOMPOSITION_SESSION_NOT_FOUND = "GOAL_DECOMPOSITION_SESSION_NOT_FOUND";
     public static final String INVALID_DECOMPOSITION = "INVALID_DECOMPOSITION";
+    public static final String AI_UNAVAILABLE = "AI_UNAVAILABLE";
 
     // Not Found
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
