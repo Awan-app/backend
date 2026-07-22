@@ -12,12 +12,15 @@ import com.ezdo.service.SessionService;
 import com.ezdo.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -27,6 +30,23 @@ public class TaskController {
 
     private final TaskService taskService;
     private final SessionService sessionService;
+
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<TaskWithSessionsResponse>> getByDate(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ResponseEntity.ok(taskService.getTasksByDate(userId, date));
+    }
+
+    @GetMapping("/range")
+    public ResponseEntity<Map<LocalDate, List<TaskWithSessionsResponse>>> getByDateRange(
+        @AuthenticationPrincipal UUID userId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(taskService.getTasksByDateRange(userId, startDate, endDate));
+    }
 
     @PostMapping
     public ResponseEntity<TaskInfoResponse> create(@AuthenticationPrincipal UUID userId,

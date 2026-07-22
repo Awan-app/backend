@@ -1,5 +1,6 @@
 package com.ezdo.service;
 
+import com.ezdo.dto.SessionResponse;
 import com.ezdo.dto.goal.TaskCreateRequest;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -213,6 +215,59 @@ public class TaskService {
         return task.getDependentTasks().stream()
             .map(taskMapper::toInfoResponse)
             .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskWithSessionsResponse> getTasksByDate(UUID userId, LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);
+        return tasks.stream()
+            .map(task -> new TaskWithSessionsResponse(
+                taskMapper.toInfoResponse(task),
+                task.getSessions().stream()
+                    .filter(s -> !s.getStart().isBefore(start) && s.getStart().isBefore(end))
+                    .map(sessionMapper::toResponse)
+                    .sorted(Comparator.comparing(SessionResponse::start))
+                    .toList()
+            ))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<TaskWithSessionsResponse>> getTasksByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        if (endDate.isBefore(startDate)) {
+            throw new InvalidOperationException("endDate must not be before startDate");
+        }
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);
+
+        Map<LocalDate, List<TaskWithSessionsResponse>> result = new LinkedHashMap<>();
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalDateTime dayStart = date.atStartOfDay();
+            LocalDateTime nextDayStart = date.plusDays(1).atStartOfDay();
+
+            List<TaskWithSessionsResponse> tasksForDay = tasks.stream()
+                    .filter(task -> task.getSessions().stream()
+                            .anyMatch(s -> !s.getStart().isBefore(dayStart) && s.getStart().isBefore(nextDayStart)))
+                    .map(task -> new TaskWithSessionsResponse(
+                            taskMapper.toInfoResponse(task),
+                            task.getSessions().stream()
+                                    .filter(s -> !s.getStart().isBefore(dayStart) && s.getStart().isBefore(nextDayStart))
+                                    .map(sessionMapper::toResponse)
+                                    .sorted(Comparator.comparing(SessionResponse::start))
+                                    .toList()
+                    ))
+                    .toList();
+
+            if (!tasksForDay.isEmpty()) {
+                result.put(date, tasksForDay);
+            }
+        }
+
+        return result;
     }
 
     private void validateSessionTimeRange(LocalDateTime start, LocalDateTime end) {

@@ -11,6 +11,7 @@ public record SessionResponse(
         LocalDateTime end,
         SessionStatus status,
         boolean locked,
-        UUID zoneId
+        UUID zoneId,
+        UUID taskId
 ) {
 }

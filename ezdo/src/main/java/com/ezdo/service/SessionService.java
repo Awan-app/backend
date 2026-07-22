@@ -4,6 +4,7 @@ import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
+import com.ezdo.exception.InvalidOperationException;
 import com.ezdo.exception.InvalidSessionTimeRangeException;
 import com.ezdo.exception.SessionLockedException;
 import com.ezdo.exception.SessionNotFoundException;
@@ -13,9 +14,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +42,34 @@ public class SessionService {
         return sessionRepository.findByZoneIdAndUserId(zoneId, userId).stream()
                 .map(sessionMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SessionResponse> getByDate(UUID userId, LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        return sessionRepository.findByUserIdAndDateRange(userId, start, end).stream()
+                .map(sessionMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<SessionResponse>> getByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        if (endDate.isBefore(startDate)) {
+            throw new InvalidOperationException("endDate must not be before startDate");
+        }
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        List<SessionResponse> sessions = sessionRepository.findByUserIdAndDateRange(userId, start, end).stream()
+                .map(sessionMapper::toResponse)
+                .toList();
+
+        return sessions.stream()
+                .collect(Collectors.groupingBy(
+                        s -> s.start().toLocalDate(),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
     }
 
     @Transactional(readOnly = true)

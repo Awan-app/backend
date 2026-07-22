@@ -6,10 +6,14 @@ import com.ezdo.entity.SessionStatus;
 import com.ezdo.service.SessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,6 +22,25 @@ import java.util.UUID;
 public class SessionController {
 
     private final SessionService sessionService;
+
+    @GetMapping("/range")
+    public ResponseEntity<Map<LocalDate, List<SessionResponse>>> getByDateRange(
+        @AuthenticationPrincipal UUID userId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(sessionService.getByDateRange(userId, startDate, endDate));
+    }
+
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<SessionResponse>> getByDate(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate date
+    ) {
+        return ResponseEntity.ok(sessionService.getByDate(userId, date));
+    }
 
     @GetMapping("/{sessionId}")
     public ResponseEntity<SessionResponse> get(@AuthenticationPrincipal UUID userId, @PathVariable UUID sessionId) {
