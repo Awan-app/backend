@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,4 +35,17 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         WHERE z.id = :zoneId AND (t.user.id = :userId OR o.user.id = :userId)
     """)
     List<Session> findByZoneIdAndUserId(@Param("zoneId") UUID zoneId, @Param("userId") UUID userId);
+
+    @Query("""
+        SELECT s FROM Session s
+        JOIN s.task t
+        JOIN t.goal g
+        WHERE g.user.id = :userId 
+        AND s.start >= :fromTime AND s.end <= :toTime
+    """)
+    List<Session> findByUserIdAndTimeRange(
+        @Param("userId") UUID userId, 
+        @Param("fromTime") LocalDateTime fromTime,
+        @Param("toTime") LocalDateTime toTime
+    );
 }
