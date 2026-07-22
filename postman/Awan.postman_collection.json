@@ -1018,6 +1018,97 @@
       "description": "Task CRUD, moving between goals, and dependency management.\n\n**Task Statuses:** `SCHEDULED` (default on create), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Dependencies:** Tasks can depend on other tasks **within the same goal only**. Circular dependencies are prevented.",
       "item": [
         {
+          "name": "Get Tasks by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/date/2026-07-22",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "date",
+                "2026-07-22"
+              ]
+            },
+            "description": "Get all tasks that have sessions on a specific date. Each task includes only its sessions for that day, sorted by start time ascending.\n\n**Path Parameters:**\n- `date` (LocalDate, required) \u2013 Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `TaskWithSessionsResponse`\n- `task` (object) \u2013 `TaskInfoResponse` (task details).\n- `sessions` (array) \u2013 `SessionResponse[]` for that date.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"SCHEDULED\",\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"dependsOnTaskIds\": []\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Tasks by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/range?startDate=2026-07-22&endDate=2026-07-23",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-07-22",
+                  "description": "Start date (inclusive). Format: YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-07-23",
+                  "description": "End date (inclusive). Format: YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "Get all tasks that have sessions within a date range, grouped by date. Each task includes only its sessions for that day, sorted by start time ascending.\n\n**Query Parameters:**\n| Parameter | Type | Required | Description |\n|---|---|---|---|\n| `startDate` | LocalDate | Yes | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | End date (inclusive). Format: `YYYY-MM-DD`. |\n\n**Response (200):** Map of `LocalDate` to `TaskWithSessionsResponse[]`\n- Keys are dates in ascending order.\n- Each value is an array of tasks with their sessions for that day.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `MISSING_PARAMETER` (400) \u2013 Required query parameter missing.\n- `TYPE_MISMATCH` (400) \u2013 Invalid date format.\n- `INVALID_OPERATION` (400) \u2013 `endDate` is before `startDate`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
           "name": "Create Task",
           "request": {
             "method": "POST",
