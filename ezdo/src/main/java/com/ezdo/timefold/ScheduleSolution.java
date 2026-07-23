@@ -18,6 +18,9 @@ public class ScheduleSolution {
     @ValueRangeProvider
     private List<TimeGrain> grains;
 
+    @ProblemFactCollectionProperty
+    private List<BookedInterval> bookedIntervals;
+
     @PlanningEntityCollectionProperty
     private List<SessionChunk> chunks;
 
@@ -26,9 +29,10 @@ public class ScheduleSolution {
 
     public ScheduleSolution() {}
 
-    public ScheduleSolution(UUID goalId, List<TimeGrain> grains, List<SessionChunk> chunks) {
+    public ScheduleSolution(UUID goalId, List<TimeGrain> grains, List<BookedInterval> bookedIntervals, List<SessionChunk> chunks) {
         this.goalId = goalId;
         this.grains = grains;
+        this.bookedIntervals = bookedIntervals;
         this.chunks = chunks;
     }
 
@@ -36,6 +40,8 @@ public class ScheduleSolution {
     public void setGoalId(UUID goalId) { this.goalId = goalId; }
     public List<TimeGrain> getGrains() { return grains; }
     public void setGrains(List<TimeGrain> grains) { this.grains = grains; }
+    public List<BookedInterval> getBookedIntervals() { return bookedIntervals; }
+    public void setBookedIntervals(List<BookedInterval> bookedIntervals) { this.bookedIntervals = bookedIntervals; }
     public List<SessionChunk> getChunks() { return chunks; }
     public void setChunks(List<SessionChunk> chunks) { this.chunks = chunks; }
     public HardSoftScore getScore() { return score; }

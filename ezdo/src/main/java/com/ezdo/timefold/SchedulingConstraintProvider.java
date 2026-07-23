@@ -13,6 +13,8 @@ public class SchedulingConstraintProvider implements ConstraintProvider {
                 categoryMatch(factory),
                 stayWithinZone(factory),
                 noOverlap(factory),
+                respectBookedSessions(factory),
+                respectBufferWithBookedSessions(factory),
                 dependencyOrder(factory),
                 respectBuffer(factory),
                 minimizeFragmentation(factory),
@@ -117,5 +119,39 @@ public class SchedulingConstraintProvider implements ConstraintProvider {
                 .filter(chunk -> chunk.getStartingGrain() != null)
                 .penalize(HardSoftScore.ofSoft(1), chunk -> chunk.getStartingGrain().getAbsoluteStartMinute())
                 .asConstraint("Prefer earlier grains");
+    }
+    Constraint respectBookedSessions(ConstraintFactory factory) {
+        return factory.forEach(SessionChunk.class)
+                .join(BookedInterval.class)
+                .filter((chunk, booked) -> {
+                    if (chunk.getStartingGrain() == null) return false;
+                    int chunkStart = chunk.getStartingGrain().getAbsoluteStartMinute();
+                    int chunkEnd = chunkStart + (chunk.getDurationInGrains() * 15);
+                    return chunkStart < booked.getEndMinute() && booked.getStartMinute() < chunkEnd;
+                })
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Overlaps booked session");
+    }
+
+    // HARD: chunk is too close to a booked session (buffer not respected)
+    Constraint respectBufferWithBookedSessions(ConstraintFactory factory) {
+        return factory.forEach(SessionChunk.class)
+                .join(BookedInterval.class)
+                .filter((chunk, booked) -> {
+                    if (chunk.getStartingGrain() == null) return false;
+                    int chunkStart = chunk.getStartingGrain().getAbsoluteStartMinute();
+                    int chunkEnd = chunkStart + (chunk.getDurationInGrains() * 15);
+
+                    int bookedStart = booked.getStartMinute();
+                    int bookedEnd = booked.getEndMinute();
+
+                    int buffer = chunk.getBufferMinutes();
+
+                    if (bookedStart >= chunkEnd && bookedStart < chunkEnd + buffer) return true;
+                    if (chunkStart >= bookedEnd && chunkStart < bookedEnd + buffer) return true;
+                    return false;
+                })
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Buffer violation with booked session");
     }
 }
