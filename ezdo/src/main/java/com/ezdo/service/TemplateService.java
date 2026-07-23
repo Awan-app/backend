@@ -3,6 +3,7 @@ package com.ezdo.service;
 import com.ezdo.dto.CreateTemplateRequest;
 import com.ezdo.dto.TemplateResponse;
 import com.ezdo.dto.UpdateTemplateRequest;
+import com.ezdo.entity.Category;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.User;
 import com.ezdo.dto.ZoneRequest;
@@ -38,6 +39,8 @@ public class TemplateService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
 
+        // TODO: Validate non-overlapping templates...
+
         if (request.daysOfWeek() != null && !request.daysOfWeek().isEmpty()) {
             if (templateRepository.existsByUserIdAndDaysOfWeekIn(userId, request.daysOfWeek())) {
                 throw new DayInvalidException(request.daysOfWeek());
@@ -58,7 +61,7 @@ public class TemplateService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(zr.categoryId() != null ? categoryRepository.findById(zr.categoryId()).orElse(null) : null)
+                    .category(resolveCategory(userId, zr.name()))
                     .template(template)
                     .build();
                 template.getZones().add(zone);
@@ -118,6 +121,16 @@ public class TemplateService {
 //            }
 //        }
 //    }
+
+    private Category resolveCategory(UUID userId, String zoneName) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        return categoryRepository.findByNameAndUserId(zoneName, userId)
+            .orElseGet(() -> categoryRepository.save(Category.builder()
+                .name(zoneName)
+                .user(user)
+                .build()));
+    }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {
         if (start == null || end == null || !end.isAfter(start)) {

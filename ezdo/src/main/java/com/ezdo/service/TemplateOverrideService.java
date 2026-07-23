@@ -2,6 +2,7 @@ package com.ezdo.service;
 
 import com.ezdo.dto.TemplateOverrideRequest;
 import com.ezdo.dto.TemplateOverrideResponse;
+import com.ezdo.entity.Category;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.User;
 import com.ezdo.dto.ZoneRequest;
@@ -50,7 +51,7 @@ public class TemplateOverrideService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(zr.categoryId() != null ? categoryRepository.findById(zr.categoryId()).orElse(null) : null)
+                    .category(resolveCategory(userId, zr.name()))
                     .templateOverride(override)
                     .build();
                 override.getZones().add(zone);
@@ -86,6 +87,16 @@ public class TemplateOverrideService {
     public void delete(UUID userId, UUID templateOverrideId) {
         templateOverrideRepository.delete(templateOverrideRepository.findByIdAndUserId(templateOverrideId, userId)
                 .orElseThrow(() -> new TemplateOverrideNotFoundException(templateOverrideId)));
+    }
+
+    private Category resolveCategory(UUID userId, String zoneName) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        return categoryRepository.findByNameAndUserId(zoneName, userId)
+            .orElseGet(() -> categoryRepository.save(Category.builder()
+                .name(zoneName)
+                .user(user)
+                .build()));
     }
 
     private TemplateOverrideResponse toResponse(TemplateOverride o) {

@@ -53,6 +53,10 @@ public class GoalService {
             if (byTempId.containsKey(dt.tempId())) {
                 throw new DuplicateTempIdException(dt.tempId());
             }
+            Category category = dt.categoryId() != null
+                ? categoryRepository.findById(dt.categoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(dt.categoryId()))
+                : null;
             Task task = Task.builder()
                 .goal(goal)
                 .title(dt.title())
@@ -61,7 +65,7 @@ public class GoalService {
                 .mandatory(Boolean.TRUE.equals(dt.mandatory()))
                 .estimatedPoints(dt.estimatedPoints() != null ? dt.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(dt.allowTaskSplitting()))
-                .category(dt.categoryId() != null ? categoryRepository.findById(dt.categoryId()).orElse(null) : null)
+                .category(category)
                 .status(TaskStatus.SCHEDULED)
                 .build();
             goal.getTasks().add(task);
@@ -144,6 +148,8 @@ public class GoalService {
             if (newByTempId.containsKey(item.tempId())) {
                 throw new DuplicateTempIdException(item.tempId());
             }
+            Category category = categoryRepository.findById(item.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(item.categoryId()));
             newByTempId.put(item.tempId(), Task.builder()
                 .goal(goal)
                 .title(item.title())
@@ -152,7 +158,7 @@ public class GoalService {
                 .mandatory(Boolean.TRUE.equals(item.mandatory()))
                 .estimatedPoints(item.estimatedPoints() != null ? item.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(item.allowTaskSplitting()))
-                .category(item.categoryId() != null ? categoryRepository.findById(item.categoryId()).orElse(null) : null)
+                .category(category)
                 .status(TaskStatus.SCHEDULED)
                 .build());
         }

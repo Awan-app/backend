@@ -55,7 +55,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(userId, request.categoryId(), request.name()))
+            .category(resolveCategory(userId, request.name()))
             .template(template)
             .build();
 
@@ -74,7 +74,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(userId, request.categoryId(), request.name()))
+            .category(resolveCategory(userId, request.name()))
             .templateOverride(override)
             .build();
 
@@ -152,7 +152,7 @@ public class ZoneService {
         zone.setStartTime(request.startTime());
         zone.setEndTime(request.endTime());
         zone.setColor(request.color());
-        zone.setCategory(resolveCategory(userId, request.categoryId(), request.name()));
+        zone.setCategory(resolveCategory(userId, request.name()));
         return zoneMapper.toZoneResponse(zone);
     }
 
@@ -161,16 +161,14 @@ public class ZoneService {
             .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
-    private Category resolveCategory(UUID userId, UUID categoryId, String zoneName) {
-        if (categoryId != null) {
-            return categoryRepository.findById(categoryId).orElse(null);
-        }
+    private Category resolveCategory(UUID userId, String zoneName) {
         User user = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
-        return categoryRepository.save(Category.builder()
-            .name(zoneName)
-            .user(user)
-            .build());
+        return categoryRepository.findByNameAndUserId(zoneName, userId)
+            .orElseGet(() -> categoryRepository.save(Category.builder()
+                .name(zoneName)
+                .user(user)
+                .build()));
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

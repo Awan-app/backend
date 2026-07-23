@@ -48,12 +48,4 @@ public class CategoryController {
             @Valid @RequestBody CategoryRequest request) {
         return ResponseEntity.ok(categoryService.update(userId, id, request));
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal UUID userId,
-            @PathVariable UUID id) {
-        categoryService.delete(userId, id);
-        return ResponseEntity.noContent().build();
-    }
 }

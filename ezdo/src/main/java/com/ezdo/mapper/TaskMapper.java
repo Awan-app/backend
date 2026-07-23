@@ -1,5 +1,6 @@
 package com.ezdo.mapper;
 
+import com.ezdo.dto.CategoryResponse;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.entity.Task;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,9 @@ public class TaskMapper {
             .map(Task::getId)
             .collect(Collectors.toSet());
 
+        CategoryResponse category = t.getCategory() != null
+            ? categoryMapper.toResponse(t.getCategory()) : null;
+
         return new TaskInfoResponse(
             t.getId(),
             t.getTitle(),
@@ -30,7 +34,7 @@ public class TaskMapper {
             t.getEstimatedPoints(),
             t.getAllowTaskSplitting(),
             t.getGoal().getId(),
-            categoryMapper.toResponse(t.getCategory()),
+            category,
             depIds
         );
     }

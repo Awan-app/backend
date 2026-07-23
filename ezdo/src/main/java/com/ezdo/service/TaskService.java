@@ -8,13 +8,7 @@ import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
 import com.ezdo.dto.task.TaskWithSessionsRequest;
 import com.ezdo.dto.task.TaskWithSessionsResponse;
-import com.ezdo.entity.Goal;
-import com.ezdo.entity.Session;
-import com.ezdo.entity.SessionStatus;
-import com.ezdo.entity.Task;
-import com.ezdo.entity.TaskStatus;
-import com.ezdo.entity.User;
-import com.ezdo.entity.Zone;
+import com.ezdo.entity.*;
 import com.ezdo.exception.*;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
@@ -52,6 +46,11 @@ public class TaskService {
             duration = findUser(userId).getPreferences().getPreferredSessionDuration();
         }
 
+        Category category = request.categoryId() != null ?
+            categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId()))
+            : null;
+
         Task task = Task.builder()
             .goal(goal)
             .title(request.title())
@@ -60,7 +59,7 @@ public class TaskService {
             .mandatory(Boolean.TRUE.equals(request.mandatory()))
             .estimatedPoints(request.estimatedPoints() != null ? request.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(request.allowTaskSplitting()))
-            .category(request.categoryId() != null ? categoryRepository.findById(request.categoryId()).orElse(null) : null)
+            .category(category)
             .status(TaskStatus.SCHEDULED)
             .build();
 
@@ -80,6 +79,11 @@ public class TaskService {
             duration = findUser(userId).getPreferences().getPreferredSessionDuration();
         }
 
+        Category category = taskReq.categoryId() != null ?
+            categoryRepository.findById(taskReq.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
+            : null;
+
         Task task = Task.builder()
             .goal(goal)
             .title(taskReq.title())
@@ -88,7 +92,7 @@ public class TaskService {
             .mandatory(Boolean.TRUE.equals(taskReq.mandatory()))
             .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
-            .category(taskReq.categoryId() != null ? categoryRepository.findById(taskReq.categoryId()).orElse(null) : null)
+            .category(category)
             .status(TaskStatus.SCHEDULED)
             .build();
 
@@ -137,7 +141,7 @@ public class TaskService {
         if (request.mandatory() != null) task.setMandatory(request.mandatory());
         if (request.estimatedPoints() != null) task.setEstimatedPoints(request.estimatedPoints());
         if (request.allowTaskSplitting() != null) task.setAllowTaskSplitting(request.allowTaskSplitting());
-        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElse(null));
+        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
         return taskMapper.toInfoResponse(task);
     }
 
