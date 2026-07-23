@@ -89,6 +89,10 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<groupId>ai.timefold.solver</groupId>
+			<artifactId>timefold-solver-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
@@ -125,6 +129,13 @@
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
 				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>ai.timefold.solver</groupId>
+				<artifactId>timefold-solver-bom</artifactId>
+				<version>2.3.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
