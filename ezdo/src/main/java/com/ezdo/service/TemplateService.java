@@ -13,6 +13,7 @@ import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import java.time.LocalTime;
 import com.ezdo.mapper.ZoneMapper;
+import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.TemplateRepository;
 import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class TemplateService {
 
     private final TemplateRepository templateRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final ZoneMapper zoneMapper;
 
     public TemplateResponse createTemplate(UUID userId, CreateTemplateRequest request){
@@ -56,6 +58,7 @@ public class TemplateService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
+                    .category(zr.categoryId() != null ? categoryRepository.findById(zr.categoryId()).orElse(null) : null)
                     .template(template)
                     .build();
                 template.getZones().add(zone);

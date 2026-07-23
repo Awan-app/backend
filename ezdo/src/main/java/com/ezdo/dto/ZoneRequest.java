@@ -1,6 +1,7 @@
 package com.ezdo.dto;
 
 import java.time.LocalTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +16,8 @@ public record ZoneRequest(
     @NotNull(message = "End time is required")
     LocalTime endTime,
 
-    String color
+    String color,
+
+    UUID categoryId
 ) {
 }

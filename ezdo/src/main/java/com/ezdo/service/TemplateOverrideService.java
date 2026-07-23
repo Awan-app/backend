@@ -10,6 +10,7 @@ import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.ZoneMapper;
+import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class TemplateOverrideService {
 
     private final TemplateOverrideRepository templateOverrideRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final ZoneMapper zoneMapper;
 
     public TemplateOverrideResponse create(UUID userId , TemplateOverrideRequest templateOverrideRequest){
@@ -48,6 +50,7 @@ public class TemplateOverrideService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
+                    .category(zr.categoryId() != null ? categoryRepository.findById(zr.categoryId()).orElse(null) : null)
                     .templateOverride(override)
                     .build();
                 override.getZones().add(zone);
