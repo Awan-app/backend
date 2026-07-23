@@ -30,6 +30,7 @@ public class SchedulingPreprocessor {
 
     public ScheduleSolution preprocessTasks(List<Task> tasks, UUID userId, LocalDate targetDate, Preferences prefs, int horizonDays) {
         LocalDate startDate = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         LocalDate endDate = targetDate;
         LocalDate maxEndDate = startDate.plusDays(horizonDays);
         if (endDate == null || endDate.isAfter(maxEndDate)) {
@@ -101,6 +102,15 @@ public class SchedulingPreprocessor {
                     LocalTime grainTime = z.startTime().plusMinutes(i * 15L);
                     LocalDateTime grainDateTime = date.atTime(grainTime);
 
+                    // Skip any grain slot that has already elapsed (only relevant for "today").
+                    // A grain represents a 15-minute slot [grainDateTime, grainDateTime+15);
+                    // if that slot has already ended, it can no longer be scheduled into.
+//                    if (grainDateTime.plusMinutes(15).isBefore(now) || grainDateTime.plusMinutes(15).isEqual(now)) {
+//                        continue;
+//                    }
+                    if (grainDateTime.isBefore(now)) {
+                        continue;
+                    }
                     // This filtering is now just an optimization (fewer candidate
                     // starting points for the solver to try) — it is NOT relied upon
                     // for correctness anymore. The respectBookedSessions hard constraint
