@@ -1,9 +1,9 @@
 package com.ezdo.service.ai;
 
-import com.ezdo.dto.ai.BlockEnvelope;
-import com.ezdo.dto.ai.ContentBlock;
-import com.ezdo.dto.ai.ConversationMessage;
-import com.ezdo.dto.ai.GoalProposal;
+import com.ezdo.dto.ai.decompose.BlockEnvelope;
+import com.ezdo.dto.ai.decompose.ContentBlock;
+import com.ezdo.dto.ai.decompose.ConversationMessage;
+import com.ezdo.dto.ai.decompose.GoalProposal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;

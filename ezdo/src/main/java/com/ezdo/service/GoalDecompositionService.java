@@ -1,13 +1,13 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.ai.ChatMessage;
-import com.ezdo.dto.ai.ChatReply;
-import com.ezdo.dto.ai.ContentBlock;
-import com.ezdo.dto.ai.ConversationMessage;
-import com.ezdo.dto.ai.GoalProposal;
-import com.ezdo.dto.ai.GoalProposalBlock;
-import com.ezdo.dto.ai.TextBlock;
-import com.ezdo.dto.ai.TranscriptResponse;
+import com.ezdo.dto.ai.decompose.ChatMessage;
+import com.ezdo.dto.ai.decompose.ChatReply;
+import com.ezdo.dto.ai.decompose.ContentBlock;
+import com.ezdo.dto.ai.decompose.ConversationMessage;
+import com.ezdo.dto.ai.decompose.GoalProposal;
+import com.ezdo.dto.ai.decompose.GoalProposalBlock;
+import com.ezdo.dto.ai.decompose.TextBlock;
+import com.ezdo.dto.ai.decompose.TranscriptResponse;
 import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
 import com.ezdo.entity.DecompositionStatus;

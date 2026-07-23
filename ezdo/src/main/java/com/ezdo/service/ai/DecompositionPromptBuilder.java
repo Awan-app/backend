@@ -1,9 +1,9 @@
 package com.ezdo.service.ai;
 
-import com.ezdo.dto.ai.ContentBlock;
-import com.ezdo.dto.ai.ConversationMessage;
-import com.ezdo.dto.ai.QuestionBlock;
-import com.ezdo.dto.ai.TextBlock;
+import com.ezdo.dto.ai.decompose.ContentBlock;
+import com.ezdo.dto.ai.decompose.ConversationMessage;
+import com.ezdo.dto.ai.decompose.QuestionBlock;
+import com.ezdo.dto.ai.decompose.TextBlock;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;

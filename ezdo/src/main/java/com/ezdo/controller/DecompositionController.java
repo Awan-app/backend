@@ -1,8 +1,8 @@
 package com.ezdo.controller;
 
-import com.ezdo.dto.ai.ChatMessage;
-import com.ezdo.dto.ai.ChatReply;
-import com.ezdo.dto.ai.TranscriptResponse;
+import com.ezdo.dto.ai.decompose.ChatMessage;
+import com.ezdo.dto.ai.decompose.ChatReply;
+import com.ezdo.dto.ai.decompose.TranscriptResponse;
 import com.ezdo.dto.goal.GoalInfoResponse;
 import com.ezdo.service.GoalDecompositionService;
 import jakarta.validation.Valid;

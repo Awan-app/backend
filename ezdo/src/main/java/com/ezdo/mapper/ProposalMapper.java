@@ -1,7 +1,7 @@
 package com.ezdo.mapper;
 
-import com.ezdo.dto.ai.GoalProposal;
-import com.ezdo.dto.ai.TaskProposal;
+import com.ezdo.dto.ai.decompose.GoalProposal;
+import com.ezdo.dto.ai.decompose.TaskProposal;
 import com.ezdo.dto.goal.DraftTaskRequest;
 import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.exception.InvalidDecompositionException;
@@ -64,7 +64,8 @@ public class ProposalMapper {
             t.mandatory(),
             t.estimatedPoints(),
             t.allowTaskSplitting(),
-            t.dependsOnTempIds()
+            t.dependsOnTempIds(),
+            t.categoryId()
         );
     }
 
