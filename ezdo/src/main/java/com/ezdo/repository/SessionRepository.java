@@ -46,6 +46,8 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         ORDER BY s.start ASC
     """)
     List<Session> findByUserIdAndDateRange(@Param("userId") UUID userId,
+                                          @Param("startDate") LocalDateTime startDate,
+                                          @Param("endDate") LocalDateTime endDate);
 
     @Query("""
         SELECT s FROM Session s
