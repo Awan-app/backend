@@ -66,4 +66,5 @@ public class ErrorCodes {
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
     public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";
     public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
+    public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
 }

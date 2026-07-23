@@ -1,5 +1,6 @@
 package com.ezdo.dto.goal;
 
+import com.ezdo.dto.CategoryResponse;
 import com.ezdo.entity.TaskStatus;
 
 import java.util.Set;
@@ -15,5 +16,6 @@ public record TaskInfoResponse(
     Integer estimatedPoints,
     Boolean allowTaskSplitting,
     UUID goalId,
+    CategoryResponse category,
     Set<UUID> dependsOnTaskIds
 ) {}

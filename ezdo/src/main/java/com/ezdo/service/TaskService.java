@@ -18,10 +18,7 @@ import com.ezdo.entity.Zone;
 import com.ezdo.exception.*;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
-import com.ezdo.repository.GoalRepository;
-import com.ezdo.repository.TaskRepository;
-import com.ezdo.repository.UserRepository;
-import com.ezdo.repository.ZoneRepository;
+import com.ezdo.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +36,7 @@ public class TaskService {
     private final GoalService goalService;
     private final UserRepository userRepository;
     private final ZoneRepository zoneRepository;
+    private final CategoryRepository categoryRepository;
     private final TaskMapper taskMapper;
     private final SessionMapper sessionMapper;
 
@@ -62,6 +60,7 @@ public class TaskService {
             .mandatory(Boolean.TRUE.equals(request.mandatory()))
             .estimatedPoints(request.estimatedPoints() != null ? request.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(request.allowTaskSplitting()))
+            .category(request.categoryId() != null ? categoryRepository.findById(request.categoryId()).orElse(null) : null)
             .status(TaskStatus.SCHEDULED)
             .build();
 
@@ -89,6 +88,7 @@ public class TaskService {
             .mandatory(Boolean.TRUE.equals(taskReq.mandatory()))
             .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
+            .category(taskReq.categoryId() != null ? categoryRepository.findById(taskReq.categoryId()).orElse(null) : null)
             .status(TaskStatus.SCHEDULED)
             .build();
 
@@ -134,10 +134,10 @@ public class TaskService {
         if (request.title() != null) task.setTitle(request.title());
         if (request.description() != null) task.setDescription(request.description());
         if (request.estimatedDuration() != null) task.setEstimatedDuration(request.estimatedDuration());
-        if (request.status() != null) task.setStatus(request.status());
         if (request.mandatory() != null) task.setMandatory(request.mandatory());
         if (request.estimatedPoints() != null) task.setEstimatedPoints(request.estimatedPoints());
         if (request.allowTaskSplitting() != null) task.setAllowTaskSplitting(request.allowTaskSplitting());
+        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElse(null));
         return taskMapper.toInfoResponse(task);
     }
 

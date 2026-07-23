@@ -24,6 +24,8 @@ public record TaskCreateRequest(
 
     Boolean allowTaskSplitting,
 
-    UUID goalId // null -> lands in Inbox
+    UUID goalId, // null -> lands in Inbox
+
+    UUID categoryId
 ) {
 }

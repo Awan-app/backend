@@ -64,3 +64,8 @@ ezdo:
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
+
+timefold:
+  solver:
+    termination:
+      spent-limit: 5s

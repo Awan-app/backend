@@ -7,6 +7,7 @@ import com.ezdo.entity.*;
 import com.ezdo.exception.*;
 import com.ezdo.mapper.GoalMapper;
 import com.ezdo.mapper.TaskMapper;
+import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.UserRepository;
@@ -27,6 +28,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final GoalMapper goalMapper;
     private final TaskMapper taskMapper;
 
@@ -59,6 +61,7 @@ public class GoalService {
                 .mandatory(Boolean.TRUE.equals(dt.mandatory()))
                 .estimatedPoints(dt.estimatedPoints() != null ? dt.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(dt.allowTaskSplitting()))
+                .category(dt.categoryId() != null ? categoryRepository.findById(dt.categoryId()).orElse(null) : null)
                 .status(TaskStatus.SCHEDULED)
                 .build();
             goal.getTasks().add(task);
@@ -149,6 +152,7 @@ public class GoalService {
                 .mandatory(Boolean.TRUE.equals(item.mandatory()))
                 .estimatedPoints(item.estimatedPoints() != null ? item.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(item.allowTaskSplitting()))
+                .category(item.categoryId() != null ? categoryRepository.findById(item.categoryId()).orElse(null) : null)
                 .status(TaskStatus.SCHEDULED)
                 .build());
         }
