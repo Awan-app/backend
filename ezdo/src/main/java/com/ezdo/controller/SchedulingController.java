@@ -2,6 +2,8 @@ package com.ezdo.controller;
 
 import com.ezdo.dto.ai.GoalScheduleRequest;
 import com.ezdo.dto.ai.GoalScheduleResponse;
+import com.ezdo.dto.ai.TaskScheduleRequest;
+import com.ezdo.dto.ai.TaskScheduleResponse;
 import com.ezdo.service.GoalSchedulingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,4 +27,13 @@ public class SchedulingController {
     ) {
         return ResponseEntity.ok(schedulingService.scheduleGoal(userId, request));
     }
+
+    @PostMapping("/task")
+    public ResponseEntity<TaskScheduleResponse> scheduleTask(
+            @AuthenticationPrincipal UUID userId,
+            @Valid @RequestBody TaskScheduleRequest request
+    ) {
+        return ResponseEntity.ok(schedulingService.scheduleTask(userId, request));
+    }
+
 }
