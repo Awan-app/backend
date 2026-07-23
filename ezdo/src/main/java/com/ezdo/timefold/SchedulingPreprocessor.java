@@ -44,7 +44,7 @@ public class SchedulingPreprocessor {
         List<SessionChunk> chunks = new ArrayList<>();
         List<TimeGrain> grains = new ArrayList<>();
 
-        // 1. Process Tasks into Chunks
+        // 1. Process Tasks into Chunks (unchanged)
         List<Task> sortedTasks = topologicalSort(tasks);
         int taskOrder = 0;
         for (Task task : sortedTasks) {
@@ -70,13 +70,24 @@ public class SchedulingPreprocessor {
             }
         }
 
-        // 2. Process Calendar into Grains
+        // 2. Process Calendar into Grains + booked intervals
         LocalDateTime absoluteStart = startDate.atStartOfDay();
         List<Session> existingSessions = sessionRepository.findByUserIdAndTimeRange(
                 userId,
                 startDate.atStartOfDay(),
                 endDate.plusDays(1).atStartOfDay()
         );
+
+        // Build the hard-constraint-facing representation of "already booked" time,
+        // independent of the grain list. This is what actually protects against
+        // a new chunk spanning across an already-booked window.
+        List<BookedInterval> bookedIntervals = existingSessions.stream()
+                .map(s -> new BookedInterval(
+                        s.getId(),
+                        (int) ChronoUnit.MINUTES.between(absoluteStart, s.getStart()),
+                        (int) ChronoUnit.MINUTES.between(absoluteStart, s.getEnd())
+                ))
+                .toList();
 
         long grainIdCounter = 1;
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
@@ -89,8 +100,11 @@ public class SchedulingPreprocessor {
                 for (int i = 0; i < zoneDurationGrains; i++) {
                     LocalTime grainTime = z.startTime().plusMinutes(i * 15L);
                     LocalDateTime grainDateTime = date.atTime(grainTime);
-                    
-                    // Check if overlaps with booked session
+
+                    // This filtering is now just an optimization (fewer candidate
+                    // starting points for the solver to try) — it is NOT relied upon
+                    // for correctness anymore. The respectBookedSessions hard constraint
+                    // is the actual safety net, since it checks the full chunk span.
                     boolean isBooked = false;
                     for (Session booked : existingSessions) {
                         if (grainDateTime.isBefore(booked.getEnd()) && grainDateTime.plusMinutes(15).isAfter(booked.getStart())) {
@@ -98,18 +112,23 @@ public class SchedulingPreprocessor {
                             break;
                         }
                     }
-                    
+
                     if (!isBooked) {
                         int absMinute = (int) ChronoUnit.MINUTES.between(absoluteStart, grainDateTime);
                         grains.add(new TimeGrain(
-                                grainIdCounter++, date, grainTime, i, z.id(), z.category() != null ? z.category().id():null, zoneDurationGrains, absMinute
+                                grainIdCounter++, date, grainTime, i, z.id(), z.category() != null ? z.category().id() : null, zoneDurationGrains, absMinute
                         ));
                     }
                 }
             }
         }
 
-        return new ScheduleSolution(tasks.isEmpty() ? null : tasks.getFirst().getGoal().getId(), grains, chunks);
+        return new ScheduleSolution(
+                tasks.isEmpty() ? null : tasks.getFirst().getGoal().getId(),
+                grains,
+                bookedIntervals,
+                chunks
+        );
     }
 
     private List<Task> topologicalSort(List<Task> tasks) {
