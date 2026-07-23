@@ -1,4 +1,4 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.decompose;
 
 import java.time.Instant;
 import java.util.List;

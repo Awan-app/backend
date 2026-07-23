@@ -54,10 +54,4 @@ public class CategoryService {
         category.setName(request.name());
         return categoryMapper.toResponse(category);
     }
-
-    public void delete(UUID userId, UUID categoryId) {
-        Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
-            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
-        categoryRepository.delete(category);
-    }
 }

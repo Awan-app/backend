@@ -1,7 +1,8 @@
 package com.ezdo.controller;
 
-import com.ezdo.dto.ai.ChatMessage;
-import com.ezdo.dto.ai.ChatReply;
+import com.ezdo.dto.ai.decompose.ChatMessage;
+import com.ezdo.dto.ai.decompose.ChatReply;
+import com.ezdo.dto.ai.decompose.TranscriptResponse;
 import com.ezdo.dto.goal.GoalInfoResponse;
 import com.ezdo.service.GoalDecompositionService;
 import jakarta.validation.Valid;
@@ -34,5 +35,22 @@ public class DecompositionController {
     ) {
         GoalInfoResponse result = decompositionService.confirmDecomposition(userId, sessionId);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/goal-decompose/{sessionId}")
+    public TranscriptResponse getTranscript(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable UUID sessionId
+    ) {
+        return decompositionService.getTranscript(userId, sessionId);
+    }
+
+    @PostMapping("/goal-decompose/{sessionId}/cancel")
+    public ResponseEntity<Void> cancel(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable UUID sessionId
+    ) {
+        decompositionService.cancel(userId, sessionId);
+        return ResponseEntity.noContent().build();
     }
 }

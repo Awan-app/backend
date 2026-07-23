@@ -1,5 +1,6 @@
 package com.ezdo.service;
 
+import com.ezdo.dto.SessionResponse;
 import com.ezdo.dto.goal.TaskCreateRequest;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
@@ -7,13 +8,7 @@ import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
 import com.ezdo.dto.task.TaskWithSessionsRequest;
 import com.ezdo.dto.task.TaskWithSessionsResponse;
-import com.ezdo.entity.Goal;
-import com.ezdo.entity.Session;
-import com.ezdo.entity.SessionStatus;
-import com.ezdo.entity.Task;
-import com.ezdo.entity.TaskStatus;
-import com.ezdo.entity.User;
-import com.ezdo.entity.Zone;
+import com.ezdo.entity.*;
 import com.ezdo.exception.*;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
@@ -22,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -50,6 +46,11 @@ public class TaskService {
             duration = findUser(userId).getPreferences().getPreferredSessionDuration();
         }
 
+        Category category = request.categoryId() != null ?
+            categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.categoryId()))
+            : null;
+
         Task task = Task.builder()
             .goal(goal)
             .title(request.title())
@@ -58,7 +59,7 @@ public class TaskService {
             .mandatory(Boolean.TRUE.equals(request.mandatory()))
             .estimatedPoints(request.estimatedPoints() != null ? request.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(request.allowTaskSplitting()))
-            .category(request.categoryId() != null ? categoryRepository.findById(request.categoryId()).orElse(null) : null)
+            .category(category)
             .status(TaskStatus.SCHEDULED)
             .build();
 
@@ -78,6 +79,11 @@ public class TaskService {
             duration = findUser(userId).getPreferences().getPreferredSessionDuration();
         }
 
+        Category category = taskReq.categoryId() != null ?
+            categoryRepository.findById(taskReq.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
+            : null;
+
         Task task = Task.builder()
             .goal(goal)
             .title(taskReq.title())
@@ -86,7 +92,7 @@ public class TaskService {
             .mandatory(Boolean.TRUE.equals(taskReq.mandatory()))
             .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
-            .category(taskReq.categoryId() != null ? categoryRepository.findById(taskReq.categoryId()).orElse(null) : null)
+            .category(category)
             .status(TaskStatus.SCHEDULED)
             .build();
 
@@ -135,7 +141,7 @@ public class TaskService {
         if (request.mandatory() != null) task.setMandatory(request.mandatory());
         if (request.estimatedPoints() != null) task.setEstimatedPoints(request.estimatedPoints());
         if (request.allowTaskSplitting() != null) task.setAllowTaskSplitting(request.allowTaskSplitting());
-        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElse(null));
+        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
         return taskMapper.toInfoResponse(task);
     }
 
@@ -213,6 +219,59 @@ public class TaskService {
         return task.getDependentTasks().stream()
             .map(taskMapper::toInfoResponse)
             .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskWithSessionsResponse> getTasksByDate(UUID userId, LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);
+        return tasks.stream()
+            .map(task -> new TaskWithSessionsResponse(
+                taskMapper.toInfoResponse(task),
+                task.getSessions().stream()
+                    .filter(s -> !s.getStart().isBefore(start) && s.getStart().isBefore(end))
+                    .map(sessionMapper::toResponse)
+                    .sorted(Comparator.comparing(SessionResponse::start))
+                    .toList()
+            ))
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<TaskWithSessionsResponse>> getTasksByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        if (endDate.isBefore(startDate)) {
+            throw new InvalidOperationException("endDate must not be before startDate");
+        }
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+        List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);
+
+        Map<LocalDate, List<TaskWithSessionsResponse>> result = new LinkedHashMap<>();
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalDateTime dayStart = date.atStartOfDay();
+            LocalDateTime nextDayStart = date.plusDays(1).atStartOfDay();
+
+            List<TaskWithSessionsResponse> tasksForDay = tasks.stream()
+                    .filter(task -> task.getSessions().stream()
+                            .anyMatch(s -> !s.getStart().isBefore(dayStart) && s.getStart().isBefore(nextDayStart)))
+                    .map(task -> new TaskWithSessionsResponse(
+                            taskMapper.toInfoResponse(task),
+                            task.getSessions().stream()
+                                    .filter(s -> !s.getStart().isBefore(dayStart) && s.getStart().isBefore(nextDayStart))
+                                    .map(sessionMapper::toResponse)
+                                    .sorted(Comparator.comparing(SessionResponse::start))
+                                    .toList()
+                    ))
+                    .toList();
+
+            if (!tasksForDay.isEmpty()) {
+                result.put(date, tasksForDay);
+            }
+        }
+
+        return result;
     }
 
     private void validateSessionTimeRange(LocalDateTime start, LocalDateTime end) {

@@ -1,6 +1,7 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.decompose;
 
 import java.util.List;
+import java.util.UUID;
 
 public record TaskProposal(
     String tempId,
@@ -10,6 +11,7 @@ public record TaskProposal(
     Integer estimatedPoints,
     boolean mandatory,
     boolean allowTaskSplitting,
-    List<String> dependsOnTempIds
+    List<String> dependsOnTempIds,
+    UUID categoryId
 ) {
 }
