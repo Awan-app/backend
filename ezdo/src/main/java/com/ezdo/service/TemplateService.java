@@ -95,32 +95,31 @@ public class TemplateService {
         return toResponse(template);
     }
 
-    public List<ZoneResponse> updateTemplateZones(UUID templateId , UUID userId , UpdateTemplateZoneRequest request){
+    public List<ZoneResponse> updateTemplateZones(UUID templateId, UUID userId, UpdateTemplateZoneRequest request) {
 
-        Template template = templateRepository.findById(templateId)
-                .orElseThrow(() ->new TemplateNotFoundException(templateId));
+        Template template = templateRepository.findByIdAndUserId(templateId, userId)
+            .orElseThrow(() -> new TemplateNotFoundException(templateId));
 
-        List<Zone> existingZones = zoneRepository.findByTemplateIdAndTemplateUserId(templateId ,userId);
+        List<Zone> existingZones = zoneRepository.findByTemplateIdAndTemplateUserId(templateId, userId);
 
         Map<UUID, Zone> existingById = existingZones.stream()
-                .collect(Collectors.toMap(Zone::getId, z -> z));
+            .collect(Collectors.toMap(Zone::getId, z -> z));
 
         Set<UUID> keepIds = new HashSet<>();
         List<Zone> toSave = new ArrayList<>();
 
-        for(ZoneRequest item : request.zones()){
+        for (ZoneRequest item : request.zones()) {
             validateTimeRange(item.startTime(), item.endTime());
-            if(item.id() == null){
+            if (item.id() == null) {
                 //add new one
                 toSave.add(Zone.builder()
-                        .name(item.name())
-                        .startTime(item.startTime())
-                        .endTime(item.endTime())
-                        .color(item.color())
-                        .template(template)
-                        .build());
-            }
-            else{
+                    .name(item.name())
+                    .startTime(item.startTime())
+                    .endTime(item.endTime())
+                    .color(item.color())
+                    .template(template)
+                    .build());
+            } else {
                 //update on existing zone
                 Zone existing = existingById.get(item.id());
                 existing.setName(item.name());
@@ -134,13 +133,12 @@ public class TemplateService {
         }
         // delete
         List<Zone> toDelete = existingZones.stream()
-                .filter(z -> !keepIds.contains(z.getId()))
-                .toList();
+            .filter(z -> !keepIds.contains(z.getId()))
+            .toList();
         zoneRepository.deleteAll(toDelete);
 
         List<Zone> saved = zoneRepository.saveAll(toSave);
-        return saved.stream().map(zoneMapper ::toZoneResponse).toList();
-
+        return saved.stream().map(zoneMapper::toZoneResponse).toList();
     }
 
     public void deleteTemplate(UUID userId, UUID templateId) {

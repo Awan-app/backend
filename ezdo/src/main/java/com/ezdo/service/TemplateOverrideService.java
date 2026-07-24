@@ -87,32 +87,31 @@ public class TemplateOverrideService {
                 .orElseThrow(() -> new TemplateOverrideNotFoundException(templateOverrideId)));
     }
 
-    public List<ZoneResponse> updateTemplateZones(UUID overrideId , UUID userId , UpdateTemplateZoneRequest request){
+    public List<ZoneResponse> updateTemplateZones(UUID overrideId, UUID userId, UpdateTemplateZoneRequest request) {
 
-        TemplateOverride override = templateOverrideRepository.findById(overrideId)
-                .orElseThrow(() ->new TemplateOverrideNotFoundException(overrideId));
+        TemplateOverride override = templateOverrideRepository.findByIdAndUserId(overrideId, userId)
+            .orElseThrow(() -> new TemplateOverrideNotFoundException(overrideId));
 
-        List<Zone> existingZones = zoneRepository.findByTemplateOverrideIdAndTemplateOverrideUserId(overrideId ,userId);
+        List<Zone> existingZones = zoneRepository.findByTemplateOverrideIdAndTemplateOverrideUserId(overrideId, userId);
 
         Map<UUID, Zone> existingById = existingZones.stream()
-                .collect(Collectors.toMap(Zone::getId, z -> z));
+            .collect(Collectors.toMap(Zone::getId, z -> z));
 
         Set<UUID> keepIds = new HashSet<>();
         List<Zone> toSave = new ArrayList<>();
 
-        for(ZoneRequest item : request.zones()){
+        for (ZoneRequest item : request.zones()) {
             validateTimeRange(item.startTime(), item.endTime());
-            if(item.id() == null){
+            if (item.id() == null) {
                 //add new one
                 toSave.add(Zone.builder()
-                        .name(item.name())
-                        .startTime(item.startTime())
-                        .endTime(item.endTime())
-                        .color(item.color())
-                        .templateOverride(override)
-                        .build());
-            }
-            else{
+                    .name(item.name())
+                    .startTime(item.startTime())
+                    .endTime(item.endTime())
+                    .color(item.color())
+                    .templateOverride(override)
+                    .build());
+            } else {
                 //update on existing zone
                 Zone existing = existingById.get(item.id());
 
@@ -130,13 +129,12 @@ public class TemplateOverrideService {
         }
         // delete
         List<Zone> toDelete = existingZones.stream()
-                .filter(z -> !keepIds.contains(z.getId()))
-                .toList();
+            .filter(z -> !keepIds.contains(z.getId()))
+            .toList();
         zoneRepository.deleteAll(toDelete);
 
         List<Zone> saved = zoneRepository.saveAll(toSave);
-        return saved.stream().map(zoneMapper ::toZoneResponse).toList();
-
+        return saved.stream().map(zoneMapper::toZoneResponse).toList();
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

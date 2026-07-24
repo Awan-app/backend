@@ -7,7 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ZoneRequest(
-        UUID id ,
+    UUID id,
+
     @NotBlank(message = "Zone name is required")
     String name,
 
