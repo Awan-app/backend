@@ -7,6 +7,7 @@ import com.ezdo.entity.*;
 import com.ezdo.exception.*;
 import com.ezdo.mapper.GoalMapper;
 import com.ezdo.mapper.TaskMapper;
+import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.UserRepository;
@@ -27,6 +28,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final GoalMapper goalMapper;
     private final TaskMapper taskMapper;
 
@@ -51,6 +53,10 @@ public class GoalService {
             if (byTempId.containsKey(dt.tempId())) {
                 throw new DuplicateTempIdException(dt.tempId());
             }
+            Category category = dt.categoryId() != null
+                ? categoryRepository.findById(dt.categoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(dt.categoryId()))
+                : null;
             Task task = Task.builder()
                 .goal(goal)
                 .title(dt.title())
@@ -59,6 +65,7 @@ public class GoalService {
                 .mandatory(Boolean.TRUE.equals(dt.mandatory()))
                 .estimatedPoints(dt.estimatedPoints() != null ? dt.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(dt.allowTaskSplitting()))
+                .category(category)
                 .status(TaskStatus.SCHEDULED)
                 .build();
             goal.getTasks().add(task);
@@ -113,7 +120,7 @@ public class GoalService {
         if (req.description() != null) goal.setDescription(req.description());
         if (req.status() != null) goal.setStatus(req.status());
         if (req.targetDate() != null) goal.setTargetDate(req.targetDate());
-        return goalMapper.toInfoResponse(goal, false);
+        return goalMapper.toInfoResponse(goalRepository.save(goal), false);
     }
 
     @Transactional
@@ -141,6 +148,8 @@ public class GoalService {
             if (newByTempId.containsKey(item.tempId())) {
                 throw new DuplicateTempIdException(item.tempId());
             }
+            Category category = categoryRepository.findById(item.categoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(item.categoryId()));
             newByTempId.put(item.tempId(), Task.builder()
                 .goal(goal)
                 .title(item.title())
@@ -149,6 +158,7 @@ public class GoalService {
                 .mandatory(Boolean.TRUE.equals(item.mandatory()))
                 .estimatedPoints(item.estimatedPoints() != null ? item.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(item.allowTaskSplitting()))
+                .category(category)
                 .status(TaskStatus.SCHEDULED)
                 .build());
         }

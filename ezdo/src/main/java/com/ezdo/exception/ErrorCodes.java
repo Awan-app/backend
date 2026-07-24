@@ -49,7 +49,8 @@ public class ErrorCodes {
     //zone-template
     public static final String ZONE_OVERLAP = "ZONE_OVERLAP";
     public static final String TEMPLATE_NOT_FOUND = "TEMPLATE_NOT_FOUND";
-    public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATEOVERRIDE_NOT_FOUND";
+    public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATE_OVERRIDE_NOT_FOUND";
+    public static final String INVALID_ZONE_TIME_RANGE = "INVALID_ZONE_TIME_RANGE";
     public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
     public static final String DAY_NOT_FOUND = "DAY_NOT_FOUND";
     public static final String DAY_ALREADY_ASSIGNED = "DAY_ALREADY_ASSIGNED";
@@ -57,8 +58,14 @@ public class ErrorCodes {
 
     public static final String SESSION_NOT_FOUND = "SESSION_NOT_FOUND";
 
+    // AI / Decomposition
+    public static final String GOAL_DECOMPOSITION_SESSION_NOT_FOUND = "GOAL_DECOMPOSITION_SESSION_NOT_FOUND";
+    public static final String INVALID_DECOMPOSITION = "INVALID_DECOMPOSITION";
+    public static final String AI_UNAVAILABLE = "AI_UNAVAILABLE";
+
     // Not Found
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
     public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";
     public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
+    public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
 }

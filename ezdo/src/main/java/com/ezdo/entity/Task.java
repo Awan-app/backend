@@ -43,6 +43,10 @@ public class Task {
     @Builder.Default
     private Boolean allowTaskSplitting = false;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     // --- consists_of (N side) ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = false)

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
+import java.util.UUID;
 
 public record BulkTaskItem(
     @NotBlank
@@ -26,6 +27,8 @@ public record BulkTaskItem(
     Integer estimatedPoints,
 
     Boolean allowTaskSplitting,
+
+    UUID categoryId,
 
     List<String> dependsOnRefs // each entry: a tempId from THIS batch, OR a real UUID of an existing task in the goal
 ) {}

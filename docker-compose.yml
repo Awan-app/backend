@@ -43,6 +43,18 @@ services:
       SPRING_MAIL_AUTH: ${SPRING_MAIL_AUTH:-false}
       SPRING_MAIL_STARTTLS: ${SPRING_MAIL_STARTTLS:-false}
 
+      # AI (OpenAI-compatible — defaults to Groq with llama-3.3-70b)
+      SPRING_OPENAI_API_KEY: ${SPRING_OPENAI_API_KEY}
+      SPRING_OPENAI_BASE_URL: ${SPRING_OPENAI_BASE_URL:-https://api.groq.com/openai/v1}
+      SPRING_OPENAI_CHAT_MODEL: ${SPRING_OPENAI_CHAT_MODEL:-llama-3.3-70b-versatile}
+      SPRING_OPENAI_CHAT_TEMPERATURE: ${SPRING_OPENAI_CHAT_TEMPERATURE:-0.4}
+
+      # EZDO-specific settings
+      EZDO_JWT_SECRET: ${EZDO_JWT_SECRET}
+      EZDO_OTP_PEPPER: ${EZDO_OTP_PEPPER}
+      EZDO_MAIL_FROM: ${EZDO_MAIL_FROM:-noreply@awan.com}
+      EZDO_AI_MAX_TURNS: ${EZDO_AI_MAX_TURNS:-20}
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: mailpit

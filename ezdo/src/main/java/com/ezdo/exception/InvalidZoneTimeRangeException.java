@@ -11,7 +11,7 @@ public class InvalidZoneTimeRangeException extends ApplicationException {
         super(
             "Invalid zone time range: startTime=" + startTime + ", endTime=" + endTime,
             HttpStatus.BAD_REQUEST.value(),
-            ErrorCodes.VALIDATION_ERROR,
+            ErrorCodes.INVALID_ZONE_TIME_RANGE,
             Map.of(
                     "startTime", startTime,
                     "endTime", endTime

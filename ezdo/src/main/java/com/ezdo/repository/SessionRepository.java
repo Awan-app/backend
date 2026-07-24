@@ -48,4 +48,17 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
     List<Session> findByUserIdAndDateRange(@Param("userId") UUID userId,
                                           @Param("startDate") LocalDateTime startDate,
                                           @Param("endDate") LocalDateTime endDate);
+
+    @Query("""
+        SELECT s FROM Session s
+        JOIN s.task t
+        JOIN t.goal g
+        WHERE g.user.id = :userId 
+        AND s.start >= :fromTime AND s.end <= :toTime
+    """)
+    List<Session> findByUserIdAndTimeRange(
+        @Param("userId") UUID userId,
+        @Param("fromTime") LocalDateTime fromTime,
+        @Param("toTime") LocalDateTime toTime
+    );
 }

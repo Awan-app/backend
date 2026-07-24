@@ -9,6 +9,7 @@ public record ZoneResponse(
         LocalTime startTime,
         LocalTime endTime,
         String color,
+        CategoryResponse category,
         UUID templateId,
         UUID templateOverrideId
 ) {

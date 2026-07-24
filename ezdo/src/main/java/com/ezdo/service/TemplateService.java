@@ -1,15 +1,18 @@
 package com.ezdo.service;
 
+import com.ezdo.dto.CreateTemplateRequest;
+import com.ezdo.dto.TemplateResponse;
+import com.ezdo.dto.UpdateTemplateRequest;
+import com.ezdo.entity.Category;
 import com.ezdo.dto.*;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.User;
 import com.ezdo.entity.Zone;
-import com.ezdo.exception.DayInvalidException;
-import com.ezdo.exception.InvalidZoneTimeRangeException;
-import com.ezdo.exception.TemplateNotFoundException;
-import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.*;
+
 import java.time.LocalTime;
 import com.ezdo.mapper.ZoneMapper;
+import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.TemplateRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
@@ -27,6 +30,7 @@ public class TemplateService {
 
     private final TemplateRepository templateRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final ZoneMapper zoneMapper;
     private final ZoneRepository zoneRepository;
 
@@ -40,6 +44,13 @@ public class TemplateService {
             }
         }
 
+        if (request.zones() != null) {
+            for (ZoneRequest zr : request.zones()) {
+                validateTimeRange(zr.startTime(), zr.endTime());
+            }
+            validateZonesNoOverlap(request.zones());
+        }
+
         Template template = Template.builder()
             .name(request.name())
             .daysOfWeek(request.daysOfWeek() != null ? request.daysOfWeek() : Set.of())
@@ -48,12 +59,12 @@ public class TemplateService {
 
         if (request.zones() != null) {
             for (ZoneRequest zr : request.zones()) {
-                validateTimeRange(zr.startTime(), zr.endTime());
                 Zone zone = Zone.builder()
                     .name(zr.name())
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
+                    .category(resolveCategory(userId, zr.name()))
                     .template(template)
                     .build();
                 template.getZones().add(zone);
@@ -91,7 +102,7 @@ public class TemplateService {
         }
 
         template.setName(request.name());
-        template.setDaysOfWeek(request.daysOfWeek());
+        template.setDaysOfWeek(request.daysOfWeek() != null ? request.daysOfWeek() : Set.of());
         return toResponse(template);
     }
 
@@ -117,15 +128,21 @@ public class TemplateService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
+                    .category(resolveCategory(userId, item.name()))
                     .template(template)
                     .build());
             } else {
                 //update on existing zone
                 Zone existing = existingById.get(item.id());
+
+                if (existing == null) {
+                    throw new ZoneNotFoundException(item.id());
+                }
                 existing.setName(item.name());
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
+                existing.setCategory(resolveCategory(userId, item.name()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -160,9 +177,31 @@ public class TemplateService {
 //        }
 //    }
 
+    private Category resolveCategory(UUID userId, String zoneName) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        return categoryRepository.findByNameAndUserId(zoneName, userId)
+            .orElseGet(() -> categoryRepository.save(Category.builder()
+                .name(zoneName)
+                .user(user)
+                .build()));
+    }
+
     private void validateTimeRange(LocalTime start, LocalTime end) {
         if (start == null || end == null || !end.isAfter(start)) {
             throw new InvalidZoneTimeRangeException(start, end);
+        }
+    }
+
+    private void validateZonesNoOverlap(List<ZoneRequest> zones) {
+        for (int i = 0; i < zones.size(); i++) {
+            for (int j = i + 1; j < zones.size(); j++) {
+                ZoneRequest a = zones.get(i);
+                ZoneRequest b = zones.get(j);
+                if (a.startTime().isBefore(b.endTime()) && a.endTime().isAfter(b.startTime())) {
+                    throw new ZoneOverlapException(a.startTime(), a.endTime());
+                }
+            }
         }
     }
 

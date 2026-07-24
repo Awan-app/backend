@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
+import java.util.UUID;
 
 public record DraftTaskRequest(
     @NotBlank
@@ -27,6 +28,8 @@ public record DraftTaskRequest(
 
     Boolean allowTaskSplitting,
 
-    List<String> dependsOnTempIds
+    List<String> dependsOnTempIds,
+
+    UUID categoryId
 ) {
 }
