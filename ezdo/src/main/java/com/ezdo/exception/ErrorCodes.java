@@ -47,6 +47,7 @@ public class ErrorCodes {
     public static final String REFRESH_TOKEN_REUSE_DETECTED = "REFRESH_TOKEN_REUSE_DETECTED";
 
     //zone-template
+    public static final String ZONE_OVERLAP = "ZONE_OVERLAP";
     public static final String TEMPLATE_NOT_FOUND = "TEMPLATE_NOT_FOUND";
     public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATEOVERRIDE_NOT_FOUND";
     public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
