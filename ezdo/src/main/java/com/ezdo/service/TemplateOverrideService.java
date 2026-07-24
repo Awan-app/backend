@@ -10,6 +10,7 @@ import com.ezdo.entity.Zone;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.ZoneOverlapException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.TemplateOverrideRepository;
@@ -46,6 +47,9 @@ public class TemplateOverrideService {
                 if (zr.startTime() == null || zr.endTime() == null || !zr.endTime().isAfter(zr.startTime())) {
                     throw new InvalidZoneTimeRangeException(zr.startTime(), zr.endTime());
                 }
+            }
+            validateZonesNoOverlap(templateOverrideRequest.zones());
+            for (ZoneRequest zr : templateOverrideRequest.zones()) {
                 Zone zone = Zone.builder()
                     .name(zr.name())
                     .startTime(zr.startTime())
@@ -87,6 +91,18 @@ public class TemplateOverrideService {
     public void delete(UUID userId, UUID templateOverrideId) {
         templateOverrideRepository.delete(templateOverrideRepository.findByIdAndUserId(templateOverrideId, userId)
                 .orElseThrow(() -> new TemplateOverrideNotFoundException(templateOverrideId)));
+    }
+
+    private void validateZonesNoOverlap(List<ZoneRequest> zones) {
+        for (int i = 0; i < zones.size(); i++) {
+            for (int j = i + 1; j < zones.size(); j++) {
+                ZoneRequest a = zones.get(i);
+                ZoneRequest b = zones.get(j);
+                if (a.startTime().isBefore(b.endTime()) && a.endTime().isAfter(b.startTime())) {
+                    throw new ZoneOverlapException(a.startTime(), a.endTime());
+                }
+            }
+        }
     }
 
     private Category resolveCategory(UUID userId, String zoneName) {

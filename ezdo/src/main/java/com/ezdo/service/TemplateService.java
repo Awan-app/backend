@@ -12,6 +12,7 @@ import com.ezdo.exception.DayInvalidException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.ZoneOverlapException;
 import java.time.LocalTime;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.CategoryRepository;
@@ -39,12 +40,17 @@ public class TemplateService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
 
-        // TODO: Validate non-overlapping templates...
-
         if (request.daysOfWeek() != null && !request.daysOfWeek().isEmpty()) {
             if (templateRepository.existsByUserIdAndDaysOfWeekIn(userId, request.daysOfWeek())) {
                 throw new DayInvalidException(request.daysOfWeek());
             }
+        }
+
+        if (request.zones() != null) {
+            for (ZoneRequest zr : request.zones()) {
+                validateTimeRange(zr.startTime(), zr.endTime());
+            }
+            validateZonesNoOverlap(request.zones());
         }
 
         Template template = Template.builder()
@@ -55,7 +61,6 @@ public class TemplateService {
 
         if (request.zones() != null) {
             for (ZoneRequest zr : request.zones()) {
-                validateTimeRange(zr.startTime(), zr.endTime());
                 Zone zone = Zone.builder()
                     .name(zr.name())
                     .startTime(zr.startTime())
@@ -135,6 +140,18 @@ public class TemplateService {
     private void validateTimeRange(LocalTime start, LocalTime end) {
         if (start == null || end == null || !end.isAfter(start)) {
             throw new InvalidZoneTimeRangeException(start, end);
+        }
+    }
+
+    private void validateZonesNoOverlap(List<ZoneRequest> zones) {
+        for (int i = 0; i < zones.size(); i++) {
+            for (int j = i + 1; j < zones.size(); j++) {
+                ZoneRequest a = zones.get(i);
+                ZoneRequest b = zones.get(j);
+                if (a.startTime().isBefore(b.endTime()) && a.endTime().isAfter(b.startTime())) {
+                    throw new ZoneOverlapException(a.startTime(), a.endTime());
+                }
+            }
         }
     }
 
