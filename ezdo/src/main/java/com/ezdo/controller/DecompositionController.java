@@ -3,10 +3,14 @@ package com.ezdo.controller;
 import com.ezdo.dto.ai.decompose.ChatMessage;
 import com.ezdo.dto.ai.decompose.ChatReply;
 import com.ezdo.dto.ai.decompose.TranscriptResponse;
+import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
+import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.service.GoalDecompositionService;
+import com.ezdo.service.ai.TaskEnrichmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,7 @@ import java.util.UUID;
 public class DecompositionController {
 
     private final GoalDecompositionService decompositionService;
+    private final TaskEnrichmentService enrichmentService;
 
     @PostMapping("/goal-decompose")
     public ChatReply sendMessage(
@@ -35,6 +40,14 @@ public class DecompositionController {
     ) {
         GoalInfoResponse result = decompositionService.confirmDecomposition(userId, sessionId);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/task-create")
+    public ResponseEntity<TaskInfoResponse> create(
+        @AuthenticationPrincipal UUID userId,
+        @Valid @RequestBody TaskEnrichmentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(enrichmentService.enrich(userId, request));
     }
 
     @GetMapping("/goal-decompose/{sessionId}")

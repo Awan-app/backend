@@ -24,6 +24,7 @@ public class TimefoldSchedulerService {
                     .getFinalBestSolution();
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
+            // TODO: Application specific exception...
             throw new RuntimeException("Scheduling failed", e);
         }
     }

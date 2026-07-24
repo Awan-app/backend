@@ -120,7 +120,7 @@ public class GoalService {
         if (req.description() != null) goal.setDescription(req.description());
         if (req.status() != null) goal.setStatus(req.status());
         if (req.targetDate() != null) goal.setTargetDate(req.targetDate());
-        return goalMapper.toInfoResponse(goal, false);
+        return goalMapper.toInfoResponse(goalRepository.save(goal), false);
     }
 
     @Transactional

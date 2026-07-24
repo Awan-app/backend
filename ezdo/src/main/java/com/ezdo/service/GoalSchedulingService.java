@@ -1,13 +1,10 @@
 package com.ezdo.service;
 
 import com.ezdo.dto.ai.*;
-import com.ezdo.entity.Goal;
-import com.ezdo.entity.Preferences;
-import com.ezdo.entity.Session;
-import com.ezdo.entity.Task;
-import com.ezdo.entity.Zone;
+import com.ezdo.entity.*;
 import com.ezdo.exception.GoalNotFoundException;
 import com.ezdo.exception.TaskNotFoundException;
+import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.exception.ZoneNotFoundException;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.SessionRepository;
@@ -48,7 +45,10 @@ public class GoalSchedulingService {
 
         Goal goal = goalRepository.findByIdAndUserId(request.goalId(), userId)
                 .orElseThrow(() -> new GoalNotFoundException(request.goalId()));
-        Preferences prefs = userRepository.findById(userId).orElseThrow().getPreferences();
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        Preferences prefs = user.getPreferences();
 
         ScheduleSolution problem = schedulingPreprocessor.preprocess(goal, prefs, 14);
         ScheduleSolution solution = timefoldSchedulerService.schedule(problem);
@@ -60,7 +60,10 @@ public class GoalSchedulingService {
     public TaskScheduleResponse scheduleTask(UUID userId, TaskScheduleRequest request) {
         Task task = taskRepository.findByIdAndGoalUserId(request.taskId(), userId)
                 .orElseThrow(() -> new TaskNotFoundException(request.taskId()));
-        Preferences prefs = userRepository.findById(userId).orElseThrow().getPreferences();
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        Preferences prefs = user.getPreferences();
 
         int horizon = request.horizonDays() != null ? request.horizonDays() : 14;
         ScheduleSolution problem = schedulingPreprocessor.preprocessTasks(
@@ -81,7 +84,8 @@ public class GoalSchedulingService {
             UUID taskId = entry.getKey();
             List<SessionChunk> taskChunks = entry.getValue();
 
-            boolean anyUnscheduled = taskChunks.stream().anyMatch(c -> c.getStartingGrain() == null);
+            boolean anyUnscheduled = taskChunks.stream()
+                .anyMatch(c -> c.getStartingGrain() == null);
 
             if (anyUnscheduled) {
                 Task task = taskRepository.findById(taskId).orElse(null);

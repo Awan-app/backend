@@ -1,22 +1,19 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.ai.decompose.ChatMessage;
-import com.ezdo.dto.ai.decompose.ChatReply;
-import com.ezdo.dto.ai.decompose.ContentBlock;
-import com.ezdo.dto.ai.decompose.ConversationMessage;
-import com.ezdo.dto.ai.decompose.GoalProposal;
-import com.ezdo.dto.ai.decompose.GoalProposalBlock;
-import com.ezdo.dto.ai.decompose.TextBlock;
-import com.ezdo.dto.ai.decompose.TranscriptResponse;
+import com.ezdo.dto.ai.decompose.*;
 import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
+import com.ezdo.entity.Category;
 import com.ezdo.entity.DecompositionStatus;
 import com.ezdo.entity.GoalDecompositionSession;
+import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
 import com.ezdo.exception.AiUnavailableException;
 import com.ezdo.exception.GoalDecompositionSessionNotFoundException;
 import com.ezdo.exception.InvalidDecompositionException;
+import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.ProposalMapper;
+import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.GoalDecompositionSessionRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.service.ai.ConversationCodec;
@@ -29,9 +26,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,6 +41,7 @@ public class GoalDecompositionService {
     private final GoalDecompositionSessionRepository sessionRepository;
     private final GoalService goalService;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final ChatClient chatClient;
     private final ConversationCodec codec;
     private final DecompositionPromptBuilder promptBuilder;
@@ -50,6 +52,7 @@ public class GoalDecompositionService {
         GoalDecompositionSessionRepository sessionRepository,
         GoalService goalService,
         UserRepository userRepository,
+        CategoryRepository categoryRepository,
         ChatClient chatClient,
         ConversationCodec codec,
         DecompositionPromptBuilder promptBuilder,
@@ -59,6 +62,7 @@ public class GoalDecompositionService {
         this.sessionRepository = sessionRepository;
         this.goalService = goalService;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
         this.chatClient = chatClient;
         this.codec = codec;
         this.promptBuilder = promptBuilder;
@@ -79,7 +83,9 @@ public class GoalDecompositionService {
 
         transcript.add(new ConversationMessage("user", List.of(new TextBlock(request.message()))));
 
-        List<ContentBlock> replyBlocks = generateReply(promptBuilder.build(transcript));
+        DecompositionUserContext userContext = buildUserContext(userId);
+        List<ContentBlock> replyBlocks =
+            generateReply(promptBuilder.build(transcript, userContext), userId);
         transcript.add(new ConversationMessage("assistant", replyBlocks));
 
         GoalProposal proposal = findProposal(replyBlocks);
@@ -101,7 +107,14 @@ public class GoalDecompositionService {
             throw new InvalidDecompositionException("This conversation has no goal proposal to confirm yet");
         }
 
-        GoalCreateRequest createRequest = proposalMapper.toCreateRequest(proposal);
+        // The model was grounded with the real category list, but never trust it blindly:
+        // strip any category id that doesn't actually belong to this user before persisting.
+        Set<UUID> validCategoryIds = categoryRepository.findByUserId(userId).stream()
+            .map(Category::getId)
+            .collect(Collectors.toSet());
+        GoalProposal sanitized = sanitizeCategories(proposal, validCategoryIds, sessionId);
+
+        GoalCreateRequest createRequest = proposalMapper.toCreateRequest(sanitized);
         GoalInfoResponse goal = goalService.createGoal(userId, createRequest);
 
         session.setStatus(DecompositionStatus.CONFIRMED);
@@ -171,17 +184,69 @@ public class GoalDecompositionService {
     }
 
     /**
-     * Call the model and parse its reply into blocks. On a parse failure, retry once;
-     * if it still fails, fall back to a plain text block so the user is never handed a
-     * 500. A transport/API failure surfaces as {@link AiUnavailableException} (503).
+     * Builds the grounding context for one turn: the user's real categories, their
+     * scheduling preferences, and today's date resolved in their timezone. Built fresh
+     * every call — never cached — so edits made mid-conversation are always reflected.
      */
-    private List<ContentBlock> generateReply(List<Message> messages) {
+    private DecompositionUserContext buildUserContext(UUID userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        Preferences prefs = user.getPreferences();
+
+        ZoneId zone = ZoneId.of("UTC");
+        if (prefs != null && prefs.getTimezone() != null) {
+            try {
+                zone = ZoneId.of(prefs.getTimezone());
+            } catch (Exception e) {
+                log.warn("Invalid timezone '{}' for user {}, defaulting to UTC",
+                    prefs.getTimezone(), userId);
+            }
+        }
+
+        List<DecompositionUserContext.CategoryOption> categories = categoryRepository.findByUserId(userId)
+            .stream()
+            .map(c -> new DecompositionUserContext.CategoryOption(c.getId(), c.getName()))
+            .toList();
+
+        return new DecompositionUserContext(
+            LocalDate.now(zone),
+            prefs != null ? prefs.getTimezone() : null,
+            prefs != null ? prefs.getPreferredSessionDuration() : null,
+            prefs != null ? prefs.getBufferBetweenSessions() : null,
+            categories
+        );
+    }
+
+    /**
+     * Replaces any task's category with null if its id doesn't belong to this user's
+     * real category set, logging so a pattern of hallucinated ids is visible rather
+     * than silently swallowed.
+     */
+    private GoalProposal sanitizeCategories(GoalProposal proposal, Set<UUID> validCategoryIds, UUID sessionId) {
+        List<TaskProposal> tasks = proposal.tasks() != null ? proposal.tasks() : List.of();
+        List<TaskProposal> sanitized = tasks.stream()
+            .map(t -> {
+                if (t.category() != null && !validCategoryIds.contains(t.category().id())) {
+                    log.warn("Session {}: proposal referenced unknown category id {} for task '{}'; clearing it",
+                        sessionId, t.category().id(), t.title());
+                    return new TaskProposal(
+                        t.tempId(), t.title(), t.description(), t.estimatedDuration(),
+                        t.estimatedPoints(), t.mandatory(), t.allowTaskSplitting(),
+                        null, t.dependsOnTempIds());
+                }
+                return t;
+            })
+            .toList();
+        return new GoalProposal(proposal.title(), proposal.description(), proposal.targetDate(), sanitized);
+    }
+
+    private List<ContentBlock> generateReply(List<Message> messages, UUID userId) {
         try {
-            return codec.parseBlocks(callModel(messages));
+            return codec.parseBlocks(callModel(messages, userId));
         } catch (ConversationCodec.BlockParseException first) {
             log.warn("Model reply was not valid blocks, retrying once", first);
             try {
-                return codec.parseBlocks(callModel(messages));
+                return codec.parseBlocks(callModel(messages, userId));
             } catch (ConversationCodec.BlockParseException second) {
                 log.warn("Model reply still invalid after retry, falling back to text", second);
                 return List.of(new TextBlock(
@@ -190,10 +255,11 @@ public class GoalDecompositionService {
         }
     }
 
-    private String callModel(List<Message> messages) {
+    private String callModel(List<Message> messages, UUID userId) {
         try {
             return chatClient.prompt()
                 .messages(messages)
+                .advisors(a -> a.param("userId", userId.toString()))
                 .call()
                 .content();
         } catch (Exception e) {
@@ -224,10 +290,14 @@ public class GoalDecompositionService {
     }
 
     private GoalProposal findProposal(List<ContentBlock> blocks) {
-        return blocks.stream()
+        List<GoalProposal> proposals = blocks.stream()
             .filter(GoalProposalBlock.class::isInstance)
             .map(b -> ((GoalProposalBlock) b).getProposal())
-            .findFirst() // POSSIBLE HALLUCINATION: Two proposal blocks...
-            .orElse(null);
+            .toList();
+        if (proposals.size() > 1) {
+            log.warn("Model returned {} proposal blocks in one reply; contract allows at most one. Using the first.",
+                proposals.size());
+        }
+        return proposals.isEmpty() ? null : proposals.get(0);
     }
 }

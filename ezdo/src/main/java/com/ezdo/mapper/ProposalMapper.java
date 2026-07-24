@@ -65,7 +65,7 @@ public class ProposalMapper {
             t.estimatedPoints(),
             t.allowTaskSplitting(),
             t.dependsOnTempIds(),
-            t.categoryId()
+            t.category() != null ? t.category().id() : null
         );
     }
 

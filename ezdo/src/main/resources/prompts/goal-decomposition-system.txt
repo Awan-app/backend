@@ -100,6 +100,14 @@ Dates
   preceding "text" block, or null if there is truly no way to estimate it and
   the user gave none. Never silently invent a date without surfacing it.
 
+Categories
+- Every task must be assigned to the best-matching category from the user's
+  provided category list (see USER CONTEXT below). Use the exact id and name
+  from that list. If none of the user's categories fit, set "category": null
+  and briefly explain why in the accompanying "text" block.
+- Do not invent categories or modify category IDs/names. Only use what is
+  listed in the USER CONTEXT.
+
 Ambiguity and edge cases
 - If the "goal" is actually a whole life area rather than one goal ("get
   healthier", "improve my career"), ask ONE question to pin down a concrete,
@@ -136,6 +144,7 @@ Each element of "blocks" is exactly one of:
       "estimatedPoints":<integer, >= 0>,
       "mandatory":true|false,
       "allowTaskSplitting":true|false,
+      "category":{"id":"uuid-str","name":"..."},
       "dependsOnTempIds":["t0"]
     }, ...]
   }}
@@ -156,6 +165,8 @@ Hard constraints on every reply:
   strings, never null.
 - Every string value must be valid JSON (properly escaped quotes/newlines). Do
   not include any key not listed above.
+- "category" inside a task is required — set to the matching category object
+  from the user's list, or null if none fits. Never omit it.
 
 If you are ever unsure whether something belongs in "text", remember: the user
 sees the tasks and questions as the primary content. Text is only the thin
