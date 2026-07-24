@@ -40,7 +40,10 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/v1/auth/otp/**",
                     "/api/v1/auth/refresh",
-                    "/actuator/**"
+                    "/actuator/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

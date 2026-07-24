@@ -1,11 +1,8 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.CreateTemplateRequest;
-import com.ezdo.dto.TemplateResponse;
-import com.ezdo.dto.UpdateTemplateRequest;
+import com.ezdo.dto.*;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.User;
-import com.ezdo.dto.ZoneRequest;
 import com.ezdo.entity.Zone;
 import com.ezdo.exception.DayInvalidException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
@@ -15,13 +12,13 @@ import java.time.LocalTime;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.TemplateRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +28,7 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final UserRepository userRepository;
     private final ZoneMapper zoneMapper;
+    private final ZoneRepository zoneRepository;
 
     public TemplateResponse createTemplate(UUID userId, CreateTemplateRequest request){
         User user = userRepository.findById(userId)
@@ -95,6 +93,52 @@ public class TemplateService {
         template.setName(request.name());
         template.setDaysOfWeek(request.daysOfWeek());
         return toResponse(template);
+    }
+
+    public List<ZoneResponse> updateTemplateZones(UUID templateId, UUID userId, UpdateTemplateZoneRequest request) {
+
+        Template template = templateRepository.findByIdAndUserId(templateId, userId)
+            .orElseThrow(() -> new TemplateNotFoundException(templateId));
+
+        List<Zone> existingZones = zoneRepository.findByTemplateIdAndTemplateUserId(templateId, userId);
+
+        Map<UUID, Zone> existingById = existingZones.stream()
+            .collect(Collectors.toMap(Zone::getId, z -> z));
+
+        Set<UUID> keepIds = new HashSet<>();
+        List<Zone> toSave = new ArrayList<>();
+
+        for (ZoneRequest item : request.zones()) {
+            validateTimeRange(item.startTime(), item.endTime());
+            if (item.id() == null) {
+                //add new one
+                toSave.add(Zone.builder()
+                    .name(item.name())
+                    .startTime(item.startTime())
+                    .endTime(item.endTime())
+                    .color(item.color())
+                    .template(template)
+                    .build());
+            } else {
+                //update on existing zone
+                Zone existing = existingById.get(item.id());
+                existing.setName(item.name());
+                existing.setStartTime(item.startTime());
+                existing.setEndTime(item.endTime());
+                existing.setColor(item.color());
+                toSave.add(existing);
+                keepIds.add(item.id());
+            }
+
+        }
+        // delete
+        List<Zone> toDelete = existingZones.stream()
+            .filter(z -> !keepIds.contains(z.getId()))
+            .toList();
+        zoneRepository.deleteAll(toDelete);
+
+        List<Zone> saved = zoneRepository.saveAll(toSave);
+        return saved.stream().map(zoneMapper::toZoneResponse).toList();
     }
 
     public void deleteTemplate(UUID userId, UUID templateId) {

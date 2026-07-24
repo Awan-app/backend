@@ -1,9 +1,6 @@
 package com.ezdo.controller;
 
-import com.ezdo.dto.TemplateOverrideRequest;
-import com.ezdo.dto.TemplateOverrideResponse;
-import com.ezdo.dto.ZoneRequest;
-import com.ezdo.dto.ZoneResponse;
+import com.ezdo.dto.*;
 import com.ezdo.service.TemplateOverrideService;
 import com.ezdo.service.ZoneService;
 import jakarta.validation.Valid;
@@ -58,6 +55,13 @@ public class TemplateOverrideController {
                                                            @PathVariable UUID overrideId,
                                                            @Valid @RequestBody TemplateOverrideRequest request) {
         return ResponseEntity.ok(templateOverrideService.updateTemplate(userId, overrideId, request));
+    }
+
+    @PutMapping("/{templateOverrideId}/zones")
+    public ResponseEntity<List<ZoneResponse>> updateZonesTemplate(@AuthenticationPrincipal UUID userId ,
+                                                                  @PathVariable UUID templateOverrideId ,
+                                                                  @Valid @RequestBody UpdateTemplateZoneRequest request){
+        return ResponseEntity.ok(templateOverrideService.updateTemplateZones(templateOverrideId , userId , request));
     }
 
     @DeleteMapping("/{overrideId}")

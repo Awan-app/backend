@@ -1,11 +1,14 @@
 package com.ezdo.dto;
 
 import java.time.LocalTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ZoneRequest(
+    UUID id,
+
     @NotBlank(message = "Zone name is required")
     String name,
 

@@ -59,6 +59,13 @@ public class TemplateController {
         return ResponseEntity.ok(templateService.updateTemplate(userId, templateId, updateTemplateRequest));
     }
 
+    @PutMapping("/{templateId}/zones")
+    public ResponseEntity<List<ZoneResponse>> updateZonesTemplate(@AuthenticationPrincipal UUID userId ,
+                                                                  @PathVariable UUID templateId ,
+                                                                  @Valid @RequestBody UpdateTemplateZoneRequest request){
+        return ResponseEntity.ok(templateService.updateTemplateZones(templateId , userId , request));
+    }
+
     @DeleteMapping("/{templateId}")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal UUID userId, @PathVariable UUID templateId) {
         templateService.deleteTemplate(userId, templateId);

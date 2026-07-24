@@ -1,23 +1,24 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.TemplateOverrideRequest;
-import com.ezdo.dto.TemplateOverrideResponse;
+import com.ezdo.dto.*;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.User;
-import com.ezdo.dto.ZoneRequest;
 import com.ezdo.entity.Zone;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.ZoneNotFoundException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class TemplateOverrideService {
     private final TemplateOverrideRepository templateOverrideRepository;
     private final UserRepository userRepository;
     private final ZoneMapper zoneMapper;
+    private final ZoneRepository zoneRepository;
 
     public TemplateOverrideResponse create(UUID userId , TemplateOverrideRequest templateOverrideRequest){
         User user = userRepository.findById(userId)
@@ -83,6 +85,62 @@ public class TemplateOverrideService {
     public void delete(UUID userId, UUID templateOverrideId) {
         templateOverrideRepository.delete(templateOverrideRepository.findByIdAndUserId(templateOverrideId, userId)
                 .orElseThrow(() -> new TemplateOverrideNotFoundException(templateOverrideId)));
+    }
+
+    public List<ZoneResponse> updateTemplateZones(UUID overrideId, UUID userId, UpdateTemplateZoneRequest request) {
+
+        TemplateOverride override = templateOverrideRepository.findByIdAndUserId(overrideId, userId)
+            .orElseThrow(() -> new TemplateOverrideNotFoundException(overrideId));
+
+        List<Zone> existingZones = zoneRepository.findByTemplateOverrideIdAndTemplateOverrideUserId(overrideId, userId);
+
+        Map<UUID, Zone> existingById = existingZones.stream()
+            .collect(Collectors.toMap(Zone::getId, z -> z));
+
+        Set<UUID> keepIds = new HashSet<>();
+        List<Zone> toSave = new ArrayList<>();
+
+        for (ZoneRequest item : request.zones()) {
+            validateTimeRange(item.startTime(), item.endTime());
+            if (item.id() == null) {
+                //add new one
+                toSave.add(Zone.builder()
+                    .name(item.name())
+                    .startTime(item.startTime())
+                    .endTime(item.endTime())
+                    .color(item.color())
+                    .templateOverride(override)
+                    .build());
+            } else {
+                //update on existing zone
+                Zone existing = existingById.get(item.id());
+
+                if (existing == null) {
+                    throw new ZoneNotFoundException(item.id());
+                }
+                existing.setName(item.name());
+                existing.setStartTime(item.startTime());
+                existing.setEndTime(item.endTime());
+                existing.setColor(item.color());
+                toSave.add(existing);
+                keepIds.add(item.id());
+            }
+
+        }
+        // delete
+        List<Zone> toDelete = existingZones.stream()
+            .filter(z -> !keepIds.contains(z.getId()))
+            .toList();
+        zoneRepository.deleteAll(toDelete);
+
+        List<Zone> saved = zoneRepository.saveAll(toSave);
+        return saved.stream().map(zoneMapper::toZoneResponse).toList();
+    }
+
+    private void validateTimeRange(LocalTime start, LocalTime end) {
+        if (start == null || end == null || !end.isAfter(start)) {
+            throw new InvalidZoneTimeRangeException(start, end);
+        }
     }
 
     private TemplateOverrideResponse toResponse(TemplateOverride o) {
