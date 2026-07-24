@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/ai/schedule")
+@RequestMapping("/api/v1/schedule")
 @RequiredArgsConstructor
 public class SchedulingController {
 
