@@ -1,0 +1,9 @@
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: WARN
+        orm:
+          jdbc:
+            bind: WARN
