@@ -82,9 +82,6 @@ public class SessionService {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(()->new SessionNotFoundException(sessionId));
 
-        if (session.isLocked()) {
-            throw new SessionLockedException(session.getId());
-        }
         validateTimeRange(request.start(), request.end());
 
         session.setStart(request.start());
@@ -97,9 +94,6 @@ public class SessionService {
         Session session =  sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
-        if (session.isLocked()) {
-            throw new SessionLockedException(session.getId());
-        }
         session.setStatus(status);
         return sessionMapper.toResponse(session);
     }
@@ -121,9 +115,6 @@ public class SessionService {
     public void delete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
-        if (session.isLocked()) {
-            throw new SessionLockedException(session.getId());
-        }
         sessionRepository.delete(session);
     }
 
