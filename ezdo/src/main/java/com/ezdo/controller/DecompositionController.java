@@ -5,7 +5,7 @@ import com.ezdo.dto.ai.decompose.ChatReply;
 import com.ezdo.dto.ai.decompose.TranscriptResponse;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
-import com.ezdo.dto.goal.TaskInfoResponse;
+import com.ezdo.dto.task.TaskWithSessionsResponse;
 import com.ezdo.service.GoalDecompositionService;
 import com.ezdo.service.ai.TaskEnrichmentService;
 import jakarta.validation.Valid;
@@ -43,7 +43,7 @@ public class DecompositionController {
     }
 
     @PostMapping("/task-create")
-    public ResponseEntity<TaskInfoResponse> create(
+    public ResponseEntity<TaskWithSessionsResponse> create(
         @AuthenticationPrincipal UUID userId,
         @Valid @RequestBody TaskEnrichmentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)

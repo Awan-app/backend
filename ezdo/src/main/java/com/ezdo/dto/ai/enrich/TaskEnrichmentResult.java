@@ -2,6 +2,8 @@ package com.ezdo.dto.ai.enrich;
 
 import com.ezdo.dto.CategoryResponse;
 
+import java.time.LocalDateTime;
+
 /**
  * The shape Spring AI's structured-output converter asks the model to fill in.
  * Excludes title (never the model's to produce — always echoed from the request
@@ -15,6 +17,8 @@ public record TaskEnrichmentResult(
     Integer estimatedPoints,
     Boolean mandatory,
     Boolean allowTaskSplitting,
-    CategoryResponse category
+    CategoryResponse category,
+    LocalDateTime scheduledStart,
+    LocalDateTime scheduledEnd
 ) {
 }
