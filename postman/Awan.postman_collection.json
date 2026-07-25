@@ -382,7 +382,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"firstName\": \"John\",\n  \"timezone\": \"America/New_York\",\n  \"preferredSessionDuration\": 45\n}",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"timezone\": \"America/New_York\",\n  \"preferredSessionDuration\": 45,\n  \"bufferBetweenSessions\": 5,\n  \"wakeupTime\": \"07:00:00\",\n  \"sleepTime\": \"23:00:00\",\n  \"schedulingType\": \"BALANCED\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -400,7 +400,7 @@
                     "me"
                   ]
                 },
-                "description": "Partially update profile fields. Only provided fields are updated.\n\n**Request Body (all optional):**\n- `firstName` (string) – Max 50 chars.\n- `lastName` (string) – Max 50 chars.\n- `birthDate` (LocalDate) – Must be in the past.\n- `timezone` (string) – IANA timezone regex: `^[A-Za-z]+(?:/[A-Za-z_]+)+$`.\n- `preferredSessionDuration` (int) – Minutes (≥ 0).\n- `bufferBetweenSessions` (int) – Minutes (≥ 0).\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
+                "description": "Partially update profile fields. Only provided fields are updated.\n\n**Request Body (all optional):**\n- `firstName` (string) – Max 50 chars.\n- `lastName` (string) – Max 50 chars.\n- `birthDate` (LocalDate) – Must be in the past.\n- `timezone` (string) – IANA timezone regex: `^[A-Za-z]+(?:/[A-Za-z_]+)+$`.\n- `preferredSessionDuration` (int) – Minutes (≥ 0).\n- `bufferBetweenSessions` (int) – Minutes (≥ 0).\n- `wakeupTime` (LocalTime) – Format: `HH:mm:ss`.\n- `sleepTime` (LocalTime) – Must differ from `wakeupTime`. Format: `HH:mm:ss`.\n- `schedulingType` (enum) – `BALANCED`, `EASIEST_FIRST`, `HARDEST_FIRST`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
               }
             }
           ]
