@@ -1,8 +1,8 @@
 package com.ezdo.entity;
 
 public enum TaskStatus {
+    ACTIVE,
     SCHEDULED,
-    IN_PROGRESS,
-    COMPLETED,
+    DONE,
     CANCELLED
 }
