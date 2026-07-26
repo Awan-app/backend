@@ -284,6 +284,58 @@
               ]
             },
             {
+              "name": "Is New",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/is-new",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "is-new"
+                  ]
+                },
+                "description": "Check if the user account is new (onboarding not yet completed).\n\n**Query Parameters:** None.\n\n**Response (200):** `Map<string, boolean>`\n- `isNew` (boolean) – `true` if onboarding is incomplete, `false` otherwise.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid access token.\n- `USER_NOT_FOUND` (404) – User not found."
+              },
+              "response": [
+                {
+                  "name": "Success (new user)",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"isNew\": true\n}"
+                },
+                {
+                  "name": "Success (returning user)",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"isNew\": false\n}"
+                }
+              ]
+            },
+            {
               "name": "Update Name",
               "request": {
                 "method": "PATCH",
