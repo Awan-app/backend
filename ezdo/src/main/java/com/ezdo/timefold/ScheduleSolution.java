@@ -5,7 +5,7 @@ import ai.timefold.solver.core.api.domain.solution.PlanningScore;
 import ai.timefold.solver.core.api.domain.solution.PlanningSolution;
 import ai.timefold.solver.core.api.domain.solution.ProblemFactCollectionProperty;
 import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
-import ai.timefold.solver.core.api.score.HardSoftScore;
+import ai.timefold.solver.core.api.score.HardMediumSoftScore;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class ScheduleSolution {
     private List<SessionChunk> chunks;
 
     @PlanningScore
-    private HardSoftScore score;
+    private HardMediumSoftScore score;
 
     public ScheduleSolution() {}
 
@@ -44,6 +44,6 @@ public class ScheduleSolution {
     public void setBookedIntervals(List<BookedInterval> bookedIntervals) { this.bookedIntervals = bookedIntervals; }
     public List<SessionChunk> getChunks() { return chunks; }
     public void setChunks(List<SessionChunk> chunks) { this.chunks = chunks; }
-    public HardSoftScore getScore() { return score; }
-    public void setScore(HardSoftScore score) { this.score = score; }
+    public HardMediumSoftScore getScore() { return score; } // changed
+    public void setScore(HardMediumSoftScore score) { this.score = score; } // changed
 }
