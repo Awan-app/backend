@@ -61,4 +61,10 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         @Param("fromTime") LocalDateTime fromTime,
         @Param("toTime") LocalDateTime toTime
     );
+
+    @Query("SELECT s FROM Session s WHERE s.task.goal.user.id = :userId " +
+            "AND s.start >= :dayStart AND s.start < :dayEnd")
+    List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
+                                      @Param("dayStart") LocalDateTime dayStart,
+                                      @Param("dayEnd") LocalDateTime dayEnd);
 }
