@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,8 +30,11 @@ public class SchedulingPreprocessor {
     }
 
     public ScheduleSolution preprocessTasks(List<Task> tasks, UUID userId, LocalDate targetDate, Preferences prefs, int horizonDays) {
-        LocalDate startDate = LocalDate.now();
-        LocalDateTime now = LocalDateTime.now();
+        ZoneId userZone = (prefs.getTimezone() != null)
+                ? ZoneId.of(prefs.getTimezone())
+                : ZoneId.systemDefault(); // fallback
+        LocalDate startDate = LocalDate.now(userZone);
+        LocalDateTime now = LocalDateTime.now(userZone);
         LocalDate endDate = targetDate;
         LocalDate maxEndDate = startDate.plusDays(horizonDays);
         if (endDate == null || endDate.isAfter(maxEndDate)) {
