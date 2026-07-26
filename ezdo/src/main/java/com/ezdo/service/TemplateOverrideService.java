@@ -14,6 +14,7 @@ import com.ezdo.exception.ZoneNotFoundException;
 import com.ezdo.exception.ZoneOverlapException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.CategoryRepository;
+import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
@@ -35,6 +36,7 @@ public class TemplateOverrideService {
     private final CategoryRepository categoryRepository;
     private final ZoneMapper zoneMapper;
     private final ZoneRepository zoneRepository;
+    private final SessionRepository sessionRepository;
 
     public TemplateOverrideResponse create(UUID userId , TemplateOverrideRequest templateOverrideRequest){
         User user = userRepository.findById(userId)
@@ -143,6 +145,10 @@ public class TemplateOverrideService {
         List<Zone> toDelete = existingZones.stream()
             .filter(z -> !keepIds.contains(z.getId()))
             .toList();
+        if (!toDelete.isEmpty()) {
+            sessionRepository.nullifyZoneId(
+                toDelete.stream().map(Zone::getId).toList());
+        }
         zoneRepository.deleteAll(toDelete);
 
         List<Zone> saved = zoneRepository.saveAll(toSave);

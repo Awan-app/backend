@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -31,6 +32,11 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         return userMapper.toProfileResponse(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Boolean> isNew(UUID userId) {
+        return Map.of("isNew", findUser(userId).getIsNew());
     }
 
     @Transactional

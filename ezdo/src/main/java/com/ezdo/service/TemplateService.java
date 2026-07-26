@@ -13,6 +13,7 @@ import com.ezdo.exception.*;
 import java.time.LocalTime;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.CategoryRepository;
+import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.TemplateRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
@@ -33,6 +34,7 @@ public class TemplateService {
     private final CategoryRepository categoryRepository;
     private final ZoneMapper zoneMapper;
     private final ZoneRepository zoneRepository;
+    private final SessionRepository sessionRepository;
 
     public TemplateResponse createTemplate(UUID userId, CreateTemplateRequest request){
         User user = userRepository.findById(userId)
@@ -152,6 +154,10 @@ public class TemplateService {
         List<Zone> toDelete = existingZones.stream()
             .filter(z -> !keepIds.contains(z.getId()))
             .toList();
+        if (!toDelete.isEmpty()) {
+            sessionRepository.nullifyZoneId(
+                toDelete.stream().map(Zone::getId).toList());
+        }
         zoneRepository.deleteAll(toDelete);
 
         List<Zone> saved = zoneRepository.saveAll(toSave);

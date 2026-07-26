@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +23,13 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal UUID userId) {
         return ResponseEntity.ok(userService.getProfile(userId));
+    }
+
+    @GetMapping("/me/is-new")
+    public ResponseEntity<Map<String, Boolean>> isNew(
+        @AuthenticationPrincipal UUID userId
+    ) {
+        return ResponseEntity.ok(userService.isNew(userId));
     }
 
     @PatchMapping("/me")
