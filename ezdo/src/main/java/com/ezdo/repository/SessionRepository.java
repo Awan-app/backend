@@ -2,6 +2,7 @@ package com.ezdo.repository;
 
 import com.ezdo.entity.Session;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -67,4 +68,7 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
     List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
                                       @Param("dayStart") LocalDateTime dayStart,
                                       @Param("dayEnd") LocalDateTime dayEnd);
+    @Modifying
+    @Query("UPDATE Session s SET s.zone = null WHERE s.zone.id IN :zoneIds")
+    void nullifyZoneId(@Param("zoneIds") List<UUID> zoneIds);
 }

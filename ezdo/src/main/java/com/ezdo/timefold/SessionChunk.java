@@ -21,7 +21,7 @@ public class SessionChunk {
     private Set<UUID> dependsOnTaskIds;
     private int bufferMinutes;
 
-    @PlanningVariable
+    @PlanningVariable(allowsUnassigned = true)
     private TimeGrain startingGrain;
 
     public SessionChunk() {}
