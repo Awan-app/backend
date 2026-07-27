@@ -21,6 +21,7 @@ public class SchedulingConstraintProvider implements ConstraintProvider {
                 respectBuffer(factory),
                 minimizeFragmentation(factory),
                 preferEarlier(factory)
+                //number of sessions,
         };
     }
 
