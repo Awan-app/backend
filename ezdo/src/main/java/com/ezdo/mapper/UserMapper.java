@@ -5,11 +5,7 @@ import com.ezdo.dto.UpdateProfileRequest;
 import com.ezdo.dto.UserProfileResponse;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
-import com.ezdo.exception.InvalidTimezoneException;
 import org.springframework.stereotype.Component;
-
-import java.time.DateTimeException;
-import java.time.ZoneId;
 
 @Component
 public class UserMapper {
@@ -60,34 +56,28 @@ public class UserMapper {
             user.setBirthDate(request.birthDate());
         }
 
-        Preferences preferences = user.getPreferences();
-        if (preferences == null && hasPreferenceFields(request)) {
-            preferences = new Preferences();
-            preferences.setUser(user);
-            user.setPreferences(preferences);
+        Preferences p = user.getPreferences();
+        if (p == null) {
+            return;
         }
 
-        if (preferences != null) {
-            if (request.timezone() != null) {
-                try {
-                    ZoneId.of(request.timezone());
-                } catch (DateTimeException ex) {
-                    throw new InvalidTimezoneException();
-                }
-                preferences.setTimezone(request.timezone());
-            }
-            if (request.preferredSessionDuration() != null) {
-                preferences.setPreferredSessionDuration(request.preferredSessionDuration());
-            }
-            if (request.bufferBetweenSessions() != null) {
-                preferences.setBufferBetweenSessions(request.bufferBetweenSessions());
-            }
+        if (request.timezone() != null) {
+            p.setTimezone(request.timezone());
         }
-    }
-
-    private boolean hasPreferenceFields(UpdateProfileRequest request) {
-        return request.timezone() != null || 
-               request.preferredSessionDuration() != null || 
-               request.bufferBetweenSessions() != null;
+        if (request.preferredSessionDuration() != null) {
+            p.setPreferredSessionDuration(request.preferredSessionDuration());
+        }
+        if (request.bufferBetweenSessions() != null) {
+            p.setBufferBetweenSessions(request.bufferBetweenSessions());
+        }
+        if (request.wakeupTime() != null) {
+            p.setWakeupTime(request.wakeupTime());
+        }
+        if (request.sleepTime() != null) {
+            p.setSleepTime(request.sleepTime());
+        }
+        if (request.schedulingType() != null) {
+            p.setSchedulingType(request.schedulingType());
+        }
     }
 }
