@@ -1,6 +1,7 @@
 package com.ezdo.timefold;
 
 import ai.timefold.solver.core.api.solver.SolverManager;
+import com.ezdo.exception.SchedulingFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +25,7 @@ public class TimefoldSchedulerService {
                     .getFinalBestSolution();
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            // TODO: Application specific exception...
-            throw new RuntimeException("Scheduling failed", e);
+            throw new SchedulingFailedException(problem.getGoalId());
         }
     }
 }

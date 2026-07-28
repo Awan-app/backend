@@ -31,7 +31,7 @@ public class SchedulingConstraintProvider implements ConstraintProvider {
         return factory.forEach(SessionChunk.class)
                 .filter(chunk -> chunk.getStartingGrain() != null
                         && !categoryMatches(chunk))
-                .penalize(HardSoftScore.ONE_HARD)
+                .penalize(HardMediumSoftScore.ONE_HARD)
                 .asConstraint("Category mismatch");
     }
 
