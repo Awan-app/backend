@@ -1,6 +1,6 @@
 package com.ezdo.service.ai.enrich;
 
-import com.ezdo.dto.ai.decompose.DecompositionUserContext;
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
 import com.ezdo.service.ai.UserContextRenderer;
 import org.springframework.ai.chat.messages.Message;
@@ -33,7 +33,7 @@ public class TaskEnrichmentPromptBuilder {
         }
     }
 
-    public List<Message> build(TaskEnrichmentRequest request, DecompositionUserContext context) {
+    public List<Message> build(TaskEnrichmentRequest request, AiUserPreferencesContext context) {
         return List.of(
             new SystemMessage(systemPrompt + UserContextRenderer.render(context)),
             new UserMessage(renderTask(request))

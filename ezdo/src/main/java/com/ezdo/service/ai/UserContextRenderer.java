@@ -1,11 +1,11 @@
 package com.ezdo.service.ai;
 
-import com.ezdo.dto.ai.decompose.DecompositionUserContext;
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 
 import java.time.format.DateTimeFormatter;
 
 /**
- * Renders a {@link DecompositionUserContext} into the "USER CONTEXT" prompt section
+ * Renders a {@link AiUserPreferencesContext} into the "USER CONTEXT" prompt section
  * shared by every AI-facing prompt builder that needs category/preference grounding
  * (goal decomposition, standalone task enrichment, image-to-tasks extraction).
  * Appended to the static system prompt rather than sent as a separate message.
@@ -20,7 +20,7 @@ public final class UserContextRenderer {
     private UserContextRenderer() {
     }
 
-    public static String render(DecompositionUserContext ctx) {
+    public static String render(AiUserPreferencesContext ctx) {
         StringBuilder sb = new StringBuilder();
         sb.append("\n\n=====================================================================\n");
         sb.append("USER CONTEXT\n");
@@ -62,7 +62,7 @@ public final class UserContextRenderer {
         if (ctx.categories() == null || ctx.categories().isEmpty()) {
             sb.append("- (this user has no categories yet; every task's category must be null)\n");
         } else {
-            for (DecompositionUserContext.CategoryOption c : ctx.categories()) {
+            for (AiUserPreferencesContext.CategoryOption c : ctx.categories()) {
                 sb.append("- id: ").append(c.id()).append(", name: \"").append(c.name()).append("\"\n");
             }
         }
@@ -70,7 +70,7 @@ public final class UserContextRenderer {
     }
 
     /** "Tuesday" rather than "TUESDAY" — the model reads prose, not enum constants. */
-    private static String displayName(DecompositionUserContext ctx) {
+    private static String displayName(AiUserPreferencesContext ctx) {
         String name = ctx.dayOfWeek().name();
         return name.charAt(0) + name.substring(1).toLowerCase();
     }

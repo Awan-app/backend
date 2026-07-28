@@ -1,7 +1,7 @@
 package com.ezdo.service.ai.image;
 
 import com.ezdo.dto.CategoryResponse;
-import com.ezdo.dto.ai.decompose.DecompositionUserContext;
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 import com.ezdo.dto.ai.image.ExtractedSession;
 import com.ezdo.dto.ai.image.ExtractedTask;
 import com.ezdo.dto.ai.image.ImageExtractionResult;
@@ -42,7 +42,7 @@ import java.util.UUID;
  * report and deliberately does NOT resolve relative dates; the planning model turns
  * that report into the strict task/session contract, resolving "Fri" and "3pm"
  * against the user's real local clock from USER CONTEXT. Splitting it this way keeps
- * date arithmetic in the model that can actually see the user's timezone, and keeps
+ * date arithmetic in the model that can actually see the user's timezone and keeps
  * the strict-JSON contract off the model that is busy reading handwriting.
  */
 @Slf4j
@@ -57,11 +57,11 @@ public class ImageTaskExtractionService {
 
     /** Content types the vision model accepts, mapped to what Spring AI should send. */
     private static final Map<String, MimeType> SUPPORTED_IMAGE_TYPES = Map.of(
-        "image/png", MimeType.valueOf("image/png"),
-        "image/jpeg", MimeType.valueOf("image/jpeg"),
-        "image/jpg", MimeType.valueOf("image/jpeg"),
-        "image/webp", MimeType.valueOf("image/webp"),
-        "image/gif", MimeType.valueOf("image/gif")
+        "image/png",    MimeType.valueOf("image/png"),
+        "image/jpeg",   MimeType.valueOf("image/jpeg"),
+        "image/jpg",    MimeType.valueOf("image/jpeg"),
+        "image/webp",   MimeType.valueOf("image/webp"),
+        "image/gif",    MimeType.valueOf("image/gif")
     );
 
     private static final long MAX_IMAGE_BYTES = 10L * 1024 * 1024;
@@ -99,7 +99,7 @@ public class ImageTaskExtractionService {
         MimeType mimeType = validateImage(image);
         byte[] bytes = readBytes(image);
 
-        DecompositionUserContext context = userContextService.buildFor(userId);
+        AiUserPreferencesContext context = userContextService.buildFor(userId);
 
         String report = callVision(promptBuilder.buildVision(bytes, mimeType, note, context), userId);
         if (isNothingFound(report)) {

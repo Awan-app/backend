@@ -1,5 +1,6 @@
 package com.ezdo.service.ai.decompose;
 
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 import com.ezdo.dto.ai.decompose.*;
 import com.ezdo.service.ai.UserContextRenderer;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -44,7 +45,7 @@ public class DecompositionPromptBuilder {
         }
     }
 
-    public List<Message> build(List<ConversationMessage> transcript, DecompositionUserContext context) {
+    public List<Message> build(List<ConversationMessage> transcript, AiUserPreferencesContext context) {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt + UserContextRenderer.render(context)));
         for (ConversationMessage turn : transcript) {

@@ -1,5 +1,6 @@
 package com.ezdo.service.ai.decompose;
 
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 import com.ezdo.dto.ai.decompose.*;
 import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
@@ -85,7 +86,7 @@ public class GoalDecompositionService {
 
         transcript.add(new ConversationMessage("user", List.of(new TextBlock(request.message()))));
 
-        DecompositionUserContext userContext = userContextService.buildFor(userId);
+        AiUserPreferencesContext userContext = userContextService.buildFor(userId);
         List<ContentBlock> replyBlocks =
             generateReply(promptBuilder.build(transcript, userContext), userId);
         transcript.add(new ConversationMessage("assistant", replyBlocks));

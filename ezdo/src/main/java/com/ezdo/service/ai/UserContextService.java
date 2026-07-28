@@ -1,6 +1,6 @@
 package com.ezdo.service.ai;
 
-import com.ezdo.dto.ai.decompose.DecompositionUserContext;
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
 import com.ezdo.exception.UserNotFoundException;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Builds a fresh {@link DecompositionUserContext} for a single AI call: the user's
+ * Builds a fresh {@link AiUserPreferencesContext} for a single AI call: the user's
  * real categories, scheduling preferences, and the current date-time resolved in their
  * timezone. Shared by every service that grounds a model call in per-user data.
  * Never cached across calls, so edits the user makes to categories/preferences
@@ -30,7 +30,7 @@ public class UserContextService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    public DecompositionUserContext buildFor(UUID userId) {
+    public AiUserPreferencesContext buildFor(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
         Preferences prefs = user.getPreferences();
@@ -45,12 +45,12 @@ public class UserContextService {
             }
         }
 
-        List<DecompositionUserContext.CategoryOption> categories = categoryRepository.findByUserId(userId)
+        List<AiUserPreferencesContext.CategoryOption> categories = categoryRepository.findByUserId(userId)
             .stream()
-            .map(c -> new DecompositionUserContext.CategoryOption(c.getId(), c.getName()))
+            .map(c -> new AiUserPreferencesContext.CategoryOption(c.getId(), c.getName()))
             .toList();
 
-        return new DecompositionUserContext(
+        return new AiUserPreferencesContext(
             LocalDateTime.now(zone),
             prefs != null ? prefs.getTimezone() : null,
             prefs != null ? prefs.getPreferredSessionDuration() : null,

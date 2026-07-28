@@ -1,4 +1,4 @@
-package com.ezdo.dto.ai.decompose;
+package com.ezdo.dto.ai;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -12,7 +12,7 @@ import java.util.UUID;
  * moment in the user's own timezone — not just the date — because resolving phrasing
  * like "at 7pm" ("today if that's still ahead, otherwise tomorrow") needs the time.
  */
-public record DecompositionUserContext(
+public record AiUserPreferencesContext(
     LocalDateTime now,
     String timezone,
     Integer preferredSessionDuration,

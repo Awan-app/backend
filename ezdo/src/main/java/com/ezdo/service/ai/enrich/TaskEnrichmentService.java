@@ -1,7 +1,7 @@
 package com.ezdo.service.ai.enrich;
 
 import com.ezdo.dto.CategoryResponse;
-import com.ezdo.dto.ai.decompose.DecompositionUserContext;
+import com.ezdo.dto.ai.AiUserPreferencesContext;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentResult;
 import com.ezdo.dto.goal.TaskCreateRequest;
@@ -11,6 +11,7 @@ import com.ezdo.dto.task.TaskWithSessionsResponse;
 import com.ezdo.entity.SessionStatus;
 import com.ezdo.exception.AiUnavailableException;
 import com.ezdo.exception.InvalidOperationException;
+import com.ezdo.exception.ResultParseException;
 import com.ezdo.service.TaskService;
 import com.ezdo.service.ai.TaskDraftNormalizer;
 import com.ezdo.service.ai.UserContextService;
@@ -73,7 +74,7 @@ public class TaskEnrichmentService {
             throw new InvalidOperationException("Task title is required");
         }
 
-        DecompositionUserContext context = userContextService.buildFor(userId);
+        AiUserPreferencesContext context = userContextService.buildFor(userId);
         List<Message> messages = promptBuilder.build(request, context);
 
         TaskEnrichmentResult result = generateResult(messages, userId);
@@ -112,11 +113,11 @@ public class TaskEnrichmentService {
     private TaskEnrichmentResult generateResult(List<Message> messages, UUID userId) {
         try {
             return codec.parseResult(callModel(messages, userId));
-        } catch (TaskEnrichmentCodec.ResultParseException first) {
+        } catch (ResultParseException first) {
             log.warn("Task enrichment reply was not valid JSON, retrying once", first);
             try {
                 return codec.parseResult(callModel(messages, userId));
-            } catch (TaskEnrichmentCodec.ResultParseException second) {
+            } catch (ResultParseException second) {
                 throw new AiUnavailableException(second);
             }
         }
