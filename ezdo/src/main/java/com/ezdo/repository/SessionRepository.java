@@ -63,6 +63,11 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         @Param("toTime") LocalDateTime toTime
     );
 
+    @Query("SELECT s FROM Session s WHERE s.task.goal.user.id = :userId " +
+            "AND s.start >= :dayStart AND s.start < :dayEnd")
+    List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
+                                      @Param("dayStart") LocalDateTime dayStart,
+                                      @Param("dayEnd") LocalDateTime dayEnd);
     @Modifying
     @Query("UPDATE Session s SET s.zone = null WHERE s.zone.id IN :zoneIds")
     void nullifyZoneId(@Param("zoneIds") List<UUID> zoneIds);

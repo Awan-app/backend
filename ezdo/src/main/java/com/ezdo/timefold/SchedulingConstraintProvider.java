@@ -5,6 +5,8 @@ import ai.timefold.solver.core.api.score.stream.Constraint;
 import ai.timefold.solver.core.api.score.stream.ConstraintFactory;
 import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
 
+import java.util.UUID;
+
 public class SchedulingConstraintProvider implements ConstraintProvider {
 
     @Override
@@ -20,19 +22,28 @@ public class SchedulingConstraintProvider implements ConstraintProvider {
                 penalizeUnassignedChunks(factory), // added
                 minimizeFragmentation(factory),
                 preferEarlier(factory)
+                //number of sessions,
         };
     }
 
     Constraint categoryMatch(ConstraintFactory factory) {
         return factory.forEach(SessionChunk.class)
                 .filter(chunk -> chunk.getStartingGrain() != null
-                        && chunk.getCategoryId() != null
-                        && chunk.getStartingGrain().getCategoryId() != null
-                        && !chunk.getCategoryId().equals(chunk.getStartingGrain().getCategoryId()))
-                .penalize(HardMediumSoftScore.ONE_HARD)
+                        && !categoryMatches(chunk))
+                .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Category mismatch");
     }
 
+    private boolean categoryMatches(SessionChunk chunk) {
+        UUID chunkCat = chunk.getCategoryId();
+        UUID zoneCat = chunk.getStartingGrain().getCategoryId();
+        if (chunkCat == null) {
+            return false;
+        }
+        return chunkCat.equals(zoneCat);
+    }
+
+    // HARD: chunk overflows past the end of its containing zone
     Constraint stayWithinZone(ConstraintFactory factory) {
         return factory.forEach(SessionChunk.class)
                 .filter(chunk -> chunk.getStartingGrain() != null
