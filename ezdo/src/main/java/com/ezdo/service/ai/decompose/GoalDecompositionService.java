@@ -1,4 +1,4 @@
-package com.ezdo.service;
+package com.ezdo.service.ai.decompose;
 
 import com.ezdo.dto.ai.decompose.*;
 import com.ezdo.dto.goal.GoalCreateRequest;
@@ -6,28 +6,26 @@ import com.ezdo.dto.goal.GoalInfoResponse;
 import com.ezdo.entity.Category;
 import com.ezdo.entity.DecompositionStatus;
 import com.ezdo.entity.GoalDecompositionSession;
-import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
 import com.ezdo.exception.AiUnavailableException;
 import com.ezdo.exception.GoalDecompositionSessionNotFoundException;
 import com.ezdo.exception.InvalidDecompositionException;
-import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.ResultParseException;
 import com.ezdo.mapper.ProposalMapper;
 import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.GoalDecompositionSessionRepository;
 import com.ezdo.repository.UserRepository;
-import com.ezdo.service.ai.ConversationCodec;
-import com.ezdo.service.ai.DecompositionPromptBuilder;
+import com.ezdo.service.GoalService;
+import com.ezdo.service.ai.UserContextService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +40,7 @@ public class GoalDecompositionService {
     private final GoalService goalService;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final UserContextService userContextService;
     private final ChatClient chatClient;
     private final ConversationCodec codec;
     private final DecompositionPromptBuilder promptBuilder;
@@ -53,6 +52,8 @@ public class GoalDecompositionService {
         GoalService goalService,
         UserRepository userRepository,
         CategoryRepository categoryRepository,
+        UserContextService userContextService,
+        @Qualifier("planningModel")
         ChatClient chatClient,
         ConversationCodec codec,
         DecompositionPromptBuilder promptBuilder,
@@ -63,6 +64,7 @@ public class GoalDecompositionService {
         this.goalService = goalService;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.userContextService = userContextService;
         this.chatClient = chatClient;
         this.codec = codec;
         this.promptBuilder = promptBuilder;
@@ -83,7 +85,7 @@ public class GoalDecompositionService {
 
         transcript.add(new ConversationMessage("user", List.of(new TextBlock(request.message()))));
 
-        DecompositionUserContext userContext = buildUserContext(userId);
+        DecompositionUserContext userContext = userContextService.buildFor(userId);
         List<ContentBlock> replyBlocks =
             generateReply(promptBuilder.build(transcript, userContext), userId);
         transcript.add(new ConversationMessage("assistant", replyBlocks));
@@ -184,40 +186,6 @@ public class GoalDecompositionService {
     }
 
     /**
-     * Builds the grounding context for one turn: the user's real categories, their
-     * scheduling preferences, and today's date resolved in their timezone. Built fresh
-     * every call — never cached — so edits made mid-conversation are always reflected.
-     */
-    private DecompositionUserContext buildUserContext(UUID userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
-        Preferences prefs = user.getPreferences();
-
-        ZoneId zone = ZoneId.of("UTC");
-        if (prefs != null && prefs.getTimezone() != null) {
-            try {
-                zone = ZoneId.of(prefs.getTimezone());
-            } catch (Exception e) {
-                log.warn("Invalid timezone '{}' for user {}, defaulting to UTC",
-                    prefs.getTimezone(), userId);
-            }
-        }
-
-        List<DecompositionUserContext.CategoryOption> categories = categoryRepository.findByUserId(userId)
-            .stream()
-            .map(c -> new DecompositionUserContext.CategoryOption(c.getId(), c.getName()))
-            .toList();
-
-        return new DecompositionUserContext(
-            LocalDate.now(zone),
-            prefs != null ? prefs.getTimezone() : null,
-            prefs != null ? prefs.getPreferredSessionDuration() : null,
-            prefs != null ? prefs.getBufferBetweenSessions() : null,
-            categories
-        );
-    }
-
-    /**
      * Replaces any task's category with null if its id doesn't belong to this user's
      * real category set, logging so a pattern of hallucinated ids is visible rather
      * than silently swallowed.
@@ -243,11 +211,11 @@ public class GoalDecompositionService {
     private List<ContentBlock> generateReply(List<Message> messages, UUID userId) {
         try {
             return codec.parseBlocks(callModel(messages, userId));
-        } catch (ConversationCodec.BlockParseException first) {
+        } catch (ResultParseException first) {
             log.warn("Model reply was not valid blocks, retrying once", first);
             try {
                 return codec.parseBlocks(callModel(messages, userId));
-            } catch (ConversationCodec.BlockParseException second) {
+            } catch (ResultParseException second) {
                 log.warn("Model reply still invalid after retry, falling back to text", second);
                 return List.of(new TextBlock(
                     "Sorry, I had trouble putting that together. Could you rephrase or add a little more detail?"));
@@ -298,6 +266,6 @@ public class GoalDecompositionService {
             log.warn("Model returned {} proposal blocks in one reply; contract allows at most one. Using the first.",
                 proposals.size());
         }
-        return proposals.isEmpty() ? null : proposals.get(0);
+        return proposals.isEmpty() ? null : proposals.getFirst();
     }
 }

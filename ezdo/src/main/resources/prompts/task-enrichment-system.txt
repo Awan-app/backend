@@ -65,10 +65,13 @@ scheduledStart / scheduledEnd
   "tonight", "this weekend").
 - If you find explicit or clearly implied scheduling intent (e.g. "tomorrow
   at 7pm for two hours", "next Monday at 9am"), resolve relative terms using
-  today's date from USER CONTEXT and output the parsed start and end as ISO
-  datetime strings (e.g. "2026-07-26T19:00:00" and "2026-07-26T21:00:00").
-- If the user says "at 7pm" without specifying which day, assume today if it's
-  still ahead, otherwise tomorrow.
+  the current date AND time from USER CONTEXT — that is the user's own local
+  wall clock, not yours — and output the parsed start and end as ISO datetime
+  strings (e.g. "2026-07-26T19:00:00" and "2026-07-26T21:00:00").
+- If the user says "at 7pm" without specifying which day, compare 19:00
+  against the current time in USER CONTEXT: if it is still ahead of the
+  current time today, use today; otherwise use tomorrow.
+- Never produce a scheduledStart earlier than the current date and time.
 - If the user gives a time but no duration, set scheduledEnd based on the
   estimatedDuration (e.g. if estimatedDuration=120 and start is 19:00,
   scheduledEnd = 21:00).

@@ -1,6 +1,7 @@
-package com.ezdo.service.ai;
+package com.ezdo.service.ai.enrich;
 
 import com.ezdo.dto.ai.enrich.TaskEnrichmentResult;
+import com.ezdo.exception.ResultParseException;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -12,13 +13,6 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Component
 public class TaskEnrichmentCodec {
-
-    /** Raised when the model's raw output cannot be parsed into a result. */
-    public static class ResultParseException extends RuntimeException {
-        public ResultParseException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 
     private final ObjectMapper objectMapper;
 
@@ -35,26 +29,5 @@ public class TaskEnrichmentCodec {
         } catch (Exception e) {
             throw new ResultParseException("Model output was not a valid enrichment result", e);
         }
-    }
-
-    private String extractJsonObject(String raw) {
-        String s = raw.strip();
-        if (s.startsWith("```")) {
-            int firstNewline = s.indexOf('\n');
-            if (firstNewline >= 0) {
-                s = s.substring(firstNewline + 1);
-            }
-            int closingFence = s.lastIndexOf("```");
-            if (closingFence >= 0) {
-                s = s.substring(0, closingFence);
-            }
-            s = s.strip();
-        }
-        int start = s.indexOf('{');
-        int end = s.lastIndexOf('}');
-        if (start < 0 || end < 0 || end < start) {
-            throw new ResultParseException("No JSON object found in model output", null);
-        }
-        return s.substring(start, end + 1);
     }
 }

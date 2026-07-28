@@ -1,9 +1,10 @@
-package com.ezdo.service.ai;
+package com.ezdo.service.ai.decompose;
 
 import com.ezdo.dto.ai.decompose.BlockEnvelope;
 import com.ezdo.dto.ai.decompose.ContentBlock;
 import com.ezdo.dto.ai.decompose.ConversationMessage;
 import com.ezdo.dto.ai.decompose.GoalProposal;
+import com.ezdo.exception.ResultParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
@@ -27,13 +28,6 @@ public class ConversationCodec {
         new TypeReference<>() {};
 
     private final ObjectMapper objectMapper;
-
-    /** Raised when the model's raw output cannot be parsed into blocks. */
-    public static class BlockParseException extends RuntimeException {
-        public BlockParseException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 
     // --- transcript column ---------------------------------------------------
 
@@ -92,44 +86,22 @@ public class ConversationCodec {
      * Defensive parse of the model's raw reply: strips markdown code fences and any
      * surrounding prose, then deserializes the {@code {"blocks":[...]}} envelope.
      *
-     * @throws BlockParseException if no valid envelope can be extracted
+     * @throws ResultParseException if no valid envelope can be extracted
      */
     public List<ContentBlock> parseBlocks(String rawModelOutput) {
         if (rawModelOutput == null || rawModelOutput.isBlank()) {
-            throw new BlockParseException("Model returned empty output", null);
+            throw new ResultParseException("Model returned empty output", null);
         }
-        String json = rawModelOutput;
         try {
-            BlockEnvelope envelope = objectMapper.readValue(json, BlockEnvelope.class);
+            BlockEnvelope envelope = objectMapper.readValue(rawModelOutput, BlockEnvelope.class);
             if (envelope.blocks() == null || envelope.blocks().isEmpty()) {
-                throw new BlockParseException("Model output contained no blocks", null);
+                throw new ResultParseException("Model output contained no blocks", null);
             }
             return envelope.blocks();
-        } catch (BlockParseException e) {
+        } catch (ResultParseException e) {
             throw e;
         } catch (Exception e) {
-            throw new BlockParseException("Model output was not a valid block envelope", e);
+            throw new ResultParseException("Model output was not a valid block envelope", e);
         }
-    }
-
-    private String extractJsonObject(String raw) {
-        String s = raw.strip();
-        if (s.startsWith("```")) {
-            int firstNewline = s.indexOf('\n');
-            if (firstNewline >= 0) {
-                s = s.substring(firstNewline + 1);
-            }
-            int closingFence = s.lastIndexOf("```");
-            if (closingFence >= 0) {
-                s = s.substring(0, closingFence);
-            }
-            s = s.strip();
-        }
-        int start = s.indexOf('{');
-        int end = s.lastIndexOf('}');
-        if (start < 0 || end < 0 || end < start) {
-            throw new BlockParseException("No JSON object found in model output", null);
-        }
-        return s.substring(start, end + 1);
     }
 }

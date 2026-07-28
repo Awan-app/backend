@@ -1,6 +1,7 @@
-package com.ezdo.service.ai;
+package com.ezdo.service.ai.decompose;
 
 import com.ezdo.dto.ai.decompose.*;
+import com.ezdo.service.ai.UserContextRenderer;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -45,7 +46,7 @@ public class DecompositionPromptBuilder {
 
     public List<Message> build(List<ConversationMessage> transcript, DecompositionUserContext context) {
         List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(systemPrompt + renderUserContext(context)));
+        messages.add(new SystemMessage(systemPrompt + UserContextRenderer.render(context)));
         for (ConversationMessage turn : transcript) {
             if ("assistant".equalsIgnoreCase(turn.role())) {
                 messages.add(new AssistantMessage(codec.writeBlocks(turn.blocks())));
@@ -68,43 +69,5 @@ public class DecompositionPromptBuilder {
             sb.append('\n');
         }
         return sb.toString().strip();
-    }
-
-    /**
-     * Renders the per-user grounding section referenced by the system prompt's
-     * "USER CONTEXT" pointers (categories, targetDate estimation, task sizing).
-     * Appended to the static prompt rather than sent as a separate SystemMessage.
-     */
-    private String renderUserContext(DecompositionUserContext ctx) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n\n=====================================================================\n");
-        sb.append("USER CONTEXT\n");
-        sb.append("=====================================================================\n");
-        sb.append("Today's date: ").append(ctx.today()).append("\n");
-
-        if (ctx.timezone() != null) {
-            sb.append("User's timezone: ").append(ctx.timezone()).append("\n");
-        }
-        if (ctx.preferredSessionDuration() != null) {
-            sb.append("User's preferred focused-session length: ")
-                .append(ctx.preferredSessionDuration()).append(" minutes. ")
-                .append("Prefer sizing individual task durations around this rather than the generic ")
-                .append("15-minutes-to-half-a-day range where the two conflict.\n");
-        }
-        if (ctx.bufferBetweenSessions() != null) {
-            sb.append("User's preferred buffer between sessions: ")
-                .append(ctx.bufferBetweenSessions()).append(" minutes.\n");
-        }
-
-        sb.append("Categories — use the EXACT id and name below for a task's \"category\", ")
-            .append("or null if none fit. Never invent an id or name not listed here:\n");
-        if (ctx.categories() == null || ctx.categories().isEmpty()) {
-            sb.append("- (this user has no categories yet; every task's category must be null)\n");
-        } else {
-            for (DecompositionUserContext.CategoryOption c : ctx.categories()) {
-                sb.append("- id: ").append(c.id()).append(", name: \"").append(c.name()).append("\"\n");
-            }
-        }
-        return sb.toString();
     }
 }

@@ -37,6 +37,17 @@ spring:
       chat:
         model: ${SPRING_OPENAI_CHAT_MODEL:deepseek-v4-flash-free}
         temperature: ${SPRING_OPENAI_CHAT_TEMPERATURE:0.4}
+    google:
+      genai:
+        api-key: ${SPRING_GENAI_API_KEY:}
+        chat:
+          model: ${SPRING_GENAI_CHAT_MODEL:gemini-2.5-flash}
+          temperature: ${SPRING_GENAI_CHAT_TEMPERATURE:0.4}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 logging:
   level:
@@ -64,6 +75,9 @@ ezdo:
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
+    image:
+      max-tasks: ${EZDO_AI_IMAGE_MAX_TASKS:25}
+      max-sessions-per-task: ${EZDO_AI_IMAGE_MAX_SESSIONS:10}
 
 timefold:
   solver:

@@ -1,7 +1,8 @@
-package com.ezdo.service.ai;
+package com.ezdo.service.ai.enrich;
 
 import com.ezdo.dto.ai.decompose.DecompositionUserContext;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
+import com.ezdo.service.ai.UserContextRenderer;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;

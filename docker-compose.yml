@@ -49,11 +49,19 @@ services:
       SPRING_OPENAI_CHAT_MODEL: ${SPRING_OPENAI_CHAT_MODEL:-llama-3.3-70b-versatile}
       SPRING_OPENAI_CHAT_TEMPERATURE: ${SPRING_OPENAI_CHAT_TEMPERATURE:-0.4}
 
+      # AI (Google GenAI — the vision model behind /api/v1/ai/image-to-tasks).
+      # Required: the app fails to start without a key.
+      SPRING_GENAI_API_KEY: ${SPRING_GENAI_API_KEY}
+      SPRING_GENAI_CHAT_MODEL: ${SPRING_GENAI_CHAT_MODEL:-gemini-2.5-flash}
+      SPRING_GENAI_CHAT_TEMPERATURE: ${SPRING_GENAI_CHAT_TEMPERATURE:-0.4}
+
       # EZDO-specific settings
       EZDO_JWT_SECRET: ${EZDO_JWT_SECRET}
       EZDO_OTP_PEPPER: ${EZDO_OTP_PEPPER}
       EZDO_MAIL_FROM: ${EZDO_MAIL_FROM:-noreply@awan.com}
       EZDO_AI_MAX_TURNS: ${EZDO_AI_MAX_TURNS:-20}
+      EZDO_AI_IMAGE_MAX_TASKS: ${EZDO_AI_IMAGE_MAX_TASKS:-25}
+      EZDO_AI_IMAGE_MAX_SESSIONS: ${EZDO_AI_IMAGE_MAX_SESSIONS:-10}
 
   mailpit:
     image: axllent/mailpit:latest

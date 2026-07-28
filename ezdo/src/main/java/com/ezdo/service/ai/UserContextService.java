@@ -1,23 +1,23 @@
 package com.ezdo.service.ai;
 
 import com.ezdo.dto.ai.decompose.DecompositionUserContext;
-import com.ezdo.entity.Category;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
+import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Builds a fresh {@link DecompositionUserContext} for a single AI call: the user's
- * real categories, scheduling preferences, and today's date resolved in their
+ * real categories, scheduling preferences, and the current date-time resolved in their
  * timezone. Shared by every service that grounds a model call in per-user data.
  * Never cached across calls, so edits the user makes to categories/preferences
  * mid-session are always reflected on the next call.
@@ -32,7 +32,7 @@ public class UserContextService {
 
     public DecompositionUserContext buildFor(UUID userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
+            .orElseThrow(() -> new UserNotFoundException(userId));
         Preferences prefs = user.getPreferences();
 
         ZoneId zone = ZoneId.of("UTC");
@@ -51,10 +51,12 @@ public class UserContextService {
             .toList();
 
         return new DecompositionUserContext(
-            LocalDate.now(zone),
+            LocalDateTime.now(zone),
             prefs != null ? prefs.getTimezone() : null,
             prefs != null ? prefs.getPreferredSessionDuration() : null,
             prefs != null ? prefs.getBufferBetweenSessions() : null,
+            prefs != null ? prefs.getWakeupTime() : null,
+            prefs != null ? prefs.getSleepTime() : null,
             categories
         );
     }
