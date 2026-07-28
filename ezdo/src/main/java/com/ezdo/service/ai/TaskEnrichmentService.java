@@ -5,8 +5,11 @@ import com.ezdo.dto.ai.decompose.DecompositionUserContext;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
 import com.ezdo.dto.ai.enrich.TaskEnrichmentResult;
 import com.ezdo.dto.goal.TaskCreateRequest;
-import com.ezdo.dto.goal.TaskInfoResponse;
+import com.ezdo.dto.task.SessionDraftRequest;
+import com.ezdo.dto.task.TaskWithSessionsRequest;
+import com.ezdo.dto.task.TaskWithSessionsResponse;
 import com.ezdo.entity.Category;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.exception.AiUnavailableException;
 import com.ezdo.exception.InvalidOperationException;
 import com.ezdo.repository.CategoryRepository;
@@ -25,9 +28,9 @@ import java.util.stream.Collectors;
 /**
  * Single-shot enrichment: given a task title/description, asks the model to fill in
  * the operational fields (description if blank, duration, points, mandatory,
- * splitting, category) grounded in the user's real categories and scheduling
- * preferences, and returns a proposal for the caller to review. Does not persist
- * anything — creation is a separate step.
+ * splitting, category, and optionally scheduling info) grounded in the user's real
+ * categories and scheduling preferences. Creates the Task and, if the user mentioned
+ * timing, also creates Sessions.
  */
 @Slf4j
 @Service
@@ -43,7 +46,7 @@ public class TaskEnrichmentService {
     private final TaskEnrichmentCodec codec;
     private final TaskService taskService;
 
-    public TaskInfoResponse enrich(UUID userId, TaskEnrichmentRequest request) {
+    public TaskWithSessionsResponse enrich(UUID userId, TaskEnrichmentRequest request) {
         if (request.title() == null || request.title().isBlank()) {
             throw new InvalidOperationException("Task title is required");
         }
@@ -62,10 +65,63 @@ public class TaskEnrichmentService {
             normalizePoints(result.estimatedPoints()),
             result.allowTaskSplitting() != null && result.allowTaskSplitting(),
             null,
-            category.id()
+            category != null ? category.id() : null
         );
 
-        return taskService.createTask(userId, createRequest);
+        if (result.scheduledStart() != null && result.scheduledEnd() != null) {
+            SessionDraftRequest session = new SessionDraftRequest(
+                null,
+                result.scheduledStart(),
+                result.scheduledEnd(),
+                SessionStatus.SCHEDULED
+            );
+            TaskWithSessionsRequest withSessions = new TaskWithSessionsRequest(
+                createRequest, List.of(session)
+            );
+            return taskService.createTaskWithSessions(userId, withSessions);
+        }
+
+        return new TaskWithSessionsResponse(
+            taskService.createTask(userId, createRequest),
+            List.of()
+        );
+    }
+
+    public TaskWithSessionsRequest enrichNoPersist(UUID userId, TaskEnrichmentRequest request) {
+        if (request.title() == null || request.title().isBlank()) {
+            throw new InvalidOperationException("Task title is required");
+        }
+
+        DecompositionUserContext context = userContextService.buildFor(userId);
+        List<Message> messages = promptBuilder.build(request, context);
+
+        TaskEnrichmentResult result = generateResult(messages, userId);
+        CategoryResponse category = sanitizeCategory(result.category(), userId);
+
+        TaskCreateRequest createRequest = new TaskCreateRequest(
+            request.title().strip(),
+            resolveDescription(request, result),
+            normalizeDuration(result.estimatedDuration()),
+            result.mandatory() == null || result.mandatory(),
+            normalizePoints(result.estimatedPoints()),
+            result.allowTaskSplitting() != null && result.allowTaskSplitting(),
+            null,
+            category != null ? category.id() : null
+        );
+
+        if (result.scheduledStart() != null && result.scheduledEnd() != null) {
+            SessionDraftRequest session = new SessionDraftRequest(
+                null,
+                result.scheduledStart(),
+                result.scheduledEnd(),
+                SessionStatus.SCHEDULED
+            );
+            return new TaskWithSessionsRequest(
+                createRequest, List.of(session)
+            );
+        }
+
+        return new TaskWithSessionsRequest(createRequest, List.of());
     }
 
     /**
