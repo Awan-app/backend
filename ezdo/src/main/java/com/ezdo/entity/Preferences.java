@@ -42,7 +42,7 @@ public class Preferences {
     @Column(name = "scheduling_type")
     private SchedulingType schedulingType;
 
-    @Column(name = "daily_summary_enabled", nullable = false)
+    @Column(name = "daily_summary_enabled")
     @Builder.Default
     private Boolean dailySummaryEnabled = true;
 }
