@@ -43,11 +43,12 @@ public class DecompositionController {
     }
 
     @PostMapping("/task-create")
-    public ResponseEntity<TaskWithSessionsResponse> create(
+    public ResponseEntity<?> create(
         @AuthenticationPrincipal UUID userId,
+        @RequestParam(defaultValue = "true") Boolean persist,
         @Valid @RequestBody TaskEnrichmentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(enrichmentService.enrich(userId, request));
+            .body(persist ? enrichmentService.enrich(userId, request) : enrichmentService.enrichNoPersist(userId, request));
     }
 
     @GetMapping("/goal-decompose/{sessionId}")

@@ -87,6 +87,43 @@ public class TaskEnrichmentService {
         );
     }
 
+    public TaskWithSessionsRequest enrichNoPersist(UUID userId, TaskEnrichmentRequest request) {
+        if (request.title() == null || request.title().isBlank()) {
+            throw new InvalidOperationException("Task title is required");
+        }
+
+        DecompositionUserContext context = userContextService.buildFor(userId);
+        List<Message> messages = promptBuilder.build(request, context);
+
+        TaskEnrichmentResult result = generateResult(messages, userId);
+        CategoryResponse category = sanitizeCategory(result.category(), userId);
+
+        TaskCreateRequest createRequest = new TaskCreateRequest(
+            request.title().strip(),
+            resolveDescription(request, result),
+            normalizeDuration(result.estimatedDuration()),
+            result.mandatory() == null || result.mandatory(),
+            normalizePoints(result.estimatedPoints()),
+            result.allowTaskSplitting() != null && result.allowTaskSplitting(),
+            null,
+            category != null ? category.id() : null
+        );
+
+        if (result.scheduledStart() != null && result.scheduledEnd() != null) {
+            SessionDraftRequest session = new SessionDraftRequest(
+                null,
+                result.scheduledStart(),
+                result.scheduledEnd(),
+                SessionStatus.SCHEDULED
+            );
+            return new TaskWithSessionsRequest(
+                createRequest, List.of(session)
+            );
+        }
+
+        return new TaskWithSessionsRequest(createRequest, List.of());
+    }
+
     /**
      * Parse failures get one retry, same policy as goal decomposition. Unlike that
      * flow there's no sensible partial response to fall back to here, so a second
