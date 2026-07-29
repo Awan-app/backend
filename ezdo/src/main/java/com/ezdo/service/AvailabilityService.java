@@ -85,6 +85,7 @@ public class AvailabilityService {
                         zoneStart,
                         null,
                         null,
+                        null,
                         null
                 ));
             }
@@ -107,6 +108,7 @@ public class AvailabilityService {
                             overlapStart,
                             zone.id(),
                             zone.name(),
+                            zone.color(),
                             zone.category()
                     ));
                 }
@@ -119,6 +121,7 @@ public class AvailabilityService {
                         zoneEnd,
                         zone.id(),
                         zone.name(),
+                        zone.color(),
                         zone.category()
                 ));
             }
@@ -130,6 +133,7 @@ public class AvailabilityService {
             slots.add(new AvailableSlot(
                     current,
                     daySleep,
+                    null,
                     null,
                     null,
                     null
