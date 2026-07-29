@@ -1,6 +1,7 @@
 package com.ezdo.dto.ai;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record AiSchedulingPayload(
@@ -8,6 +9,7 @@ public record AiSchedulingPayload(
     String goalDescription,
     LocalDate startDate,
     LocalDate endDate,
+    LocalDateTime currentDateTime,
     List<AiTaskItem> tasks,
     UserPreferencesContext preferences,
     List<DaySlot> calendar

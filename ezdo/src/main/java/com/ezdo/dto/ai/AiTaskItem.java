@@ -10,5 +10,7 @@ public record AiTaskItem(
     int estimatedPoints,
     boolean mandatory,
     boolean allowSplitting,
-    List<String> dependsOnTaskIds
+    List<String> dependsOnTaskIds,
+    String categoryId,
+    String categoryName
 ) {}
