@@ -1,6 +1,6 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.ai.*;
+import com.ezdo.dto.ai.schedule.*;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.Task;
 import com.ezdo.entity.Zone;

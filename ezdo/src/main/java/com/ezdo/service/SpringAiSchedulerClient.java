@@ -1,8 +1,9 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.ai.AiSchedulingPayload;
-import com.ezdo.dto.ai.AiSchedulingResult;
+import com.ezdo.dto.ai.schedule.AiSchedulingPayload;
+import com.ezdo.dto.ai.schedule.AiSchedulingResult;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,9 @@ public class SpringAiSchedulerClient implements AiSchedulerClient {
     private final String systemPrompt;
 
     public SpringAiSchedulerClient(
-            ChatClient chatClient,
-            @Value("classpath:prompts/scheduling-system.txt") Resource promptResource
+        @Qualifier("planningModel")
+        ChatClient chatClient,
+        @Value("classpath:prompts/scheduling-system.txt") Resource promptResource
     ) throws IOException {
         this.chatClient = chatClient;
         this.systemPrompt = new String(

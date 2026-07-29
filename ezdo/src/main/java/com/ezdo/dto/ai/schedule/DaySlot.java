@@ -1,4 +1,4 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.schedule;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.schedule;
 
 public record FailedTask(
     String taskId,

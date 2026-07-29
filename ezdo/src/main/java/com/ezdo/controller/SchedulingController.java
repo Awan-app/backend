@@ -1,10 +1,10 @@
 package com.ezdo.controller;
 
 import com.ezdo.dto.SessionResponse;
-import com.ezdo.dto.ai.GoalScheduleRequest;
-import com.ezdo.dto.ai.GoalScheduleResponse;
-import com.ezdo.dto.ai.TaskScheduleRequest;
-import com.ezdo.dto.ai.TaskScheduleResponse;
+import com.ezdo.dto.ai.schedule.GoalScheduleRequest;
+import com.ezdo.dto.ai.schedule.GoalScheduleResponse;
+import com.ezdo.dto.ai.schedule.TaskScheduleRequest;
+import com.ezdo.dto.ai.schedule.TaskScheduleResponse;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.service.GoalSchedulingService;
 import jakarta.validation.Valid;

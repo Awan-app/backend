@@ -1,4 +1,4 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.schedule;
 
 public enum FailureReason {
     INSUFFICIENT_TIME,

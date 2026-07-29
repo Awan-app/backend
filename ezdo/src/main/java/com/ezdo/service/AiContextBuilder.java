@@ -1,11 +1,10 @@
 package com.ezdo.service;
 
 import com.ezdo.dto.ZoneResponse;
-import com.ezdo.dto.ai.*;
+import com.ezdo.dto.ai.schedule.*;
 import com.ezdo.entity.Goal;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Session;
-import com.ezdo.entity.Task;
 import com.ezdo.exception.GoalNotFoundException;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.SessionRepository;

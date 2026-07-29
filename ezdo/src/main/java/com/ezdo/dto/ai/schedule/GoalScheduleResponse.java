@@ -1,10 +1,10 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.schedule;
 
 import java.util.List;
 import java.util.UUID;
 
-public record TaskScheduleResponse(
-    UUID taskId,
+public record GoalScheduleResponse(
+    UUID goalId,
     List<ScheduledSessionResult> scheduledSessions,
     List<UnscheduledTaskResult> unscheduledTasks
 ) {}

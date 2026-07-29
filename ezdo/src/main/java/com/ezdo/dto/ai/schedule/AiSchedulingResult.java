@@ -1,4 +1,4 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.schedule;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;

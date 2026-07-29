@@ -1,7 +1,7 @@
 package com.ezdo.service;
 
 import com.ezdo.dto.SessionResponse;
-import com.ezdo.dto.ai.*;
+import com.ezdo.dto.ai.schedule.*;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.entity.*;
 import com.ezdo.exception.GoalNotFoundException;

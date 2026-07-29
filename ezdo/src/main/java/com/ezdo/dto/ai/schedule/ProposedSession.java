@@ -1,8 +1,6 @@
-package com.ezdo.dto.ai;
+package com.ezdo.dto.ai.schedule;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public record ProposedSession(
         String taskId,
