@@ -7,5 +7,6 @@ public record AvailableZone(
     String zoneName,
     LocalTime startTime,
     LocalTime endTime,
-    long durationMinutes
+    long durationMinutes,
+    String categoryName
 ) {}
