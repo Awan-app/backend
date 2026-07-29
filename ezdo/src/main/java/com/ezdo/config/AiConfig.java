@@ -18,7 +18,7 @@ public class AiConfig {
 
     @Bean("planningModel")
     public ChatClient openAiChatClient(
-        @Qualifier("openAiChatModel") ChatModel openAiChatModel
+        @Qualifier("googleGenAiChatModel") ChatModel openAiChatModel
     ) {
         return ChatClient.builder(openAiChatModel).build();
     }

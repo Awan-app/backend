@@ -41,7 +41,7 @@ spring:
       genai:
         api-key: ${SPRING_GENAI_API_KEY:}
         chat:
-          model: ${SPRING_GENAI_CHAT_MODEL:gemini-2.5-flash}
+          model: ${SPRING_GENAI_CHAT_MODEL:gemini-3.5-flash-lite}
           temperature: ${SPRING_GENAI_CHAT_TEMPERATURE:0.4}
 
   servlet:
@@ -75,9 +75,10 @@ ezdo:
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
-    image:
-      max-tasks: ${EZDO_AI_IMAGE_MAX_TASKS:25}
-      max-sessions-per-task: ${EZDO_AI_IMAGE_MAX_SESSIONS:10}
+    plan:
+      max-tasks: ${EZDO_AI_PLAN_MAX_TASKS:25}
+      max-sessions-per-task: ${EZDO_AI_PLAN_MAX_SESSIONS:10}
+      availability-horizon-days: ${EZDO_AI_PLAN_HORIZON_DAYS:14}
 
 timefold:
   solver:

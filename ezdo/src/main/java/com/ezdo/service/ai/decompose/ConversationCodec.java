@@ -5,6 +5,7 @@ import com.ezdo.dto.ai.decompose.ContentBlock;
 import com.ezdo.dto.ai.decompose.ConversationMessage;
 import com.ezdo.dto.ai.decompose.GoalProposal;
 import com.ezdo.exception.ResultParseException;
+import com.ezdo.service.ai.JsonExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
@@ -89,11 +90,14 @@ public class ConversationCodec {
      * @throws ResultParseException if no valid envelope can be extracted
      */
     public List<ContentBlock> parseBlocks(String rawModelOutput) {
-        if (rawModelOutput == null || rawModelOutput.isBlank()) {
-            throw new ResultParseException("Model returned empty output", null);
+        String json;
+        try {
+            json = JsonExtractor.extractObject(rawModelOutput);
+        } catch (JsonExtractor.NoJsonObjectException e) {
+            throw new ResultParseException(e.getMessage(), e);
         }
         try {
-            BlockEnvelope envelope = objectMapper.readValue(rawModelOutput, BlockEnvelope.class);
+            BlockEnvelope envelope = objectMapper.readValue(json, BlockEnvelope.class);
             if (envelope.blocks() == null || envelope.blocks().isEmpty()) {
                 throw new ResultParseException("Model output contained no blocks", null);
             }

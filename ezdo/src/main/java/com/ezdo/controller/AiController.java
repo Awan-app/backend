@@ -3,15 +3,14 @@ package com.ezdo.controller;
 import com.ezdo.dto.ai.decompose.ChatMessage;
 import com.ezdo.dto.ai.decompose.ChatReply;
 import com.ezdo.dto.ai.decompose.TranscriptResponse;
-import com.ezdo.dto.ai.enrich.TaskEnrichmentRequest;
-import com.ezdo.dto.ai.image.ImageTaskExtractionResponse;
+import com.ezdo.dto.ai.plan.TaskPlanningRequest;
+import com.ezdo.dto.ai.plan.TaskProposalResponse;
 import com.ezdo.dto.goal.GoalInfoResponse;
 import com.ezdo.service.ai.decompose.GoalDecompositionService;
-import com.ezdo.service.ai.enrich.TaskEnrichmentService;
 import com.ezdo.service.ai.image.ImageTaskExtractionService;
+import com.ezdo.service.ai.plan.TaskPlanningService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +25,7 @@ import java.util.UUID;
 public class AiController {
 
     private final GoalDecompositionService decompositionService;
-    private final TaskEnrichmentService enrichmentService;
+    private final TaskPlanningService planningService;
     private final ImageTaskExtractionService imageTaskExtractionService;
 
     @PostMapping("/goal-decompose")
@@ -47,16 +46,15 @@ public class AiController {
     }
 
     @PostMapping("/task-create")
-    public ResponseEntity<?> create(
+    public TaskProposalResponse create(
         @AuthenticationPrincipal UUID userId,
-        @RequestParam(defaultValue = "true") Boolean persist,
-        @Valid @RequestBody TaskEnrichmentRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(persist ? enrichmentService.enrich(userId, request) : enrichmentService.enrichNoPersist(userId, request));
+        @Valid @RequestBody TaskPlanningRequest request
+    ) {
+        return planningService.planFromText(userId, request);
     }
 
     @PostMapping(value = "/image-to-tasks", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ImageTaskExtractionResponse extract(
+    public TaskProposalResponse extract(
         @AuthenticationPrincipal UUID userId,
         @RequestPart("image") MultipartFile image,
         @RequestPart(value = "note", required = false) String note
