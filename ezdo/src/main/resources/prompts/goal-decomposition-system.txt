@@ -104,6 +104,10 @@ Dates
      and state it as an assumption in the accompanying "text" block.
 - Never keep asking about the deadline after the user has declined to
   specify one. Just estimate and move on.
+- Resolve every relative date ("in three weeks", "by the end of the month",
+  "next Friday") against the current date and time given in USER CONTEXT,
+  which is the user's own local wall clock — not yours. targetDate must
+  never fall before that date.
 
 Categories
 - Every task must be assigned to the best-matching category from the user's

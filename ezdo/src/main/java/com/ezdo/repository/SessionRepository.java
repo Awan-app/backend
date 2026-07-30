@@ -50,11 +50,32 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
                                           @Param("startDate") LocalDateTime startDate,
                                           @Param("endDate") LocalDateTime endDate);
 
+    /**
+     * Same range as {@link #findByUserIdAndDateRange}, but the task is fetch-joined.
+     * The plain query joins {@code s.task} only to filter by owner, which leaves the
+     * association a lazy proxy — fine for reading its id, but any caller that needs
+     * the task's title or flags (the AI schedule context does) would N+1 or blow up
+     * outside a transaction.
+     */
+    @Query("""
+        SELECT s FROM Session s
+        JOIN FETCH s.task t
+        LEFT JOIN FETCH t.category
+        JOIN t.goal g
+        WHERE g.user.id = :userId
+          AND s.start >= :startDate
+          AND s.start < :endDate
+        ORDER BY s.start ASC
+    """)
+    List<Session> findByUserIdAndDateRangeWithTask(@Param("userId") UUID userId,
+                                                   @Param("startDate") LocalDateTime startDate,
+                                                   @Param("endDate") LocalDateTime endDate);
+
     @Query("""
         SELECT s FROM Session s
         JOIN s.task t
         JOIN t.goal g
-        WHERE g.user.id = :userId 
+        WHERE g.user.id = :userId
         AND s.start >= :fromTime AND s.end <= :toTime
     """)
     List<Session> findByUserIdAndTimeRange(

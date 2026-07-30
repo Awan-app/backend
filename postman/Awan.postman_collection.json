@@ -2915,7 +2915,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/ai/task-create?persist=true",
+              "raw": "{{baseUrl}}/v1/ai/task-create",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2923,50 +2923,87 @@
                 "v1",
                 "ai",
                 "task-create"
-              ],
-              "query": [
-                {
-                  "key": "persist",
-                  "value": "true",
-                  "description": "If true (default), creates the task and returns TaskWithSessionsResponse. If false, returns the proposed TaskWithSessionsRequest without persisting (for preview)."
-                }
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Build login page\",\n  \"description\": \"Create a login page with email and password fields\"\n}",
+              "raw": "{\n  \"text\": \"I need to build a login page with email and password fields, plus validation. Also set up the database schema for user accounts.\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Create a task with AI-enriched details. The AI analyzes the title and description to suggest optimal duration, points, category, scheduling, and other fields \u2014 grounded in the user's real categories and preferences.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `persist` | boolean | No | `true` | If `true`, creates the task (and optional sessions) in the DB and returns `TaskWithSessionsResponse`. If `false`, returns the proposed `TaskWithSessionsRequest` without persisting (for preview). |\n\n**Request Body:**\n- `title` (string, required) \u2013 Task title (max 255 chars).\n- `description` (string, optional) \u2013 Task description (max 2000 chars). If provided, the AI will not overwrite it. If omitted, the AI infers one.\n\n**Response (201) when persist=true:** `TaskWithSessionsResponse`\n- `task` (object) \u2013 `TaskInfoResponse`:\n  - `id` (UUID) \u2013 Task ID.\n  - `title` (string) \u2013 Title (echoed from request).\n  - `description` (string or null) \u2013 AI-enriched description (if user didn't provide one).\n  - `estimatedDuration` (int) \u2013 AI-estimated minutes.\n  - `status` (string) \u2013 `SCHEDULED`.\n  - `mandatory` (boolean) \u2013 AI-suggested.\n  - `estimatedPoints` (int) \u2013 AI-estimated points.\n  - `allowTaskSplitting` (boolean) \u2013 AI-suggested.\n  - `goalId` (UUID) \u2013 Auto-assigned to Inbox.\n  - `category` (CategoryResponse or null) \u2013 AI-suggested category (matched to user's existing categories).\n  - `dependsOnTaskIds` (UUID[]) \u2013 Empty.\n- `sessions` (array) \u2013 If the AI inferred timing info (e.g. \"tomorrow at 10am\"), pre-scheduled `SessionResponse[]`. Otherwise empty:\n  - `id` (UUID) \u2013 Session ID.\n  - `start` (ISO datetime) \u2013 Session start.\n  - `end` (ISO datetime) \u2013 Session end.\n  - `status` (string) \u2013 `SCHEDULED`.\n  - `locked` (boolean) \u2013 `false`.\n  - `zoneId` (UUID or null) \u2013 `null` for AI-scheduled sessions.\n  - `taskId` (UUID) \u2013 Task ID.\n\n**Response (201) when persist=false:** `TaskWithSessionsRequest` (the proposed data without persisting).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid fields.\n- `AI_UNAVAILABLE` (503) \u2013 AI service unavailable."
+            "description": "Create task proposals from a free-form natural language note. The AI analyzes the text against your categories, preferences, and calendar availability, and returns one or more structured task drafts with AI-estimated durations, points, categories, and suggested scheduling.\n\nNothing is persisted by this endpoint. Each task in the response carries a `draft` that is literally the body to POST to `/api/v1/tasks/with-sessions` to accept that task, so confirming needs no mapping on the client side.\n\nTwo independent scheduling channels:\n- `draft.sessions` \u2014 Timing the source itself stated (e.g. \"tomorrow at 3pm\") is passed through untouched.\n- `aiProposedSessions` \u2014 The model\u2019s own suggestion grounded in real availability, with a `reason` explaining the choice.\n\n**Request Body:**\n- `text` (string, required) \u2014 Free-form natural language note (max 4000 chars). Examples: \"Build login page with validation\", \"Gym Monday and Wednesday 6-8pm, grocery shopping Friday morning\".\n\n**Response (200):** `TaskProposalResponse`\n- `sourceSummary` (string or null) \u2014 Always null for typed notes. Present for image uploads to show what was read from the image.\n- `tasks` (array) \u2014 Proposed task drafts:\n  - `draft` (TaskWithSessionsRequest) \u2014 Body to POST to `/api/v1/tasks/with-sessions`:\n    - `task` (object): `title`, `description`, `estimatedDuration`, `mandatory`, `estimatedPoints`, `allowTaskSplitting`, `goalId`, `categoryId`.\n    - `sessions` (array): Timing from source text \u2014 `start` (ISO datetime), `end` (ISO datetime), `zoneId` (UUID or null), `status` = `SCHEDULED`.\n  - `aiProposedSessions` (array) \u2014 AI-proposed timing, same structure as `draft.sessions`.\n  - `reason` (string) \u2014 Why the AI proposed those times, or what prevented scheduling.\n- `timestamp` (ISO instant) \u2014 When the response was generated.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2014 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2014 Text is blank or exceeds 4000 characters.\n- `AI_UNAVAILABLE` (503) \u2014 AI service is unavailable or returned unparseable output."
           },
           "response": [
             {
-              "name": "Created (with sessions)",
-              "status": "Created",
-              "code": 201,
+              "name": "Task Proposal",
+              "status": "OK",
+              "code": 200,
               "header": [
                 {
                   "key": "Content-Type",
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Build login page\",\n    \"description\": \"Create a login page with email and password fields including validation\",\n    \"estimatedDuration\": 60,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"inbox-goal-uuid\",\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Development\"\n    },\n    \"dependsOnTaskIds\": []\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-28T09:00:00\",\n      \"end\": \"2026-07-28T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null,\n      \"taskId\": \"task-uuid-here\"\n    }\n  ]\n}"
+              "body": "{\n  \"sourceSummary\": null,\n  \"tasks\": [\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Build login page\",\n          \"description\": \"Create a login page with email and password fields including validation\",\n          \"estimatedDuration\": 60,\n          \"mandatory\": true,\n          \"estimatedPoints\": 30,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": \"cat-uuid-here\"\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:00:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ],\n      \"reason\": \"Your morning Development zone on Jul 30 has room, and this is a high-priority task.\"\n    },\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Set up database schema\",\n          \"description\": \"Design and create the user accounts database schema\",\n          \"estimatedDuration\": 45,\n          \"mandatory\": true,\n          \"estimatedPoints\": 20,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [],\n      \"reason\": \"No suitable time slot was found in the planning horizon due to existing commitments.\"\n    }\n  ],\n  \"timestamp\": \"2026-07-30T08:30:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Image to Tasks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/image-to-tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "image-to-tasks"
+              ]
             },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Image file (PNG, JPEG, WebP, GIF, max 10MB)"
+                },
+                {
+                  "key": "note",
+                  "type": "text",
+                  "value": "Finish these by Friday",
+                  "description": "Optional additional context or instructions"
+                }
+              ]
+            },
+            "description": "Upload an image (photo of a whiteboard, handwritten todo list, screenshot, etc.) and the AI extracts actionable tasks from it.\n\nThe pipeline runs two AI models:\n1. Vision model (Google Gemini) reads the image into a faithful text report.\n2. Planning model (OpenAI-compatible) converts the report into structured task proposals.\n\nNothing is persisted by this endpoint. Each task in the response carries a `draft` that is the body to POST to `/api/v1/tasks/with-sessions` to accept it.\n\n**Multipart Form-Data Fields:**\n- `image` (file, required) \u2014 Image file. Supported types: PNG, JPEG, WebP, GIF. Max size: 10MB.\n- `note` (text, optional) \u2014 Additional context or instructions (e.g. \"Focus on the top 3 items\", \"Finish by Friday\").\n\n**Response (200):** `TaskProposalResponse`\n- `sourceSummary` (string or null) \u2014 The raw text report from the vision model, so the UI can show what was understood.\n- `tasks` (array) \u2014 Proposed task drafts (same structure as task-create endpoint).\n- `timestamp` (ISO instant) \u2014 When the response was generated.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2014 Missing/invalid/expired JWT.\n- `INVALID_OPERATION` (400) \u2014 No image provided or image is empty.\n- `UNSUPPORTED_IMAGE_TYPE` (415) \u2014 Unsupported image format. Supported: PNG, JPEG, WebP, GIF.\n- `INVALID_OPERATION` (400) \u2014 Image exceeds 10MB.\n- `AI_UNAVAILABLE` (503) \u2014 AI service unavailable."
+          },
+          "response": [
             {
-              "name": "Created (no sessions)",
-              "status": "Created",
-              "code": 201,
+              "name": "Task Proposal (from image)",
+              "status": "OK",
+              "code": 200,
               "header": [
                 {
                   "key": "Content-Type",
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Build login page\",\n    \"description\": \"Create a login page with email and password fields\",\n    \"estimatedDuration\": 30,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 20,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"inbox-goal-uuid\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"sessions\": []\n}"
+              "body": "{\n  \"sourceSummary\": \"TASK 1: Buy groceries for the week\\nTASK 2: Finish project report\\nTASK 3: Call dentist for appointment at 3pm Friday\",\n  \"tasks\": [\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Buy groceries\",\n          \"description\": \"Buy groceries for the week\",\n          \"estimatedDuration\": 45,\n          \"mandatory\": false,\n          \"estimatedPoints\": 10,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [],\n      \"reason\": \"This is a routine errand; it can fit into any available free slot.\"\n    },\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Finish project report\",\n          \"description\": \"Complete and submit the project report\",\n          \"estimatedDuration\": 120,\n          \"mandatory\": true,\n          \"estimatedPoints\": 50,\n          \"allowTaskSplitting\": true,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T14:00:00\",\n          \"end\": \"2026-07-30T16:00:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ],\n      \"reason\": \"Your afternoon focus block on Jul 30 has enough room for this 2-hour task.\"\n    },\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Call dentist\",\n          \"description\": \"Call dentist to schedule an appointment at 3pm Friday\",\n          \"estimatedDuration\": 10,\n          \"mandatory\": false,\n          \"estimatedPoints\": 5,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": [\n          {\n            \"zoneId\": null,\n            \"start\": \"2026-08-01T15:00:00\",\n            \"end\": \"2026-08-01T15:10:00\",\n            \"status\": \"SCHEDULED\"\n          }\n        ]\n      },\n      \"aiProposedSessions\": [],\n      \"reason\": \"The source text explicitly states 'at 3pm Friday', so that time was preserved as-is.\"\n    }\n  ],\n  \"timestamp\": \"2026-07-30T08:30:00Z\"\n}"
             }
           ]
         },

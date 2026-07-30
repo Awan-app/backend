@@ -57,4 +57,18 @@ AND d IN :daysOfWeek
 """)
     Optional<Template> findByUserIdAndDayOfWeekWithZones(@Param("userId") UUID userId, @Param("dayOfWeek") DayOfWeek dayOfWeek);
 
+    /**
+     * Every template a user has, with its weekdays, zones and zone categories all
+     * fetched. Callers resolving a date range index these by day-of-week in memory
+     * rather than issuing a query per day.
+     */
+    @Query("""
+        SELECT DISTINCT t FROM Template t
+        LEFT JOIN FETCH t.zones z
+        LEFT JOIN FETCH z.category
+        LEFT JOIN FETCH t.daysOfWeek
+        WHERE t.user.id = :userId
+    """)
+    List<Template> findByUserIdWithZones(@Param("userId") UUID userId);
+
 }

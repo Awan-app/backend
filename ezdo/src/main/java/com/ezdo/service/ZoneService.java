@@ -27,9 +27,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -108,27 +112,51 @@ public class ZoneService {
     }
 
     public List<ZoneResponse> getZonesByDate(UUID userId, LocalDate date) {
-        Optional<TemplateOverride> override =
-            templateOverrideRepository.findByUserIdAndDateOfDayWithZones(userId, date);
+        return getZonesByDateRange(userId, date, date).getOrDefault(date, List.of());
+    }
 
-        if (override.isPresent()) {
-            return override.get().getZones().stream()
-                .map(zoneMapper::toZoneResponse)
-                .sorted(Comparator.comparing(ZoneResponse::startTime))
-                .toList();
+    /**
+     * Resolves zones for every date in a range with a fixed two queries, rather than
+     * the two-per-day (plus a lazy category load per zone) that calling
+     * {@link #getZonesByDate} in a loop costs. Callers scanning a horizon — the AI
+     * schedule context, availability over a range — should use this.
+     *
+     * <p>Resolution per date is unchanged: a per-date override wins outright,
+     * otherwise the template covering that weekday, otherwise nothing.
+     */
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<ZoneResponse>> getZonesByDateRange(UUID userId,
+                                                                  LocalDate startDate,
+                                                                  LocalDate endDate) {
+        Map<LocalDate, TemplateOverride> overridesByDate = templateOverrideRepository
+            .findByUserIdAndDateRangeWithZones(userId, startDate, endDate).stream()
+            .collect(Collectors.toMap(TemplateOverride::getDateOfDay, o -> o, (first, second) -> first));
+
+        // At most one template may claim a given weekday; the overlap checks on
+        // create/update enforce that, so the first one wins here as it does today.
+        Map<DayOfWeek, Template> templatesByDay = new EnumMap<>(DayOfWeek.class);
+        for (Template template : templateRepository.findByUserIdWithZones(userId)) {
+            for (DayOfWeek day : template.getDaysOfWeek()) {
+                templatesByDay.putIfAbsent(day, template);
+            }
         }
 
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-
-        Optional<Template> template = templateRepository
-            .findByUserIdAndDayOfWeekWithZones(userId, dayOfWeek);
-
-        return template.map(value -> value
-                .getZones().stream()
+        Map<LocalDate, List<ZoneResponse>> result = new LinkedHashMap<>();
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            TemplateOverride override = overridesByDate.get(date);
+            List<Zone> zones;
+            if (override != null) {
+                zones = override.getZones();
+            } else {
+                Template template = templatesByDay.get(date.getDayOfWeek());
+                zones = template != null ? template.getZones() : List.of();
+            }
+            result.put(date, zones.stream()
                 .map(zoneMapper::toZoneResponse)
                 .sorted(Comparator.comparing(ZoneResponse::startTime))
-                .toList())
-            .orElseGet(List::of);
+                .toList());
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)
