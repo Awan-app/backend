@@ -1256,6 +1256,55 @@
           ]
         },
         {
+          "name": "Bulk Create Tasks with Sessions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": null,\n        \"categoryId\": \"cat-uuid-1\"\n      },\n      \"sessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"categoryId\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/with-sessions/bulk",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "with-sessions",
+                "bulk"
+              ]
+            },
+            "description": "Create multiple tasks with their pre-scheduled sessions in a single request. This is the bulk version of `POST /api/v1/tasks/with-sessions`.\n\nAll tasks are created atomically \u2014 either all succeed or none are persisted.\n\n**Request Body:**\n- `tasks` (array, required, max 50) \u2014 List of task-with-sessions objects.\n  Each item follows the same structure as `POST /api/v1/tasks/with-sessions`:\n  - `task` (object, required) \u2014 Task fields:\n    - `title` (string, required) \u2013 Max 255 chars.\n    - `description` (string, optional) \u2013 Max 2000 chars.\n    - `estimatedDuration` (int, optional) \u2013 Minutes. Defaults to user's `preferredSessionDuration`.\n    - `mandatory` (boolean, optional) \u2013 Default: `false`.\n    - `estimatedPoints` (int, optional) \u2013 Default: 0.\n    - `allowTaskSplitting` (boolean, optional) \u2013 Default: `false`.\n    - `goalId` (UUID, optional) \u2013 Target goal. **Null \u2192 task goes to Inbox.**\n    - `categoryId` (UUID, optional) \u2013 Category to assign.\n  - `sessions` (array, optional, max 50 per task) \u2013 Pre-scheduled sessions:\n    - `zoneId` (UUID, optional) \u2013 Zone to associate.\n    - `start` (LocalDateTime, required) \u2013 Format: `YYYY-MM-DDTHH:mm:ss`.\n    - `end` (LocalDateTime, required) \u2013 Must be after `start`.\n    - `status` (enum, optional) \u2013 Default: `SCHEDULED`.\n\n**Response (201):** `TasksWithSessionsResponse`\n- `tasks` (array) \u2013 List of created `TaskWithSessionsResponse`:\n  - `task` (object) \u2013 `TaskInfoResponse` (task details with generated ID).\n  - `sessions` (array) \u2013 `SessionResponse[]` with generated IDs.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2013 Request body validation failed (e.g. empty list, too many tasks, invalid fields).\n- `GOAL_NOT_FOUND` (404) \u2013 If any `goalId` doesn't exist/not owned.\n- `ZONE_NOT_FOUND` (404) \u2013 If any `zoneId` doesn't exist/not owned.\n- `CATEGORY_NOT_FOUND` (404) \u2013 If any `categoryId` doesn't exist.\n- `INVALID_SESSION_TIME_RANGE` (400) \u2013 Session start/end are null or end is not after start.\n- `INVALID_OPERATION` (400) \u2013 Any other validation failure."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
           "name": "Get Task Sessions",
           "request": {
             "method": "GET",
@@ -1292,6 +1341,55 @@
                 }
               ],
               "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Add Sessions to Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessions\": [\n    {\n      \"zoneId\": \"zone-uuid-here\",\n      \"start\": \"2026-07-30T14:00:00\",\n      \"end\": \"2026-07-30T15:00:00\",\n      \"status\": \"SCHEDULED\"\n    },\n    {\n      \"start\": \"2026-07-31T09:00:00\",\n      \"end\": \"2026-07-31T10:00:00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "sessions"
+              ]
+            },
+            "description": "Add new sessions to an existing task. Sessions are appended to the task's existing sessions.\n\n**Path Parameters:**\n- `taskId` (UUID, required) \u2013 Task ID.\n\n**Request Body:**\n- `sessions` (array, required, max 50) \u2013 Sessions to add. Each item:\n  - `zoneId` (UUID, optional) \u2013 Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) \u2013 Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) \u2013 Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) \u2013 Default: `SCHEDULED`. Options: `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `SKIPPED`.\n\n**Response (201):** `SessionResponse[]` \u2014 The newly created sessions.\n- `id` (UUID) \u2013 Session ID.\n- `start` (ISO datetime) \u2013 Start time.\n- `end` (ISO datetime) \u2013 End time.\n- `status` (string) \u2013 Current status.\n- `locked` (boolean) \u2013 Whether the session is locked.\n- `zoneId` (UUID or null) \u2013 Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2013 Request body validation failed.\n- `TASK_NOT_FOUND` (404) \u2013 Task not found or not owned by user.\n- `ZONE_NOT_FOUND` (404) \u2013 If any `zoneId` doesn't exist/not owned.\n- `INVALID_SESSION_TIME_RANGE` (400) \u2013 Session start/end are null or end is not after start."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"new-session-uuid-1\",\n    \"start\": \"2026-07-30T14:00:00\",\n    \"end\": \"2026-07-30T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"zone-uuid-here\",\n    \"taskId\": \"task-uuid-here\"\n  },\n  {\n    \"id\": \"new-session-uuid-2\",\n    \"start\": \"2026-07-31T09:00:00\",\n    \"end\": \"2026-07-31T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"task-uuid-here\"\n  }\n]"
             }
           ]
         },
