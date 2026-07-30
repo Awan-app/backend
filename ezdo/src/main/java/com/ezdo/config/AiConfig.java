@@ -22,4 +22,11 @@ public class AiConfig {
     ) {
         return ChatClient.builder(openAiChatModel).build();
     }
+
+    @Bean("planningModel2")
+    public ChatClient openAiChatClient2(
+        @Qualifier("openAiChatModel") ChatModel openAiChatModel
+    ) {
+        return ChatClient.builder(openAiChatModel).build();
+    }
 }
