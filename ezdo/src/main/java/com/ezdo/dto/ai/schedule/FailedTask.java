@@ -2,6 +2,6 @@ package com.ezdo.dto.ai.schedule;
 
 public record FailedTask(
     String taskId,
-    FailureReason reason,
+//    FailureReason reason,
     String message
 ) {}
