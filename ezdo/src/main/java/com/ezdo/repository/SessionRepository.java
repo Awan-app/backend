@@ -2,6 +2,7 @@ package com.ezdo.repository;
 
 import com.ezdo.entity.Session;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -49,11 +50,32 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
                                           @Param("startDate") LocalDateTime startDate,
                                           @Param("endDate") LocalDateTime endDate);
 
+    /**
+     * Same range as {@link #findByUserIdAndDateRange}, but the task is fetch-joined.
+     * The plain query joins {@code s.task} only to filter by owner, which leaves the
+     * association a lazy proxy — fine for reading its id, but any caller that needs
+     * the task's title or flags (the AI schedule context does) would N+1 or blow up
+     * outside a transaction.
+     */
+    @Query("""
+        SELECT s FROM Session s
+        JOIN FETCH s.task t
+        LEFT JOIN FETCH t.category
+        JOIN t.goal g
+        WHERE g.user.id = :userId
+          AND s.start >= :startDate
+          AND s.start < :endDate
+        ORDER BY s.start ASC
+    """)
+    List<Session> findByUserIdAndDateRangeWithTask(@Param("userId") UUID userId,
+                                                   @Param("startDate") LocalDateTime startDate,
+                                                   @Param("endDate") LocalDateTime endDate);
+
     @Query("""
         SELECT s FROM Session s
         JOIN s.task t
         JOIN t.goal g
-        WHERE g.user.id = :userId 
+        WHERE g.user.id = :userId
         AND s.start >= :fromTime AND s.end <= :toTime
     """)
     List<Session> findByUserIdAndTimeRange(
@@ -61,4 +83,13 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         @Param("fromTime") LocalDateTime fromTime,
         @Param("toTime") LocalDateTime toTime
     );
+
+    @Query("SELECT s FROM Session s WHERE s.task.goal.user.id = :userId " +
+            "AND s.start >= :dayStart AND s.start < :dayEnd")
+    List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
+                                      @Param("dayStart") LocalDateTime dayStart,
+                                      @Param("dayEnd") LocalDateTime dayEnd);
+    @Modifying
+    @Query("UPDATE Session s SET s.zone = null WHERE s.zone.id IN :zoneIds")
+    void nullifyZoneId(@Param("zoneIds") List<UUID> zoneIds);
 }

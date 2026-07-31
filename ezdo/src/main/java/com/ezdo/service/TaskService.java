@@ -6,6 +6,10 @@ import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
 import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
+import com.ezdo.dto.task.AddSessionsRequest;
+import com.ezdo.dto.task.SessionDraftRequest;
+import com.ezdo.dto.task.TasksWithSessionsRequest;
+import com.ezdo.dto.task.TasksWithSessionsResponse;
 import com.ezdo.dto.task.TaskWithSessionsRequest;
 import com.ezdo.dto.task.TaskWithSessionsResponse;
 import com.ezdo.entity.*;
@@ -47,7 +51,7 @@ public class TaskService {
         }
 
         Category category = request.categoryId() != null ?
-            categoryRepository.findById(request.categoryId())
+            categoryRepository.findByIdAndUserId(request.categoryId(), userId)
                 .orElseThrow(() -> new CategoryNotFoundException(request.categoryId()))
             : null;
 
@@ -80,7 +84,7 @@ public class TaskService {
         }
 
         Category category = taskReq.categoryId() != null ?
-            categoryRepository.findById(taskReq.categoryId())
+            categoryRepository.findByIdAndUserId(taskReq.categoryId(), userId)
                 .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
             : null;
 
@@ -120,6 +124,100 @@ public class TaskService {
         );
     }
 
+    @Transactional
+    public TasksWithSessionsResponse createTasksWithSessionsBulk(
+        UUID userId, TasksWithSessionsRequest request
+    ) {
+        User user = findUser(userId);
+        List<Task> tasks = new ArrayList<>();
+
+        for (TaskWithSessionsRequest item : request.tasks()) {
+            TaskCreateRequest taskReq = item.task();
+            Goal goal = (taskReq.goalId() != null)
+                ? goalRepository.findByIdAndUserId(taskReq.goalId(), userId)
+                    .orElseThrow(() -> new GoalNotFoundException(taskReq.goalId()))
+                : goalService.getOrCreateInbox(userId);
+
+            Integer duration = taskReq.estimatedDuration();
+            if (duration == null) {
+                duration = user.getPreferences().getPreferredSessionDuration();
+            }
+
+            Category category = taskReq.categoryId() != null
+                ? categoryRepository.findByIdAndUserId(taskReq.categoryId(), userId)
+                    .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
+                : null;
+
+            Task task = Task.builder()
+                .goal(goal)
+                .title(taskReq.title())
+                .description(taskReq.description())
+                .estimatedDuration(duration)
+                .mandatory(Boolean.TRUE.equals(taskReq.mandatory()))
+                .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
+                .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
+                .category(category)
+                .status(TaskStatus.SCHEDULED)
+                .build();
+
+            for (var sessionReq : item.sessions()) {
+                Zone zone = null;
+                if (sessionReq.zoneId() != null) {
+                    zone = zoneRepository.findByIdAndUserId(sessionReq.zoneId(), userId)
+                        .orElseThrow(() -> new ZoneNotFoundException(sessionReq.zoneId()));
+                }
+                validateSessionTimeRange(sessionReq.start(), sessionReq.end());
+                Session session = Session.builder()
+                    .start(sessionReq.start())
+                    .end(sessionReq.end())
+                    .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                    .zone(zone)
+                    .task(task)
+                    .build();
+                task.getSessions().add(session);
+            }
+            tasks.add(task);
+        }
+
+        List<Task> saved = taskRepository.saveAll(tasks);
+        return new TasksWithSessionsResponse(
+            saved.stream()
+                .map(t -> new TaskWithSessionsResponse(
+                    taskMapper.toInfoResponse(t),
+                    t.getSessions().stream().map(sessionMapper::toResponse).toList()))
+                .toList()
+        );
+    }
+
+    @Transactional
+    public List<SessionResponse> addSessionsToTask(
+        UUID userId, UUID taskId, AddSessionsRequest request
+    ) {
+        Task task = getOwnedTask(userId, taskId);
+        List<Session> newSessions = new ArrayList<>();
+
+        for (SessionDraftRequest sessionReq : request.sessions()) {
+            Zone zone = null;
+            if (sessionReq.zoneId() != null) {
+                zone = zoneRepository.findByIdAndUserId(sessionReq.zoneId(), userId)
+                    .orElseThrow(() -> new ZoneNotFoundException(sessionReq.zoneId()));
+            }
+            validateSessionTimeRange(sessionReq.start(), sessionReq.end());
+            Session session = Session.builder()
+                .start(sessionReq.start())
+                .end(sessionReq.end())
+                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                .zone(zone)
+                .task(task)
+                .build();
+            newSessions.add(session);
+            task.getSessions().add(session);
+        }
+
+        taskRepository.save(task);
+        return newSessions.stream().map(sessionMapper::toResponse).toList();
+    }
+
     @Transactional(readOnly = true)
     public List<TaskInfoResponse> listTasksForGoal(UUID userId, UUID goalId) {
         return taskRepository.findByGoalIdAndGoalUserId(goalId, userId).stream()
@@ -141,7 +239,7 @@ public class TaskService {
         if (request.mandatory() != null) task.setMandatory(request.mandatory());
         if (request.estimatedPoints() != null) task.setEstimatedPoints(request.estimatedPoints());
         if (request.allowTaskSplitting() != null) task.setAllowTaskSplitting(request.allowTaskSplitting());
-        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
+        if (request.categoryId() != null) task.setCategory(categoryRepository.findByIdAndUserId(request.categoryId(), userId).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
         return taskMapper.toInfoResponse(task);
     }
 

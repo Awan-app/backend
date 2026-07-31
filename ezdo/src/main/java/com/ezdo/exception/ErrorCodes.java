@@ -62,10 +62,14 @@ public class ErrorCodes {
     public static final String GOAL_DECOMPOSITION_SESSION_NOT_FOUND = "GOAL_DECOMPOSITION_SESSION_NOT_FOUND";
     public static final String INVALID_DECOMPOSITION = "INVALID_DECOMPOSITION";
     public static final String AI_UNAVAILABLE = "AI_UNAVAILABLE";
+    public static final String UNSUPPORTED_IMAGE_TYPE = "UNSUPPORTED_IMAGE_TYPE";
 
     // Not Found
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
     public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";
     public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
     public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
+
+    // Failed
+    public static final String SCHEDULING_FAILED = "SCHEDULING_FAILED";
 }

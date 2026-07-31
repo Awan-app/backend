@@ -7,6 +7,7 @@ import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
 import com.ezdo.exception.InsufficientPointsException;
 import com.ezdo.exception.InvalidSleepScheduleException;
+import com.ezdo.exception.InvalidTimezoneException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.UserMapper;
 import com.ezdo.repository.UserRepository;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DateTimeException;
+import java.time.ZoneId;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -30,22 +34,49 @@ public class UserService {
         return userMapper.toProfileResponse(user);
     }
 
+    @Transactional(readOnly = true)
+    public Map<String, Boolean> isNew(UUID userId) {
+        return Map.of("isNew", findUser(userId).getIsNew());
+    }
+
     @Transactional
     public UserProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (user.getPreferences() == null) {
-            Preferences preferences = new Preferences();
-            preferences.setUser(user);
-            user.setPreferences(preferences);
+        if (request.timezone() != null) {
+            try {
+                ZoneId.of(request.timezone());
+            } catch (DateTimeException ex) {
+                throw new InvalidTimezoneException();
+            }
+        }
+        if (request.wakeupTime() != null && request.sleepTime() != null
+                && request.wakeupTime().equals(request.sleepTime())) {
+            throw new InvalidSleepScheduleException(
+                request.wakeupTime(), request.sleepTime());
+        }
+
+        if (hasAnyPreferenceField(request)) {
+            if (user.getPreferences() == null) {
+                Preferences preferences = new Preferences();
+                preferences.setUser(user);
+                user.setPreferences(preferences);
+            }
         }
 
         userMapper.updateProfileFromRequest(request, user);
 
-        userRepository.save(user);
+        return userMapper.toProfileResponse(userRepository.save(user));
+    }
 
-        return userMapper.toProfileResponse(user);
+    private boolean hasAnyPreferenceField(UpdateProfileRequest request) {
+        return request.timezone() != null
+            || request.preferredSessionDuration() != null
+            || request.bufferBetweenSessions() != null
+            || request.wakeupTime() != null
+            || request.sleepTime() != null
+            || request.schedulingType() != null;
     }
 
     @Transactional
