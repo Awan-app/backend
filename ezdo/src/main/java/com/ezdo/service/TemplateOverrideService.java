@@ -61,7 +61,7 @@ public class TemplateOverrideService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(resolveCategory(userId, zr.name()))
+                    .category(resolveCategory(zr.name()))
                     .templateOverride(override)
                     .build();
                 override.getZones().add(zone);
@@ -121,7 +121,7 @@ public class TemplateOverrideService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
-                    .category(resolveCategory(userId, item.name()))
+                    .category(resolveCategory(item.name()))
                     .templateOverride(override)
                     .build());
             } else {
@@ -135,7 +135,7 @@ public class TemplateOverrideService {
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
-                existing.setCategory(resolveCategory(userId, item.name()));
+                existing.setCategory(resolveCategory(item.name()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -167,14 +167,8 @@ public class TemplateOverrideService {
         }
     }
 
-    private Category resolveCategory(UUID userId, String zoneName) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        return categoryRepository.findByNameAndUserId(zoneName, userId)
-            .orElseGet(() -> categoryRepository.save(Category.builder()
-                .name(zoneName)
-                .user(user)
-                .build()));
+    private Category resolveCategory(String zoneName) {
+        return categoryRepository.findByName(zoneName).orElse(null);
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

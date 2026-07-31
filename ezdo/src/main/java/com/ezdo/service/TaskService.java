@@ -51,7 +51,7 @@ public class TaskService {
         }
 
         Category category = request.categoryId() != null ?
-            categoryRepository.findByIdAndUserId(request.categoryId(), userId)
+            categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(request.categoryId()))
             : null;
 
@@ -84,7 +84,7 @@ public class TaskService {
         }
 
         Category category = taskReq.categoryId() != null ?
-            categoryRepository.findByIdAndUserId(taskReq.categoryId(), userId)
+            categoryRepository.findById(taskReq.categoryId())
                 .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
             : null;
 
@@ -144,7 +144,7 @@ public class TaskService {
             }
 
             Category category = taskReq.categoryId() != null
-                ? categoryRepository.findByIdAndUserId(taskReq.categoryId(), userId)
+                ? categoryRepository.findById(taskReq.categoryId())
                     .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
                 : null;
 
@@ -239,7 +239,7 @@ public class TaskService {
         if (request.mandatory() != null) task.setMandatory(request.mandatory());
         if (request.estimatedPoints() != null) task.setEstimatedPoints(request.estimatedPoints());
         if (request.allowTaskSplitting() != null) task.setAllowTaskSplitting(request.allowTaskSplitting());
-        if (request.categoryId() != null) task.setCategory(categoryRepository.findByIdAndUserId(request.categoryId(), userId).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
+        if (request.categoryId() != null) task.setCategory(categoryRepository.findById(request.categoryId()).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
         return taskMapper.toInfoResponse(task);
     }
 

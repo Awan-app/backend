@@ -31,20 +31,19 @@ public class TaskDraftNormalizer {
      * feed it to {@link #sanitizeCategory}, so extracting N tasks costs one query
      * rather than N.
      */
-    public Set<UUID> validCategoryIds(UUID userId) {
-        return categoryRepository.findByUserId(userId).stream()
+    public Set<UUID> validCategoryIds() {
+        return categoryRepository.findAll().stream()
             .map(Category::getId)
             .collect(Collectors.toSet());
     }
 
-    /** Never trust the model's category id blindly — clear it if it doesn't belong to this user. */
-    public CategoryResponse sanitizeCategory(CategoryResponse category, Set<UUID> validIds, UUID userId) {
+    /** Never trust the model's category id blindly — clear it if it doesn't exist. */
+    public CategoryResponse sanitizeCategory(CategoryResponse category, Set<UUID> validIds) {
         if (category == null || category.id() == null) {
             return null;
         }
         if (!validIds.contains(category.id())) {
-            log.warn("AI draft for user {} referenced unknown category id {}; clearing it",
-                userId, category.id());
+            log.warn("AI draft referenced unknown category id {}; clearing it", category.id());
             return null;
         }
         return category;

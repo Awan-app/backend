@@ -5,19 +5,16 @@ import com.ezdo.dto.ZoneResponse;
 import com.ezdo.entity.Category;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.TemplateOverride;
-import com.ezdo.entity.User;
 import com.ezdo.entity.Zone;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
-import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.exception.ZoneNotFoundException;
 import com.ezdo.exception.ZoneOverlapException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.TemplateRepository;
-import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +41,6 @@ public class ZoneService {
     private final TemplateRepository templateRepository;
     private final CategoryRepository categoryRepository;
     private final TemplateOverrideRepository templateOverrideRepository;
-    private final UserRepository userRepository;
     private final ZoneMapper zoneMapper;
 
     public ZoneResponse addZoneToTemplate(UUID userId, UUID templateId, ZoneRequest request) {
@@ -59,7 +55,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(userId, request.name()))
+            .category(resolveCategory(request.name()))
             .template(template)
             .build();
 
@@ -78,7 +74,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(userId, request.name()))
+            .category(resolveCategory(request.name()))
             .templateOverride(override)
             .build();
 
@@ -180,7 +176,7 @@ public class ZoneService {
         zone.setStartTime(request.startTime());
         zone.setEndTime(request.endTime());
         zone.setColor(request.color());
-        zone.setCategory(resolveCategory(userId, request.name()));
+        zone.setCategory(resolveCategory(request.name()));
         return zoneMapper.toZoneResponse(zone);
     }
 
@@ -189,14 +185,8 @@ public class ZoneService {
             .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
-    private Category resolveCategory(UUID userId, String zoneName) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        return categoryRepository.findByNameAndUserId(zoneName, userId)
-            .orElseGet(() -> categoryRepository.save(Category.builder()
-                .name(zoneName)
-                .user(user)
-                .build()));
+    private Category resolveCategory(String zoneName) {
+        return categoryRepository.findByName(zoneName).orElse(null);
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

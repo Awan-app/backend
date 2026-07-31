@@ -2743,41 +2743,8 @@
     },
     {
       "name": "Categories",
-      "description": "Category management for zones and tasks. Categories are auto-created when zones are created, but can also be managed independently.\n\nEach category is user-scoped \u2014 you only see your own categories.",
+      "description": "Category management for zones and tasks. Categories are global/system-wide \u2014 read only, managed via data seed.",
       "item": [
-        {
-          "name": "Create Category",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/v1/categories",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "v1",
-                "categories"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Work\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "description": "Create a new category.\n\n**Request Body:**\n- `name` (string, required) \u2013 Category name.\n\n**Response (201):** `CategoryResponse`\n- `id` (UUID) \u2013 Category ID.\n- `name` (string) \u2013 Category name.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid name."
-          }
-        },
         {
           "name": "List Categories",
           "request": {
@@ -2799,7 +2766,7 @@
                 "categories"
               ]
             },
-            "description": "List all categories for the authenticated user.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `CategoryResponse`\n- `id` (UUID) \u2013 Category ID.\n- `name` (string) \u2013 Category name.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT."
+            "description": "List all system-wide categories.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `CategoryResponse`\n- `id` (UUID) \u2013 Category ID.\n- `name` (string) \u2013 Category name."
           }
         },
         {
@@ -2824,41 +2791,7 @@
                 "{{categoryId}}"
               ]
             },
-            "description": "Get a single category by ID.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) \u2013 Category identifier.\n\n**Response (200):** `CategoryResponse`\n- `id` (UUID) \u2013 Category ID.\n- `name` (string) \u2013 Category name.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) \u2013 Category not found or does not belong to user."
-          }
-        },
-        {
-          "name": "Update Category",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/v1/categories/{{categoryId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "v1",
-                "categories",
-                "{{categoryId}}"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "description": "Update a category name.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) \u2013 Category identifier.\n\n**Request Body:**\n- `name` (string, required) \u2013 New category name.\n\n**Response (200):** `CategoryResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) \u2013 Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) \u2013 Category not found / not owned.\n- `VALIDATION_ERROR` (422) \u2013 Missing/invalid name."
+            "description": "Get a single category by ID.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) \u2013 Category identifier.\n\n**Response (200):** `CategoryResponse`\n- `id` (UUID) \u2013 Category ID.\n- `name` (string) \u2013 Category name.\n\n**Possible Errors:**\n- `CATEGORY_NOT_FOUND` (404) \u2013 Category not found."
           }
         }
       ]

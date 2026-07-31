@@ -167,7 +167,7 @@ public class TaskPlanningService {
             tasks = tasks.subList(0, maxTasks);
         }
 
-        Set<UUID> validCategoryIds = normalizer.validCategoryIds(userId);
+        Set<UUID> validCategoryIds = normalizer.validCategoryIds();
         List<LockedInterval> locked = lockedIntervals(schedule);
         List<ProposedTask> drafts = new ArrayList<>();
 
@@ -182,7 +182,7 @@ public class TaskPlanningService {
             }
 
             CategoryResponse category =
-                normalizer.sanitizeCategory(task.category(), validCategoryIds, userId);
+                normalizer.sanitizeCategory(task.category(), validCategoryIds);
 
             TaskCreateRequest createRequest = new TaskCreateRequest(
                 title,

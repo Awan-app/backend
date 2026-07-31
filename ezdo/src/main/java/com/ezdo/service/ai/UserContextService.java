@@ -45,7 +45,7 @@ public class UserContextService {
             }
         }
 
-        List<AiUserPreferencesContext.CategoryOption> categories = categoryRepository.findByUserId(userId)
+        List<AiUserPreferencesContext.CategoryOption> categories = categoryRepository.findAll()
             .stream()
             .map(c -> new AiUserPreferencesContext.CategoryOption(c.getId(), c.getName()))
             .toList();
