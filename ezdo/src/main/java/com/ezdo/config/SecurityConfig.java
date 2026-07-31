@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
     private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
     private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
 
@@ -44,10 +45,13 @@ public class SecurityConfig {
                     "/actuator/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/mcp/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
+            // API key filter runs first — if it authenticates, JWT filter skips
+            .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
