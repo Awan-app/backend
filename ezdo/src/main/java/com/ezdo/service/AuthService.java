@@ -21,21 +21,23 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public OtpResponse requestOtp(OtpRequest request) {
-        return otpService.requestOtp(request.email());
+        return otpService.requestOtp(normalizeEmail(request.email()));
     }
 
     @Transactional(noRollbackFor = OtpVerificationException.class)
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
+        String email = normalizeEmail(request.email());
+
         // Verify the OTP code
-        otpService.verifyOtp(request.email(), request.code());
+        otpService.verifyOtp(email, request.code());
 
         // Find or create user
         boolean isNewUser;
-        User user = userRepository.findByEmail(request.email()).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null) {
             user = new User();
-            user.setEmail(request.email());
+            user.setEmail(email);
             user.setIsNew(true);
         }
 
@@ -58,7 +60,7 @@ public class AuthService {
                 new UserDto(
                     user.getId(),
                     user.getEmail(),
-                    user.getIsNew() != null ? user.getIsNew() : false
+                    user.getIsNew() != null && user.getIsNew()
                 )
         );
     }
@@ -83,5 +85,9 @@ public class AuthService {
     @Transactional
     public void logout(UUID userId, LogoutRequest request) {
         refreshTokenService.revokeByUserAndDevice(userId, request.deviceId());
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase();
     }
 }

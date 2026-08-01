@@ -24,6 +24,8 @@ public class ErrorCodes {
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";
     public static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+    public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
+    public static final String TOKEN_INVALID = "TOKEN_INVALID";
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
