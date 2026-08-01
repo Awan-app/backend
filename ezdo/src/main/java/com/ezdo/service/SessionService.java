@@ -31,36 +31,36 @@ public class SessionService {
     private final SessionMapper sessionMapper;
 
     @Transactional(readOnly = true)
-    public List<SessionResponse> getByTask(UUID taskId, UUID userId) {
-        return sessionRepository.findByTaskIdAndUserId(taskId, userId).stream()
+    public List<SessionResponse> getByTask(UUID taskId, UUID userId, SessionStatus status) {
+        return sessionRepository.findByTaskIdAndUserId(taskId, userId, status).stream()
                 .map(sessionMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<SessionResponse> getByZone(UUID zoneId, UUID userId) {
-        return sessionRepository.findByZoneIdAndUserId(zoneId, userId).stream()
+    public List<SessionResponse> getByZone(UUID zoneId, UUID userId, SessionStatus status) {
+        return sessionRepository.findByZoneIdAndUserId(zoneId, userId, status).stream()
                 .map(sessionMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<SessionResponse> getByDate(UUID userId, LocalDate date) {
+    public List<SessionResponse> getByDate(UUID userId, LocalDate date, SessionStatus status) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.plusDays(1).atStartOfDay();
-        return sessionRepository.findByUserIdAndDateRange(userId, start, end).stream()
+        return sessionRepository.findByUserIdAndDateRange(userId, start, end, status).stream()
                 .map(sessionMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public Map<LocalDate, List<SessionResponse>> getByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+    public Map<LocalDate, List<SessionResponse>> getByDateRange(UUID userId, LocalDate startDate, LocalDate endDate, SessionStatus status) {
         if (endDate.isBefore(startDate)) {
             throw new InvalidOperationException("endDate must not be before startDate");
         }
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
-        List<SessionResponse> sessions = sessionRepository.findByUserIdAndDateRange(userId, start, end).stream()
+        List<SessionResponse> sessions = sessionRepository.findByUserIdAndDateRange(userId, start, end, status).stream()
                 .map(sessionMapper::toResponse)
                 .toList();
 
@@ -86,7 +86,10 @@ public class SessionService {
 
         session.setStart(request.start());
         session.setEnd(request.end());
-        if (request.status() != null) session.setStatus(request.status());
+        if (request.status() != null) {
+            validateTransition(session.getStatus(), request.status());
+            session.setStatus(request.status());
+        }
         return sessionMapper.toResponse(session);
     }
 
@@ -94,7 +97,35 @@ public class SessionService {
         Session session =  sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
+        validateTransition(session.getStatus(), status);
         session.setStatus(status);
+        return sessionMapper.toResponse(session);
+    }
+
+    public SessionResponse complete(UUID userId, UUID sessionId) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
+
+        validateTransition(session.getStatus(), SessionStatus.COMPLETED);
+        session.setStatus(SessionStatus.COMPLETED);
+        return sessionMapper.toResponse(session);
+    }
+
+    public SessionResponse uncomplete(UUID userId, UUID sessionId) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
+
+        validateTransition(session.getStatus(), SessionStatus.SCHEDULED);
+        session.setStatus(SessionStatus.SCHEDULED);
+        return sessionMapper.toResponse(session);
+    }
+
+    public SessionResponse cancel(UUID userId, UUID sessionId) {
+        Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
+
+        validateTransition(session.getStatus(), SessionStatus.CANCELLED);
+        session.setStatus(SessionStatus.CANCELLED);
         return sessionMapper.toResponse(session);
     }
 
@@ -121,6 +152,21 @@ public class SessionService {
     private void validateTimeRange(LocalDateTime start, LocalDateTime end) {
         if (start == null || end == null || !end.isAfter(start)) {
             throw new InvalidSessionTimeRangeException(start, end);
+        }
+    }
+
+    private void validateTransition(SessionStatus current, SessionStatus next) {
+        if (current == next) {
+            return;
+        }
+        boolean valid = switch (current) {
+            case SCHEDULED -> next == SessionStatus.COMPLETED || next == SessionStatus.CANCELLED;
+            case COMPLETED -> next == SessionStatus.SCHEDULED;
+            case CANCELLED -> false;
+        };
+        if (!valid) {
+            throw new InvalidOperationException(
+                "Cannot transition session from " + current + " to " + next);
         }
     }
 }

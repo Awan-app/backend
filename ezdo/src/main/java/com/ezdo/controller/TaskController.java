@@ -3,6 +3,7 @@ package com.ezdo.controller;
 import com.ezdo.dto.goal.TaskCreateRequest;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
 import com.ezdo.dto.SessionResponse;
@@ -79,9 +80,10 @@ public class TaskController {
     @GetMapping("/{taskId}/sessions")
     public ResponseEntity<List<SessionResponse>> getSessions(
         @AuthenticationPrincipal UUID userId,
-        @PathVariable UUID taskId
+        @PathVariable UUID taskId,
+        @RequestParam(required = false) SessionStatus status
     ) {
-        return ResponseEntity.ok(sessionService.getByTask(taskId, userId));
+        return ResponseEntity.ok(sessionService.getByTask(taskId, userId, status));
     }
 
     @PostMapping("/{taskId}/sessions")
