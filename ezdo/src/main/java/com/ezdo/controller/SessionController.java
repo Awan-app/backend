@@ -44,6 +44,25 @@ public class SessionController {
         return ResponseEntity.ok(sessionService.getByDate(userId, date, status));
     }
 
+    @GetMapping("/missed/{date}")
+    public ResponseEntity<List<SessionResponse>> getMissedOnDate(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate date
+    ) {
+        return ResponseEntity.ok(sessionService.getMissedOnDate(userId, date));
+    }
+
+    @GetMapping("/missed/range")
+    public ResponseEntity<List<SessionResponse>> getMissedRange(
+        @AuthenticationPrincipal UUID userId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(sessionService.getMissedRange(userId, startDate, endDate));
+    }
+
     @GetMapping("/{sessionId}")
     public ResponseEntity<SessionResponse> get(@AuthenticationPrincipal UUID userId, @PathVariable UUID sessionId) {
         return ResponseEntity.ok(sessionService.getById(userId, sessionId));

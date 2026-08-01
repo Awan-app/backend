@@ -2,20 +2,24 @@ package com.ezdo.service;
 
 import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
+import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
 import com.ezdo.exception.InvalidOperationException;
 import com.ezdo.exception.InvalidSessionTimeRangeException;
 import com.ezdo.exception.SessionLockedException;
 import com.ezdo.exception.SessionNotFoundException;
+import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.repository.SessionRepository;
+import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,7 @@ public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final SessionMapper sessionMapper;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getByTask(UUID taskId, UUID userId, SessionStatus status) {
@@ -76,6 +81,27 @@ public class SessionService {
     public SessionResponse getById(UUID userId, UUID sessionId) {
         return sessionMapper.toResponse(sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId)));
+    }
+
+    @Transactional(readOnly = true)
+    public List<SessionResponse> getMissedOnDate(UUID userId, LocalDate date) {
+        LocalDateTime now = resolveNow(userId);
+        return sessionRepository.findMissed(userId, now,
+                date.atStartOfDay(), date.plusDays(1).atStartOfDay()).stream()
+                .map(sessionMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SessionResponse> getMissedRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        if (endDate.isBefore(startDate)) {
+            throw new InvalidOperationException("endDate must not be before startDate");
+        }
+        LocalDateTime now = resolveNow(userId);
+        return sessionRepository.findMissed(userId, now,
+                startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay()).stream()
+                .map(sessionMapper::toResponse)
+                .toList();
     }
 
     public SessionResponse update(UUID userId, UUID sessionId, SessionRequest request) {
@@ -153,6 +179,15 @@ public class SessionService {
         if (start == null || end == null || !end.isAfter(start)) {
             throw new InvalidSessionTimeRangeException(start, end);
         }
+    }
+
+    private LocalDateTime resolveNow(UUID userId) {
+        Preferences prefs = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId)).getPreferences();
+        ZoneId zone = (prefs != null && prefs.getTimezone() != null)
+                ? ZoneId.of(prefs.getTimezone())
+                : ZoneId.of("UTC");
+        return LocalDateTime.now(zone);
     }
 
     private void validateTransition(SessionStatus current, SessionStatus next) {

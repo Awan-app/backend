@@ -96,6 +96,26 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
     List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
                                       @Param("dayStart") LocalDateTime dayStart,
                                       @Param("dayEnd") LocalDateTime dayEnd);
+
+    /**
+     * Still-{@code SCHEDULED} sessions whose window has already ended (missed),
+     * within a required {@code [startDate, endDate)} range.
+     */
+    @Query("""
+        SELECT s FROM Session s
+        JOIN s.task t
+        JOIN t.goal g
+        WHERE g.user.id = :userId
+          AND s.status = SCHEDULED
+          AND s.end < :now
+          AND s.start >= :startDate
+          AND s.start < :endDate
+        ORDER BY s.start ASC
+    """)
+    List<Session> findMissed(@Param("userId") UUID userId,
+                             @Param("now") LocalDateTime now,
+                             @Param("startDate") LocalDateTime startDate,
+                             @Param("endDate") LocalDateTime endDate);
     @Modifying
     @Query("UPDATE Session s SET s.zone = null WHERE s.zone.id IN :zoneIds")
     void nullifyZoneId(@Param("zoneIds") List<UUID> zoneIds);
