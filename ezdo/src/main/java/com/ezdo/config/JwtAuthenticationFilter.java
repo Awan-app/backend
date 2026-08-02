@@ -1,7 +1,9 @@
 package com.ezdo.config;
 
+import com.ezdo.exception.ErrorCodes;
 import com.ezdo.service.JwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,9 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (ExpiredJwtException e) {
+            // Token expired — flag it so the entry point can emit TOKEN_EXPIRED
+            // instead of a generic authentication failure.
+            request.setAttribute("authError", ErrorCodes.TOKEN_EXPIRED);
         } catch (JwtException | IllegalArgumentException e) {
             // Invalid token — continue without authentication.
             // The security filter chain will reject with 401 if the endpoint requires auth.
+            request.setAttribute("authError", ErrorCodes.TOKEN_INVALID);
         }
 
         filterChain.doFilter(request, response);

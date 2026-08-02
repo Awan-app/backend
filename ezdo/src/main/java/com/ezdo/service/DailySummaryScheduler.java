@@ -40,7 +40,7 @@ public class DailySummaryScheduler {
 
     private static final LocalTime DEFAULT_WAKEUP = LocalTime.of(7, 0);
 
-    @Scheduled(cron = "0 */15 * * * *")
+    // @Scheduled(cron = "0 */15 * * * *")
     @Transactional(readOnly = true)
     public void dispatchWindow() {
         List<User> users = userRepository.findAllEligibleForDailySummary();
