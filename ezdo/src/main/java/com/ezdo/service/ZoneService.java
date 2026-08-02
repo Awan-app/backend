@@ -6,6 +6,7 @@ import com.ezdo.entity.Category;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.Zone;
+import com.ezdo.exception.CategoryNotFoundException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
@@ -55,7 +56,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(request.name()))
+            .category(resolveCategory(request.categoryId()))
             .template(template)
             .build();
 
@@ -74,7 +75,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(request.name()))
+            .category(resolveCategory(request.categoryId()))
             .templateOverride(override)
             .build();
 
@@ -176,7 +177,7 @@ public class ZoneService {
         zone.setStartTime(request.startTime());
         zone.setEndTime(request.endTime());
         zone.setColor(request.color());
-        zone.setCategory(resolveCategory(request.name()));
+        zone.setCategory(resolveCategory(request.categoryId()));
         return zoneMapper.toZoneResponse(zone);
     }
 
@@ -185,8 +186,9 @@ public class ZoneService {
             .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
-    private Category resolveCategory(String zoneName) {
-        return categoryRepository.findByName(zoneName).orElse(null);
+    private Category resolveCategory(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
+            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

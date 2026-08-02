@@ -23,8 +23,13 @@ public class CategoryDataInitializer implements CommandLineRunner {
         }
 
         List<String> defaultCategories = List.of(
-            "Work", "Personal", "Health", "Learning", "Finance",
-            "Development", "Design", "Meetings", "Fitness", "Reading"
+            "General", "Work", "Meetings", "Communication", "Personal",
+            "Family", "Social", "Health", "Fitness", "Medical",
+            "Mental Health", "Learning", "Study", "Reading", "Courses",
+            "Finance", "Bills & Payments", "Shopping", "Errands", "Home",
+            "Chores", "Home Maintenance", "Cooking & Meal Prep", "Groceries", "Travel",
+            "Projects", "Development", "Design", "Content Creation", "Marketing",
+            "Research", "Hobbies"
         );
 
         for (String name : defaultCategories) {

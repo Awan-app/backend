@@ -4,17 +4,22 @@ exactly — these are not suggestions, they are hard requirements. If you cannot
 satisfy all of them for a task, put that task in failedTasks instead of
 producing an invalid schedule.
 
-RULE 1 — CATEGORY MATCH IS MANDATORY
+RULE 1 — CATEGORY MATCH
 Every task has a `categoryId` and `categoryName`. Every zone has a `categoryName`.
-A task may ONLY be placed into a zone whose `categoryName` EXACTLY matches the
-task's `categoryName`.
+A task may be placed into a zone if ANY of these holds:
+1. The task's `categoryName` is "General" — it may go in ANY zone, regardless of
+   the zone's category.
+2. The zone's `categoryName` is "General" — it may accept ANY task, regardless of
+   the task's category.
+3. The task's `categoryName` EXACTLY matches the zone's `categoryName`.
+Otherwise the task may NOT be placed into that zone.
 - If a task has `categoryId: null` or `categoryName: null`, it CANNOT be scheduled
   at all — immediately put it in failedTasks with reason NO_SUITABLE_ZONE.
-- If no zone with the matching category has enough available time for a task
+- If no zone matching the rules above has enough available time for a task
   (including across multiple days), put the task in failedTasks. Never place a
-  task into a zone with a different category.
+  task into a zone that fails all three conditions above.
 - A task's sessions CAN be spread across multiple different days, as long as
-  they are placed in zones with the matching category.
+  each session's zone satisfies one of the conditions above for that task.
 
 RULE 2 — BOUNDARIES
 Only schedule within availableZones. Never schedule outside wakeupTime/sleepTime
@@ -57,7 +62,7 @@ method — do not estimate, calculate it precisely:
 
 
 You may distribute these calculated sessions across DIFFERENT DAYS and DIFFERENT
-ZONES (as long as the category matches) if a single day does not have enough time.
+ZONES (as long as the category rules allow it) if a single day does not have enough time.
 
 This means: every session EXCEPT the last one must be exactly
 preferredSessionDurationMinutes long. No exceptions, no rounding, no
@@ -75,7 +80,7 @@ confirm the sum equals estimatedDurationMinutes exactly. If it does not match,
 recompute — do not output it anyway.
 
 FINAL SELF-CHECK (do this silently before responding, for every task)
-- [ ] Every session's zone has a categoryName that exactly matches the task's categoryName (Rule 1)
+- [ ] Every session's zone satisfies the category rules: exact match, OR the task's categoryName is "General", OR the zone's categoryName is "General" (Rule 1)
 - [ ] All sessions are inside zone/wake/sleep boundaries (Rule 2)
 - [ ] Dependencies are respected (Rule 3)
 - [ ] Buffer holds between every pair of sessions, not just same-task pairs (Rule 4)
@@ -85,9 +90,9 @@ If any box fails for a task, move it to failedTasks instead of guessing.
 CRITICAL: CHAIN OF THOUGHT REASONING
 You MUST write out your step-by-step reasoning in the `_thinkingProcess` field BEFORE you output `sessions` or `failedTasks`.
 In `_thinkingProcess`, for each task:
-1. Note its categoryName and whether it has a category at all.
+1. Note its categoryName and whether it has a category at all, and whether it is "General".
 2. State its estimated duration and whether splitting is allowed.
-3. Scan the ENTIRE `calendar` array from the first day to the last day to find zones whose categoryName matches the task's categoryName. DO NOT stop at the first few days!
+3. Scan the ENTIRE `calendar` array from the first day to the last day to find qualifying zones: if the task's categoryName is "General", any zone qualifies; if a zone's categoryName is "General", it qualifies for any task; otherwise only zones whose categoryName exactly matches the task's. DO NOT stop at the first few days!
 4. Identify a matching zone and note its exact `durationMinutes` (provided in the input).
 5. Check dependencies.
 6. Plan the exact split durations across as many days as needed.

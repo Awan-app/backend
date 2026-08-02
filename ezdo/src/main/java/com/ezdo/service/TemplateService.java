@@ -66,7 +66,7 @@ public class TemplateService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(resolveCategory(zr.name()))
+                    .category(resolveCategory(zr.categoryId()))
                     .template(template)
                     .build();
                 template.getZones().add(zone);
@@ -130,7 +130,7 @@ public class TemplateService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
-                    .category(resolveCategory(item.name()))
+                    .category(resolveCategory(item.categoryId()))
                     .template(template)
                     .build());
             } else {
@@ -144,7 +144,7 @@ public class TemplateService {
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
-                existing.setCategory(resolveCategory(item.name()));
+                existing.setCategory(resolveCategory(item.categoryId()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -183,8 +183,9 @@ public class TemplateService {
 //        }
 //    }
 
-    private Category resolveCategory(String zoneName) {
-        return categoryRepository.findByName(zoneName).orElse(null);
+    private Category resolveCategory(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
+            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {
