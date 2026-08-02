@@ -17,9 +17,9 @@ spring:
             enable: ${SPRING_MAIL_STARTTLS:false}
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/ezdo}
-    username: ${SPRING_DATASOURCE_USERNAME:ezdo}
-    password: ${SPRING_DATASOURCE_PASSWORD:ezdo}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/awan}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

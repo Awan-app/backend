@@ -44,9 +44,8 @@ public class McpToolService {
 
     @Tool(description = "List the user's goals. Returns goal titles, descriptions, statuses, and target dates. " +
                         "Use this when the user asks 'what are my goals?' or 'show me my goals'.")
-    public List<GoalInfoResponse> listGoals(
-            @ToolParam(description = "The user's UUID") String userId
-    ) {
+    public List<GoalInfoResponse> listGoals() {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] listGoals called for user {}", userId);
         return goalService.listGoals(
                 UUID.fromString(userId),
@@ -60,9 +59,9 @@ public class McpToolService {
     @Tool(description = "Get detailed info about a specific goal, including all its tasks. " +
                         "Use this when the user asks about a particular goal by name or ID.")
     public GoalInfoResponse getGoal(
-            @ToolParam(description = "The user's UUID") String userId,
             @ToolParam(description = "The goal's UUID") String goalId
     ) {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] getGoal called for user {} goal {}", userId, goalId);
         return goalService.getGoal(
                 UUID.fromString(userId),
@@ -74,9 +73,9 @@ public class McpToolService {
     @Tool(description = "List all tasks belonging to a specific goal. " +
                         "Use when the user asks 'what tasks does goal X have?' or 'show me the tasks in my goal'.")
     public List<TaskInfoResponse> listTasksForGoal(
-            @ToolParam(description = "The user's UUID") String userId,
             @ToolParam(description = "The goal's UUID") String goalId
     ) {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] listTasksForGoal called for user {} goal {}", userId, goalId);
         return taskService.listTasksForGoal(
                 UUID.fromString(userId),
@@ -88,9 +87,9 @@ public class McpToolService {
                         "Use when the user asks 'what's on my schedule today?' or 'what do I have on July 31?'. " +
                         "The date parameter should be in YYYY-MM-DD format.")
     public List<SessionResponse> getTodaySchedule(
-            @ToolParam(description = "The user's UUID") String userId,
             @ToolParam(description = "The date in YYYY-MM-DD format, e.g. 2026-07-30") String date
     ) {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] getTodaySchedule called for user {} date {}", userId, date);
         return sessionService.getByDate(
                 UUID.fromString(userId),
@@ -102,10 +101,10 @@ public class McpToolService {
                         "Use when the user asks 'what's my schedule this week?' or 'show me next 3 days'. " +
                         "Dates should be in YYYY-MM-DD format.")
     public Map<LocalDate, List<SessionResponse>> getScheduleRange(
-            @ToolParam(description = "The user's UUID") String userId,
             @ToolParam(description = "Start date in YYYY-MM-DD format") String startDate,
             @ToolParam(description = "End date in YYYY-MM-DD format") String endDate
     ) {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] getScheduleRange called for user {} from {} to {}", userId, startDate, endDate);
         return sessionService.getByDateRange(
                 UUID.fromString(userId),
@@ -117,9 +116,9 @@ public class McpToolService {
     @Tool(description = "Get the user's tasks for a specific date along with their sessions. " +
                         "Use when the user asks 'what tasks do I have today?' or needs task-level detail for a day.")
     public List<?> getTasksByDate(
-            @ToolParam(description = "The user's UUID") String userId,
             @ToolParam(description = "The date in YYYY-MM-DD format") String date
     ) {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] getTasksByDate called for user {} date {}", userId, date);
         return taskService.getTasksByDate(
                 UUID.fromString(userId),
@@ -134,10 +133,10 @@ public class McpToolService {
     @Tool(description = "Update the status of a session. Valid statuses: SCHEDULED, IN_PROGRESS, COMPLETED, SKIPPED. " +
                         "Use when the user says 'mark my session as done' or 'I finished that task'.")
     public SessionResponse updateSessionStatus(
-            @ToolParam(description = "The user's UUID") String userId,
             @ToolParam(description = "The session's UUID") String sessionId,
             @ToolParam(description = "New status: SCHEDULED, IN_PROGRESS, COMPLETED, or SKIPPED") String status
     ) {
+        String userId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("[MCP] updateSessionStatus called for user {} session {} status {}", userId, sessionId, status);
         return sessionService.updateStatus(
                 UUID.fromString(userId),

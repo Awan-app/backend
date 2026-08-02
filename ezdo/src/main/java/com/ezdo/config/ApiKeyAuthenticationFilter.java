@@ -41,6 +41,9 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             String apiKey = request.getHeader(API_KEY_HEADER);
+            if (apiKey == null || apiKey.isBlank()) {
+                apiKey = request.getParameter("api_key");
+            }
 
             if (apiKey != null && !apiKey.isBlank()) {
                 Optional<ApiKey> found = apiKeyRepository.findByKeyValueAndActiveTrue(apiKey);
@@ -48,7 +51,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                 found.ifPresent(key -> {
                     UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                            key.getUser().getId(),
+                            key.getUser().getId().toString(),
                             null,
                             List.of()
                         );
