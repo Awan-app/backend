@@ -3,6 +3,7 @@ package com.ezdo.controller;
 import com.ezdo.dto.SessionResponse;
 import com.ezdo.dto.ZoneRequest;
 import com.ezdo.dto.ZoneResponse;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.service.SessionService;
 import com.ezdo.service.ZoneService;
 import jakarta.validation.Valid;
@@ -32,9 +33,10 @@ public class ZoneController {
     @GetMapping("/{zoneId}/sessions")
     public ResponseEntity<List<SessionResponse>> getByZone(
         @AuthenticationPrincipal UUID userId,
-        @PathVariable UUID zoneId
+        @PathVariable UUID zoneId,
+        @RequestParam(required = false) SessionStatus status
     ) {
-        return ResponseEntity.ok(sessionService.getByZone(zoneId, userId));
+        return ResponseEntity.ok(sessionService.getByZone(zoneId, userId, status));
     }
 
     @GetMapping("/date/{date}")

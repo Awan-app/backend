@@ -64,6 +64,11 @@ services:
       EZDO_AI_PLAN_MAX_SESSIONS: ${EZDO_AI_PLAN_MAX_SESSIONS:-10}
       EZDO_AI_PLAN_HORIZON_DAYS: ${EZDO_AI_PLAN_HORIZON_DAYS:-14}
 
+      # Cloudinary (profile pictures)
+      EZDO_CLOUDINARY_CLOUD_NAME: ${EZDO_CLOUDINARY_CLOUD_NAME}
+      EZDO_CLOUDINARY_API_KEY: ${EZDO_CLOUDINARY_API_KEY}
+      EZDO_CLOUDINARY_API_SECRET: ${EZDO_CLOUDINARY_API_SECRET}
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: mailpit

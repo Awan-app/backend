@@ -11,6 +11,7 @@ import com.ezdo.dto.task.TasksWithSessionsRequest;
 import com.ezdo.dto.task.TasksWithSessionsResponse;
 import com.ezdo.dto.task.TaskWithSessionsRequest;
 import com.ezdo.dto.task.TaskWithSessionsResponse;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.service.SessionService;
 import com.ezdo.service.TaskService;
 import jakarta.validation.Valid;
@@ -79,9 +80,10 @@ public class TaskController {
     @GetMapping("/{taskId}/sessions")
     public ResponseEntity<List<SessionResponse>> getSessions(
         @AuthenticationPrincipal UUID userId,
-        @PathVariable UUID taskId
+        @PathVariable UUID taskId,
+        @RequestParam(required = false) SessionStatus status
     ) {
-        return ResponseEntity.ok(sessionService.getByTask(taskId, userId));
+        return ResponseEntity.ok(sessionService.getByTask(taskId, userId, status));
     }
 
     @PostMapping("/{taskId}/sessions")
