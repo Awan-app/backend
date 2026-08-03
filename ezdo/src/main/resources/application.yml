@@ -79,6 +79,8 @@ ezdo:
       max-tasks: ${EZDO_AI_PLAN_MAX_TASKS:25}
       max-sessions-per-task: ${EZDO_AI_PLAN_MAX_SESSIONS:10}
       availability-horizon-days: ${EZDO_AI_PLAN_HORIZON_DAYS:14}
+  cors:
+    allowed-origins: http://localhost:4200
 
 timefold:
   solver:
