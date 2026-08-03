@@ -412,6 +412,42 @@
               ]
             },
             {
+              "name": "Remove Profile Picture",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/profile/picture",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "profile",
+                    "picture"
+                  ]
+                },
+                "description": "Remove the authenticated user's profile picture. The stored Cloudinary asset is deleted and `profilePictureUrl` is cleared back to `null` on the profile.\n\n**Request Body:** None.\n\n**Response (204):** No content.\n\nIdempotent — calling it for a user who has no picture succeeds with the same `204`, so the client does not need to check first and retries are safe.\n\nThere is no need to call this before uploading a replacement: an upload already overwrites the previous picture.\n\nA failure to delete the remote asset does not fail the request — the stored url is cleared regardless and the call still returns `204`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `USER_NOT_FOUND` (404) — User not found."
+              },
+              "response": [
+                {
+                  "name": "No Content",
+                  "status": "No Content",
+                  "code": 204,
+                  "header": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
               "name": "Update Name",
               "request": {
                 "method": "PATCH",

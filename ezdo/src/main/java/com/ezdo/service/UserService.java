@@ -86,6 +86,16 @@ public class UserService {
         return new ProfilePictureResponse(url);
     }
 
+    /** Idempotent: removing a picture the user does not have is a no-op, not an error. */
+    public void removeProfilePicture(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
+        cloudinaryService.deleteProfilePicture(userId);
+        userRepository.updateProfilePictureUrl(userId, null);
+    }
+
     private void validateProfilePicture(MultipartFile file) {
         if (file.isEmpty()) {
             throw new ProfilePictureEmptyException();

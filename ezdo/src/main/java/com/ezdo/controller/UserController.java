@@ -42,6 +42,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateProfilePicture(userId, image));
     }
 
+    @DeleteMapping("/me/profile/picture")
+    public ResponseEntity<Void> removeProfilePicture(@AuthenticationPrincipal UUID userId) {
+        userService.removeProfilePicture(userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/me")
     public ResponseEntity<UserProfileResponse> updateProfile(@AuthenticationPrincipal UUID userId,
                                                              @Valid @RequestBody UpdateProfileRequest request) {

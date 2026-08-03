@@ -30,7 +30,7 @@ public class CloudinaryService {
         try {
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
                 "folder", PROFILE_PICTURE_FOLDER,
-                "public_id", "user_" + userId,
+                "public_id", publicId(userId),
                 "resource_type", "image",
                 "overwrite", true,
                 "invalidate", true,
@@ -43,5 +43,24 @@ public class CloudinaryService {
             log.error("Cloudinary upload failed for user {}", userId, e);
             throw new CloudinaryException("Failed to upload profile picture");
         }
+    }
+
+    /**
+     * Deletes the user's profile picture asset. Failures are logged, not thrown: the user asked
+     * for the picture to be gone, and clearing the stored url achieves that from their point of
+     * view — a leftover asset nothing links to is not worth failing the request over.
+     */
+    public void deleteProfilePicture(UUID userId) {
+        try {
+            cloudinary.uploader().destroy(
+                PROFILE_PICTURE_FOLDER + "/" + publicId(userId),
+                ObjectUtils.asMap("invalidate", true));
+        } catch (Exception e) {
+            log.warn("Cloudinary delete failed for user {}", userId, e);
+        }
+    }
+
+    private String publicId(UUID userId) {
+        return "user_" + userId;
     }
 }
