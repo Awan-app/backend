@@ -7,7 +7,6 @@ import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
 import com.ezdo.exception.InvalidOperationException;
 import com.ezdo.exception.InvalidSessionTimeRangeException;
-import com.ezdo.exception.SessionLockedException;
 import com.ezdo.exception.SessionNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.SessionMapper;
