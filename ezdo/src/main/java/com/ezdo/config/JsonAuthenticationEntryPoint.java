@@ -23,11 +23,28 @@ public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        errorWriter.write(
-            response,
-            HttpStatus.UNAUTHORIZED.value(),
-            "Authentication required",
-            ErrorCodes.AUTHENTICATION_FAILED
-        );
+        String authError = (String) request.getAttribute("authError");
+        if (ErrorCodes.TOKEN_EXPIRED.equals(authError)) {
+            errorWriter.write(
+                response,
+                HttpStatus.UNAUTHORIZED.value(),
+                "Access token expired",
+                ErrorCodes.TOKEN_EXPIRED
+            );
+        } else if (ErrorCodes.TOKEN_INVALID.equals(authError)) {
+            errorWriter.write(
+                response,
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid or malformed access token",
+                ErrorCodes.TOKEN_INVALID
+            );
+        } else {
+            errorWriter.write(
+                response,
+                HttpStatus.UNAUTHORIZED.value(),
+                "Authentication required",
+                ErrorCodes.AUTHENTICATION_FAILED
+            );
+        }
     }
 }

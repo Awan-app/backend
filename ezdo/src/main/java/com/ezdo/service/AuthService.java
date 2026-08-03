@@ -2,6 +2,8 @@ package com.ezdo.service;
 
 import com.ezdo.dto.*;
 import com.ezdo.entity.User;
+import com.ezdo.exception.ErrorCodes;
+import com.ezdo.exception.InvalidRefreshTokenException;
 import com.ezdo.exception.OtpVerificationException;
 import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,21 +23,23 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public OtpResponse requestOtp(OtpRequest request) {
-        return otpService.requestOtp(request.email());
+        return otpService.requestOtp(normalizeEmail(request.email()));
     }
 
     @Transactional(noRollbackFor = OtpVerificationException.class)
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
+        String email = normalizeEmail(request.email());
+
         // Verify the OTP code
-        otpService.verifyOtp(request.email(), request.code());
+        otpService.verifyOtp(email, request.code());
 
         // Find or create user
         boolean isNewUser;
-        User user = userRepository.findByEmail(request.email()).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null) {
             user = new User();
-            user.setEmail(request.email());
+            user.setEmail(email);
             user.setIsNew(true);
         }
 
@@ -58,7 +62,7 @@ public class AuthService {
                 new UserDto(
                     user.getId(),
                     user.getEmail(),
-                    user.getIsNew() != null ? user.getIsNew() : false
+                    user.getIsNew() != null && user.getIsNew()
                 )
         );
     }
@@ -69,7 +73,8 @@ public class AuthService {
                 refreshTokenService.rotateRefreshToken(request.refreshToken(), request.deviceId());
 
         User user = userRepository.findById(result.userId())
-                .orElseThrow(() -> new IllegalStateException("User not found for refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException(
+                        "User not found for refresh token", ErrorCodes.REFRESH_TOKEN_INVALID));
 
         String accessToken = jwtService.generateAccessToken(user);
 
@@ -83,5 +88,9 @@ public class AuthService {
     @Transactional
     public void logout(UUID userId, LogoutRequest request) {
         refreshTokenService.revokeByUserAndDevice(userId, request.deviceId());
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase();
     }
 }

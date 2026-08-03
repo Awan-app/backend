@@ -49,7 +49,6 @@ public class TaskPlanningPromptBuilder {
         String system = systemPrompt
             + UserContextRenderer.render(preferencesContext)
             + ScheduleContextRenderer.render(scheduleContext);
-        System.out.println("TEST: " + system);
         return List.of(
             new SystemMessage(system),
             new UserMessage(frame(sourceText, kind))
