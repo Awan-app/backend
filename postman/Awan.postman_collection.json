@@ -4,7 +4,7 @@
     "name": "Awan",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "38465583",
-    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** – no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n- On `401` responses: `TOKEN_EXPIRED` means the access token has expired - refresh via the refresh token.\n  `TOKEN_INVALID` or `AUTHENTICATION_FAILED` means the token is missing/invalid - re-authenticate.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing or unverifiable JWT - re-authenticate |\n| `TOKEN_EXPIRED` | 401 | Access token expired - refresh via refresh token |\n| `TOKEN_INVALID` | 401 | Access token malformed/invalid - re-login |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse – all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `CATEGORY_NOT_FOUND` | 404 | Category not found |\n| `SESSION_NOT_FOUND` | 404 | Session not found / not owned |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `GOAL_DECOMPOSITION_SESSION_NOT_FOUND` | 404 | Decomposition session not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `INVALID_DECOMPOSITION` | 400 | Invalid decomposition session state |\n| `INVALID_ZONE_TIME_RANGE` | 400 | End time must be after start time |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `ZONE_OVERLAP` | 409 | Zone time range overlaps with an existing zone |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `AI_UNAVAILABLE` | 503 | AI service is temporarily unavailable |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
+    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** – no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n- On `401` responses: `TOKEN_EXPIRED` means the access token has expired - refresh via the refresh token.\n  `TOKEN_INVALID` or `AUTHENTICATION_FAILED` means the token is missing/invalid - re-authenticate.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing or unverifiable JWT - re-authenticate |\n| `TOKEN_EXPIRED` | 401 | Access token expired - refresh via refresh token |\n| `TOKEN_INVALID` | 401 | Access token malformed/invalid - re-login |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse – all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `SOMETHING_NOT_FOUND` | 404 | Generic resource not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `CATEGORY_NOT_FOUND` | 404 | Category not found |\n| `SESSION_NOT_FOUND` | 404 | Session not found / not owned |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `DAY_NOT_FOUND` | 404 | Weekly template day not found |\n| `GOAL_DECOMPOSITION_SESSION_NOT_FOUND` | 404 | Decomposition session not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `INVALID_DECOMPOSITION` | 400 | Invalid decomposition session state |\n| `INVALID_ZONE_TIME_RANGE` | 400 | End time must be after start time |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `ZONE_OVERLAP` | 409 | Zone time range overlaps with an existing zone |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `AI_UNAVAILABLE` | 503 | AI service is temporarily unavailable |\n| `UNSUPPORTED_IMAGE_TYPE` | 400 / 415 | Unsupported image format (400 for profile pictures, 415 for AI image upload) |\n| `PROFILE_PICTURE_EMPTY` | 400 | No profile picture file sent, or the file is empty |\n| `PROFILE_PICTURE_TOO_LARGE` | 400 | Profile picture exceeds 5MB |\n| `CLOUDINARY_UPLOAD_FAILED` | 502 | Profile picture upload to Cloudinary failed |\n| `SCHEDULING_FAILED` | 500 | The scheduler could not produce a plan |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
   },
   "item": [
     {
@@ -231,7 +231,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 0,\n  \"streak\": 0,\n  \"maxStreak\": 0,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 0,\n  \"streak\": 0,\n  \"maxStreak\": 0,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
             }
           ]
         }
@@ -266,7 +266,7 @@
                     "me"
                   ]
                 },
-                "description": "Get the authenticated user's full profile and preferences.\n\n**Query Parameters:** None.\n\n**Response (200):** `UserProfileResponse`\n- `id` (UUID) – User ID.\n- `email` (string) – Email address.\n- `firstName` (string or null) – First name.\n- `lastName` (string or null) – Last name.\n- `birthDate` (LocalDate or null) – Date of birth.\n- `points` (int) – Total earned points.\n- `streak` (int) – Current streak count.\n- `maxStreak` (int) – Highest streak ever.\n- `preferences` (object):\n  - `timezone` (string) – IANA timezone.\n  - `preferredSessionDuration` (int) – Minutes per session.\n  - `bufferBetweenSessions` (int) – Minutes between sessions.\n  - `wakeupTime` (LocalTime) – Wake-up time.\n  - `sleepTime` (LocalTime) – Bed time.\n  - `schedulingType` (string) – `BALANCED`, `EASIEST_FIRST`, or `HARDEST_FIRST`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid access token.\n- `USER_NOT_FOUND` (404) – User not found (should not happen if token is valid)."
+                "description": "Get the authenticated user's full profile and preferences.\n\n**Query Parameters:** None.\n\n**Response (200):** `UserProfileResponse`\n- `id` (UUID) – User ID.\n- `email` (string) – Email address.\n- `firstName` (string or null) – First name.\n- `lastName` (string or null) – Last name.\n- `birthDate` (LocalDate or null) – Date of birth.\n- `points` (int) – Total earned points.\n- `streak` (int) – Current streak count.\n- `maxStreak` (int) – Highest streak ever.\n- `profilePictureUrl` (string or null) – Cloudinary url of the profile picture, `null` until one is uploaded.\n- `isNew` (boolean) – `true` while onboarding is incomplete.\n- `preferences` (object):\n  - `timezone` (string) – IANA timezone.\n  - `preferredSessionDuration` (int) – Minutes per session.\n  - `bufferBetweenSessions` (int) – Minutes between sessions.\n  - `wakeupTime` (LocalTime) – Wake-up time.\n  - `sleepTime` (LocalTime) – Bed time.\n  - `schedulingType` (string) – `BALANCED`, `EASIEST_FIRST`, or `HARDEST_FIRST`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid access token.\n- `USER_NOT_FOUND` (404) – User not found (should not happen if token is valid)."
               },
               "response": [
                 {
@@ -279,7 +279,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
                 }
               ]
             },
@@ -332,6 +332,118 @@
                     }
                   ],
                   "body": "{\n  \"isNew\": false\n}"
+                }
+              ]
+            },
+            {
+              "name": "Update Profile Picture",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": [],
+                      "description": "Image file (JPEG, PNG or WebP, max 5MB)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/profile/picture",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "profile",
+                    "picture"
+                  ]
+                },
+                "description": "Upload or replace the authenticated user's profile picture.\n\nThe image is uploaded to Cloudinary under a public id derived from the user id, so a new upload always replaces the previous picture — there is never more than one stored image per user. Cloudinary re-encodes it (`quality=auto:good`, `format=auto`) and the returned url carries a fresh version prefix, so clients can cache it indefinitely.\n\n**Multipart Form-Data Fields:**\n- `image` (file, required) — The picture. Allowed types: `image/jpeg`, `image/png`, `image/webp`. Max size: 5MB.\n\n**Response (200):** `ProfilePictureResponse`\n- `profilePictureUrl` (string) — Secure Cloudinary url of the newly uploaded picture. The same value is returned in `profilePictureUrl` on `GET /v1/users/me`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `PROFILE_PICTURE_EMPTY` (400) — No file sent or the file is empty.\n- `PROFILE_PICTURE_TOO_LARGE` (400) — File exceeds 5MB. `info` carries `maxSizeBytes` and `actualSizeBytes`.\n- `UNSUPPORTED_IMAGE_TYPE` (400) — Content type is not JPEG, PNG or WebP.\n- `USER_NOT_FOUND` (404) — User not found.\n- `MEDIA_TYPE_NOT_SUPPORTED` (415) — Request was not sent as `multipart/form-data`.\n- `CLOUDINARY_UPLOAD_FAILED` (502) — Upload to Cloudinary failed."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\"\n}"
+                },
+                {
+                  "name": "Too Large",
+                  "status": "Bad Request",
+                  "code": 400,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Profile picture exceeds the maximum size of 5MB\",\n  \"statusCode\": 400,\n  \"errorCode\": \"PROFILE_PICTURE_TOO_LARGE\",\n  \"info\": {\n    \"maxSizeBytes\": 5242880,\n    \"actualSizeBytes\": 8388608\n  },\n  \"timestamp\": \"2026-08-03T12:00:00\"\n}"
+                },
+                {
+                  "name": "Unsupported Type",
+                  "status": "Bad Request",
+                  "code": 400,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Unsupported image type: image/gif. Supported types are image/jpeg, image/png, image/webp\",\n  \"statusCode\": 400,\n  \"errorCode\": \"UNSUPPORTED_IMAGE_TYPE\",\n  \"info\": {\n    \"supportedTypes\": \"image/jpeg, image/png, image/webp\"\n  },\n  \"timestamp\": \"2026-08-03T12:00:00\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Remove Profile Picture",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/profile/picture",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "profile",
+                    "picture"
+                  ]
+                },
+                "description": "Remove the authenticated user's profile picture. The stored Cloudinary asset is deleted and `profilePictureUrl` is cleared back to `null` on the profile.\n\n**Request Body:** None.\n\n**Response (204):** No content.\n\nIdempotent — calling it for a user who has no picture succeeds with the same `204`, so the client does not need to check first and retries are safe.\n\nThere is no need to call this before uploading a replacement: an upload already overwrites the previous picture.\n\nA failure to delete the remote asset does not fail the request — the stored url is cleared regardless and the call still returns `204`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `USER_NOT_FOUND` (404) — User not found."
+              },
+              "response": [
+                {
+                  "name": "No Content",
+                  "status": "No Content",
+                  "code": 204,
+                  "header": [],
+                  "body": ""
                 }
               ]
             },
@@ -2840,6 +2952,101 @@
       ]
     },
     {
+      "name": "Availability",
+      "description": "Free time slots computed from the user's zone templates minus already-booked sessions. This is the same availability the AI scheduler consumes.",
+      "item": [
+        {
+          "name": "Get Available Slots by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/availability/date/{{date}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "availability",
+                "date",
+                "{{date}}"
+              ]
+            },
+            "description": "Free schedulable slots for a single day, with existing sessions already subtracted from zone time.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – `YYYY-MM-DD`.\n\n**Response (200):** `AvailableSlot[]`\n- `start` / `end` (LocalDateTime) – Slot boundaries.\n- `zoneId` (UUID or null) – Owning zone, `null` for gaps outside any zone.\n- `zoneName` (string or null) – Zone name.\n- `zoneColor` (string or null) – Zone color.\n- `category` (object or null) – The zone's category.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TYPE_MISMATCH` (400) – Malformed date."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"start\": \"2026-08-03T09:00:00\",\n    \"end\": \"2026-08-03T11:30:00\",\n    \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n    \"zoneName\": \"Deep Work\",\n    \"zoneColor\": \"#4F46E5\",\n    \"category\": {\n      \"id\": \"9c858901-8a57-4791-81fe-4c455b099bc9\",\n      \"name\": \"Study\"\n    }\n  },\n  {\n    \"start\": \"2026-08-03T14:00:00\",\n    \"end\": \"2026-08-03T15:00:00\",\n    \"zoneId\": null,\n    \"zoneName\": null,\n    \"zoneColor\": null,\n    \"category\": null\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Available Slots by Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/availability/range?startDate=2026-08-03&endDate=2026-08-05",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "availability",
+                "range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-08-03"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-08-05"
+                }
+              ]
+            },
+            "description": "Free schedulable slots for each day in an inclusive date range.\n\n**Query Parameters:**\n- `startDate` (LocalDate, required) – `YYYY-MM-DD`.\n- `endDate` (LocalDate, required) – `YYYY-MM-DD`.\n\n**Response (200):** `Map<LocalDate, AvailableSlot[]>` – Keyed by date; days with no free time map to an empty array.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `MISSING_PARAMETER` (400) – `startDate` or `endDate` omitted.\n- `TYPE_MISMATCH` (400) – Malformed date."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"2026-08-03\": [\n    {\n      \"start\": \"2026-08-03T09:00:00\",\n      \"end\": \"2026-08-03T11:30:00\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"zoneName\": \"Deep Work\",\n      \"zoneColor\": \"#4F46E5\",\n      \"category\": null\n    }\n  ],\n  \"2026-08-04\": [],\n  \"2026-08-05\": [\n    {\n      \"start\": \"2026-08-05T18:00:00\",\n      \"end\": \"2026-08-05T20:00:00\",\n      \"zoneId\": null,\n      \"zoneName\": null,\n      \"zoneColor\": null,\n      \"category\": null\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "System",
       "description": "Health check and utility endpoints.",
       "item": [
@@ -3101,6 +3308,144 @@
             },
             "description": "Schedule a single unscheduled task using the AI scheduling engine. Optionally specify a scheduling horizon (default is typically 14 days).\n\n**Request Body:**\n- `taskId` (UUID, required) – The task to schedule.\n- `horizonDays` (int, optional) – Number of days to look ahead for available slots (default: 14).\n\n**Response (200):** `TaskScheduleResponse`\n- `taskId` (UUID) – The task ID.\n- `scheduledSessions` (array) – List of scheduled session results:\n  - `sessionId` (UUID) – Created session ID.\n  - `taskId` (UUID) – The task ID.\n  - `zoneId` (UUID) – Zone ID.\n  - `start` (ISO datetime) – Session start.\n  - `end` (ISO datetime) – Session end.\n- `unscheduledTasks` (array) – If the task couldn't be scheduled:\n  - `taskId` (UUID) – Task ID.\n  - `taskTitle` (string) – Task title.\n  - `reason` (enum) – Failure reason.\n  - `message` (string) – Explanation.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `AI_UNAVAILABLE` (503) – AI service is temporarily unavailable."
           }
+        },
+        {
+          "name": "AI Schedule Goal (Proposal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goalId\": \"8d2f1c44-1f3e-4a1a-9c2b-6d0a3b7f1e55\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/schedule",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "schedule"
+              ]
+            },
+            "description": "Ask the AI to plan sessions for every task in a goal. **Nothing is persisted** – the client reviews the proposal and calls `POST /v1/ai/schedule/confirm` with the sessions the user accepted.\n\n**Request Body:**\n- `goalId` (UUID, required) – Goal to schedule.\n\n**Response (200):** `AiGoalScheduleResponse`\n- `goalId` (UUID).\n- `proposedSessions` (array) – In-zone placements with enough free time. Each: `taskId`, `taskTitle`, `zoneId`, `start`, `end`.\n- `suggestions` (array) – Placements needing user review. Adds `suggestionType` (`NO_ZONE` – placed outside any zone, `zoneId` is `null`; `OVERLAP` – placed over an existing unlocked session), `reason`, and `overlapInfo` (non-null only for `OVERLAP`: `taskTitle`, `start`, `end`, `mandatory`, `points`).\n- `unscheduledTasks` (array) – Tasks the AI could not place: `taskId`, `taskTitle`, `message`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – `goalId` missing.\n- `GOAL_NOT_FOUND` (404) – Goal not found / not owned.\n- `SCHEDULING_FAILED` (500) – The scheduler could not produce a plan.\n- `AI_UNAVAILABLE` (503) – AI service unavailable."
+          },
+          "response": [
+            {
+              "name": "Proposal",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"goalId\": \"8d2f1c44-1f3e-4a1a-9c2b-6d0a3b7f1e55\",\n  \"proposedSessions\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000001\",\n      \"taskTitle\": \"Read chapter 1\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"start\": \"2026-08-04T09:00:00\",\n      \"end\": \"2026-08-04T10:00:00\"\n    }\n  ],\n  \"suggestions\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000002\",\n      \"taskTitle\": \"Write summary\",\n      \"zoneId\": null,\n      \"start\": \"2026-08-04T20:00:00\",\n      \"end\": \"2026-08-04T21:00:00\",\n      \"suggestionType\": \"NO_ZONE\",\n      \"reason\": \"No study zone had enough free time, so this was placed in an unzoned evening gap.\",\n      \"overlapInfo\": null\n    },\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000003\",\n      \"taskTitle\": \"Practice problems\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"start\": \"2026-08-05T09:00:00\",\n      \"end\": \"2026-08-05T10:00:00\",\n      \"suggestionType\": \"OVERLAP\",\n      \"reason\": \"No free time remained; this overlaps a lower-value unlocked session.\",\n      \"overlapInfo\": {\n        \"taskTitle\": \"Email triage\",\n        \"start\": \"2026-08-05T09:00:00\",\n        \"end\": \"2026-08-05T09:30:00\",\n        \"mandatory\": false,\n        \"points\": 5\n      }\n    }\n  ],\n  \"unscheduledTasks\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000004\",\n      \"taskTitle\": \"Final revision\",\n      \"message\": \"No free time in the planning horizon could fit this task.\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirm AI Schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goalId\": \"8d2f1c44-1f3e-4a1a-9c2b-6d0a3b7f1e55\",\n  \"sessions\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000001\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"start\": \"2026-08-04T09:00:00\",\n      \"end\": \"2026-08-04T10:00:00\"\n    },\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000002\",\n      \"zoneId\": null,\n      \"start\": \"2026-08-04T20:00:00\",\n      \"end\": \"2026-08-04T21:00:00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/schedule/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "schedule",
+                "confirm"
+              ]
+            },
+            "description": "Persist the sessions the user accepted from an `AI Schedule Goal (Proposal)` response. Send any subset of `proposedSessions` plus any accepted `suggestions`; each item's ownership is validated before it is saved.\n\n**Request Body:** `ConfirmScheduleRequest`\n- `goalId` (UUID, required).\n- `sessions` (array, required, non-empty) – Each item:\n  - `taskId` (UUID, required).\n  - `zoneId` (UUID or null) – `null` when confirming a `NO_ZONE` suggestion.\n  - `start` (LocalDateTime, required).\n  - `end` (LocalDateTime, required).\n\n**Response (200):** `ScheduledSessionResult[]` – The newly created sessions with their database ids: `sessionId`, `taskId`, `zoneId`, `start`, `end`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing `goalId`, empty `sessions`, or missing item fields.\n- `GOAL_NOT_FOUND` (404) – Goal not found / not owned.\n- `TASK_NOT_FOUND` (404) – A referenced task is not found / not owned.\n- `ZONE_NOT_FOUND` (404) – A referenced zone is not found / not owned."
+          },
+          "response": [
+            {
+              "name": "Confirmed",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"sessionId\": \"7a0c1a2b-3c4d-4e5f-8a9b-0c1d2e3f4a5b\",\n    \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000001\",\n    \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n    \"start\": \"2026-08-04T09:00:00\",\n    \"end\": \"2026-08-04T10:00:00\"\n  },\n  {\n    \"sessionId\": \"7a0c1a2b-3c4d-4e5f-8a9b-0c1d2e3f4a5c\",\n    \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000002\",\n    \"zoneId\": null,\n    \"start\": \"2026-08-04T20:00:00\",\n    \"end\": \"2026-08-04T21:00:00\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Preview Schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"title\": \"Read chapter 1\",\n    \"estimatedDuration\": 60,\n    \"mandatory\": false,\n    \"estimatedPoints\": 10,\n    \"allowTaskSplitting\": true\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/schedule/preview?horizonDays=14",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "schedule",
+                "preview"
+              ],
+              "query": [
+                {
+                  "key": "horizonDays",
+                  "value": "14"
+                }
+              ]
+            },
+            "description": "**Testing endpoint.** Runs the solver over an ad-hoc list of tasks that do not need to exist in the database, and returns the sessions it would produce. Nothing is persisted.\n\n**Query Parameters:**\n- `horizonDays` (int, optional) – Planning horizon; defaults to the server setting (`EZDO_AI_PLAN_HORIZON_DAYS`, 14).\n\n**Request Body:** `TaskInfoResponse[]` – The tasks to place.\n\n**Response (200):** `SessionResponse[]` – The proposed sessions.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `MALFORMED_REQUEST_BODY` (400) – Body is not a JSON array of tasks.\n- `SCHEDULING_FAILED` (500) – The solver could not produce a schedule."
+          },
+          "response": []
         }
       ]
     },
