@@ -773,7 +773,7 @@
     },
     {
       "name": "Goals",
-      "description": "Goal and task management. Goals contain tasks. Each user has an auto-created Inbox goal for unassigned tasks.\n\n**Goal Statuses:** `ACTIVE` (default), `ACHIEVED`.\n**Task Statuses:** `SCHEDULED` (default), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.",
+      "description": "Goal and task management. Goals contain tasks. Each user has an auto-created Inbox goal for unassigned tasks.\n\n**Goal Statuses:** `ACTIVE` (default), `ACHIEVED`.\n**Task Statuses:** `ACTIVE`, `SCHEDULED` (default), `COMPLETED`, `CANCELLED`.",
       "item": [
         {
           "name": "Create Goal",
@@ -1067,7 +1067,7 @@
     },
     {
       "name": "Tasks",
-      "description": "Task CRUD, moving between goals, and dependency management.\n\n**Task Statuses:** `SCHEDULED` (default on create), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Dependencies:** Tasks can depend on other tasks **within the same goal only**. Circular dependencies are prevented.",
+      "description": "Task CRUD, moving between goals, and dependency management.\n\n**Task Statuses:** `ACTIVE`, `SCHEDULED` (default on create), `COMPLETED`, `CANCELLED`.\n\n**Dependencies:** Tasks can depend on other tasks **within the same goal only**. Circular dependencies are prevented.",
       "item": [
         {
           "name": "Get Tasks by Date",
@@ -1238,7 +1238,7 @@
                 "with-sessions"
               ]
             },
-            "description": "Create a task with one or more pre-scheduled sessions in a single request. Sessions can optionally be associated with a zone.\n\n**Request Body:**\n- `task` (object, required) – Task fields (same as Create Task):\n  - `title` (string, required) – Max 255 chars.\n  - `description` (string, optional) – Max 2000 chars.\n  - `estimatedDuration` (int, optional) – Estimated total minutes. Defaults to user's `preferredSessionDuration`.\n  - `mandatory` (boolean, optional) – Default: `false`.\n  - `estimatedPoints` (int, optional) – Default: 0.\n  - `allowTaskSplitting` (boolean, optional) – Default: `false`.\n  - `goalId` (UUID, optional) – Target goal. **Null/omitted → task goes to Inbox.**\n- `sessions` (array, optional) – Max 50 sessions. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `SKIPPED`.\n\n**Response (201):** `TaskWithSessionsResponse`\n- `task` (object) – `TaskInfoResponse` (task details).\n- `sessions` (array) – List of `SessionResponse`:\n  - `id` (UUID) – Session ID.\n  - `start` (LocalDateTime) – Start time.\n  - `end` (LocalDateTime) – End time.\n  - `status` (string) – Current status.\n  - `locked` (boolean) – Whether the session is locked.\n  - `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `GOAL_NOT_FOUND` (404) – If `goalId` provided but doesn't exist/not owned.\n- `ZONE_NOT_FOUND` (404) – If `zoneId` provided but doesn't exist/not owned.\n- `INVALID_OPERATION` (400) – Session `end` must be after `start`."
+            "description": "Create a task with one or more pre-scheduled sessions in a single request. Sessions can optionally be associated with a zone.\n\n**Request Body:**\n- `task` (object, required) – Task fields (same as Create Task):\n  - `title` (string, required) – Max 255 chars.\n  - `description` (string, optional) – Max 2000 chars.\n  - `estimatedDuration` (int, optional) – Estimated total minutes. Defaults to user's `preferredSessionDuration`.\n  - `mandatory` (boolean, optional) – Default: `false`.\n  - `estimatedPoints` (int, optional) – Default: 0.\n  - `allowTaskSplitting` (boolean, optional) – Default: `false`.\n  - `goalId` (UUID, optional) – Target goal. **Null/omitted → task goes to Inbox.**\n- `sessions` (array, optional) – Max 50 sessions. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (201):** `TaskWithSessionsResponse`\n- `task` (object) – `TaskInfoResponse` (task details).\n- `sessions` (array) – List of `SessionResponse`:\n  - `id` (UUID) – Session ID.\n  - `start` (LocalDateTime) – Start time.\n  - `end` (LocalDateTime) – End time.\n  - `status` (string) – Current status.\n  - `locked` (boolean) – Whether the session is locked.\n  - `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `GOAL_NOT_FOUND` (404) – If `goalId` provided but doesn't exist/not owned.\n- `ZONE_NOT_FOUND` (404) – If `zoneId` provided but doesn't exist/not owned.\n- `INVALID_OPERATION` (400) – Session `end` must be after `start`."
           },
           "response": [
             {
@@ -1316,7 +1316,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/sessions",
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/sessions?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1325,9 +1325,16 @@
                 "tasks",
                 "{{taskId}}",
                 "sessions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
+                }
               ]
             },
-            "description": "List all sessions for a given task.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (task-scoped sessions may be zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+            "description": "List all sessions for a given task.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Query Parameters:**\n- `status` (enum, optional) – Filter by status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (task-scoped sessions may be zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
           },
           "response": [
             {
@@ -1376,7 +1383,7 @@
                 "sessions"
               ]
             },
-            "description": "Add new sessions to an existing task. Sessions are appended to the task's existing sessions.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Request Body:**\n- `sessions` (array, required, max 50) – Sessions to add. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `SKIPPED`.\n\n**Response (201):** `SessionResponse[]` — The newly created sessions.\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Start time.\n- `end` (ISO datetime) – End time.\n- `status` (string) – Current status.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `TASK_NOT_FOUND` (404) – Task not found or not owned by user.\n- `ZONE_NOT_FOUND` (404) – If any `zoneId` doesn't exist/not owned.\n- `INVALID_SESSION_TIME_RANGE` (400) – Session start/end are null or end is not after start."
+            "description": "Add new sessions to an existing task. Sessions are appended to the task's existing sessions.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Request Body:**\n- `sessions` (array, required, max 50) – Sessions to add. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (201):** `SessionResponse[]` — The newly created sessions.\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Start time.\n- `end` (ISO datetime) – End time.\n- `status` (string) – Current status.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `TASK_NOT_FOUND` (404) – Task not found or not owned by user.\n- `ZONE_NOT_FOUND` (404) – If any `zoneId` doesn't exist/not owned.\n- `INVALID_SESSION_TIME_RANGE` (400) – Session start/end are null or end is not after start."
           },
           "response": [
             {
@@ -1431,7 +1438,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"status\": \"IN_PROGRESS\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
+              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"status\": \"COMPLETED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1449,7 +1456,7 @@
                 "{{taskId}}"
               ]
             },
-            "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
+            "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `ACTIVE`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
           }
         },
         {
@@ -1645,7 +1652,7 @@
     },
     {
       "name": "Sessions",
-      "description": "Session CRUD operations. Sessions are concrete scheduled occurrences within a task (and optionally a zone).\n\n**Session Statuses:** `SCHEDULED` (default on create), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Locking:** Locked sessions cannot be updated, have their status changed, or be deleted.",
+      "description": "Session CRUD and lifecycle management. A Session is a concrete scheduled occurrence for a task (optionally within a zone).\n\n**Statuses:** `SCHEDULED` (default on create), `COMPLETED`, `CANCELLED`.\n- `ACTIVE` and `MISSED` are **derived**, not persisted: a `SCHEDULED` session whose window currently contains `now` is *active*; one whose `end` has already passed is *missed*.\n- Use **Get Missed Sessions by Date / Range** to list sessions that were scheduled but never resolved.\n\n**Lifecycle transitions** (enforced server-side, else `INVALID_OPERATION` 400):\n- `SCHEDULED → COMPLETED` (complete)\n- `SCHEDULED → CANCELLED` (cancel)\n- `COMPLETED → SCHEDULED` (uncomplete)\n- `CANCELLED` is terminal; a cancelled session cannot be reopened.\n\n**Locking:** `locked` is metadata used by the scheduling algorithm to avoid moving a session. It does not restrict editing, status changes, or deletion through this API.",
       "item": [
         {
           "name": "Get Sessions by Date",
@@ -1659,7 +1666,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/sessions/date/{{date}}",
+              "raw": "{{baseUrl}}/v1/sessions/date/{{date}}?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1668,9 +1675,16 @@
                 "sessions",
                 "date",
                 "{{date}}"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
+                }
               ]
             },
-            "description": "Get all sessions for a specific date, sorted by start time ascending.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid date format (must be `YYYY-MM-DD`)."
+            "description": "Get all sessions for a specific date, sorted by start time ascending.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – Target date. Format: `YYYY-MM-DD`.\n\n**Query Parameters:**\n- `status` (enum, optional) – Filter by status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all.\n\n**Response (200):** Array of `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid date format (must be `YYYY-MM-DD`)."
           },
           "response": [
             {
@@ -1699,7 +1713,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/sessions/range?startDate=2026-07-20&endDate=2026-07-22",
+              "raw": "{{baseUrl}}/v1/sessions/range?startDate=2026-07-20&endDate=2026-07-22&status=SCHEDULED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1718,10 +1732,15 @@
                   "key": "endDate",
                   "value": "2026-07-22",
                   "description": "End date (inclusive). Format: YYYY-MM-DD"
+                },
+                {
+                  "key": "status",
+                  "value": "SCHEDULED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
                 }
               ]
             },
-            "description": "Get all sessions within a date range, grouped by date and sorted by start time ascending within each group.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | — | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | — | End date (inclusive). Format: `YYYY-MM-DD`. |\n\n**Response (200):** Map of `LocalDate` to `SessionResponse[]`\n- Keys are dates in ascending order.\n- Each value is an array of `SessionResponse` sorted by `start` ascending:\n  - `id` (UUID) – Session ID.\n  - `start` (ISO datetime) – Session start.\n  - `end` (ISO datetime) – Session end.\n  - `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n  - `locked` (boolean) – Whether session is locked.\n  - `zoneId` (UUID or null) – Associated zone.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – Required query parameter missing.\n- `TYPE_MISMATCH` (400) – Invalid date format.\n- `INVALID_OPERATION` (400) – `endDate` is before `startDate`."
+            "description": "Get all sessions within a date range, grouped by date and sorted by start time ascending within each group.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | — | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | — | End date (inclusive). Format: `YYYY-MM-DD`. |\n| `status` | SessionStatus | No | — | Optional filter. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. |\n\n**Response (200):** Map of `LocalDate` to `SessionResponse[]`\n- Keys are dates in ascending order.\n- Each value is an array of `SessionResponse` sorted by `start` ascending:\n  - `id` (UUID) – Session ID.\n  - `start` (ISO datetime) – Session start.\n  - `end` (ISO datetime) – Session end.\n  - `status` (string) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n  - `locked` (boolean) – Whether session is locked.\n  - `zoneId` (UUID or null) – Associated zone.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – Required query parameter missing.\n- `TYPE_MISMATCH` (400) – Invalid date format.\n- `INVALID_OPERATION` (400) – `endDate` is before `startDate`."
           },
           "response": [
             {
@@ -1737,6 +1756,70 @@
               "body": "{\n  \"2026-07-20\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n      \"start\": \"2026-07-20T09:00:00\",\n      \"end\": \"2026-07-20T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n    }\n  ],\n  \"2026-07-22\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:30:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    },\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440004\",\n      \"start\": \"2026-07-22T14:00:00\",\n      \"end\": \"2026-07-22T15:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440005\"\n    }\n  ]\n}"
             }
           ]
+        },
+        {
+          "name": "Get Missed Sessions by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/missed/{{date}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "missed",
+                "{{date}}"
+              ]
+            },
+            "description": "Get sessions on a given date that were scheduled but never resolved (status is still `SCHEDULED` and the session's `end` time has already passed). Such sessions are \"missed\". Completed or cancelled sessions are never reported here.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – Target date. Format: `YYYY-MM-DD`. Sessions whose `start` falls on `date` are considered.\n\n**Response (200):** Array of `SessionResponse` (all `SCHEDULED`, with `end` in the past).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid date format (must be `YYYY-MM-DD`)."
+          }
+        },
+        {
+          "name": "Get Missed Sessions by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/missed/range?startDate=2026-07-20&endDate=2026-07-22",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "missed",
+                "range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-07-20",
+                  "description": "Start date (inclusive). Format: YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-07-22",
+                  "description": "End date (inclusive). Format: YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "Get sessions within a date range that were scheduled but never resolved (status still `SCHEDULED` and `end` already passed). This is the catch-up view for days the user missed.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | — | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | — | End date (inclusive). Format: `YYYY-MM-DD`. |\n\n**Response (200):** Array of `SessionResponse` – `SCHEDULED` sessions with `end` in the past and `start` within the range.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – Required query parameter missing.\n- `TYPE_MISMATCH` (400) – Invalid date format.\n- `INVALID_OPERATION` (400) – `endDate` is before `startDate`."
+          }
         },
         {
           "name": "Get Session",
@@ -1760,7 +1843,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Get a single session by ID.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
+            "description": "Get a single session by ID.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1790,7 +1873,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"IN_PROGRESS\"\n}",
+              "raw": "{\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"COMPLETED\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1808,7 +1891,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Update a session's time range and optionally its status.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Request Body:**\n- `start` (ISO datetime, required) – New start time.\n- `end` (ISO datetime, required) – New end time (must be after `start`).\n- `status` (string, optional) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `VALIDATION_ERROR` (400) – Session is locked and cannot be modified."
+            "description": "Update a session's time range and optionally its status.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Request Body:**\n- `start` (ISO datetime, required) – New start time.\n- `end` (ISO datetime, required) – New end time (must be after `start`).\n- `status` (string, optional) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
           },
           "response": [
             {
@@ -1821,7 +1904,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1837,7 +1920,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/status?status=IN_PROGRESS",
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/status?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1850,12 +1933,12 @@
               "query": [
                 {
                   "key": "status",
-                  "value": "IN_PROGRESS",
-                  "description": "New status: SCHEDULED, IN_PROGRESS, COMPLETED, or CANCELLED"
+                  "value": "COMPLETED",
+                  "description": "New status: SCHEDULED, COMPLETED, or CANCELLED"
                 }
               ]
             },
-            "description": "Update only the status of a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Query Parameters:**\n- `status` (string, required) – New status. One of: `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – `status` query parameter is required.\n- `TYPE_MISMATCH` (400) – Invalid status value.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `VALIDATION_ERROR` (400) – Session is locked and cannot be modified."
+            "description": "Update only the status of a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Query Parameters:**\n- `status` (string, required) – New status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – `status` query parameter is required.\n- `TYPE_MISMATCH` (400) – Invalid status value.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
           },
           "response": [
             {
@@ -1868,9 +1951,87 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
+        },
+        {
+          "name": "Complete Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "{{sessionId}}",
+                "complete"
+              ]
+            },
+            "description": "Mark a `SCHEDULED` session as completed.\n\n**Transition:** `SCHEDULED → COMPLETED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: COMPLETED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be completed from its current status (e.g. already cancelled)."
+          }
+        },
+        {
+          "name": "Uncomplete Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/uncomplete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "{{sessionId}}",
+                "uncomplete"
+              ]
+            },
+            "description": "Revert a `COMPLETED` session back to `SCHEDULED` (mistake correction).\n\n**Transition:** `COMPLETED → SCHEDULED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: SCHEDULED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session is not `COMPLETED` (only a completed session can be uncompleted)."
+          }
+        },
+        {
+          "name": "Cancel Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "{{sessionId}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancel a `SCHEDULED` session. Cancellation is design terminal – a cancelled session cannot be reopened.\n\n**Transition:** `SCHEDULED → CANCELLED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: CANCELLED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be cancelled from its current status."
+          }
         },
         {
           "name": "Lock Session",
@@ -1895,7 +2056,7 @@
                 "lock"
               ]
             },
-            "description": "Lock a session to prevent modifications.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: true`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
+            "description": "Set the `locked` metadata flag on a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: true`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1935,7 +2096,7 @@
                 "unlock"
               ]
             },
-            "description": "Unlock a session to allow modifications again.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: false`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
+            "description": "Clear the `locked` metadata flag on a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: false`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1974,7 +2135,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Delete a session. Locked sessions cannot be deleted.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (204):** No Content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `VALIDATION_ERROR` (400) – Session is locked and cannot be deleted."
+            "description": "Delete a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (204):** No Content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -2556,7 +2717,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}/sessions",
+              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}/sessions?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2565,9 +2726,16 @@
                 "zones",
                 "{{zoneId}}",
                 "sessions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
+                }
               ]
             },
-            "description": "List all sessions for a given zone.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone ID.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID) – Associated zone ID.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+            "description": "List all sessions for a given zone.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone ID.\n\n**Query Parameters:**\n- `status` (enum, optional) – Filter by status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID) – Associated zone ID.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
           },
           "response": [
             {
