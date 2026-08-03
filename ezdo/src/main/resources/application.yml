@@ -80,6 +80,11 @@ ezdo:
       max-sessions-per-task: ${EZDO_AI_PLAN_MAX_SESSIONS:10}
       availability-horizon-days: ${EZDO_AI_PLAN_HORIZON_DAYS:14}
 
+  cloudinary:
+    cloud-name: ${EZDO_CLOUDINARY_CLOUD_NAME:}
+    api-key: ${EZDO_CLOUDINARY_API_KEY:}
+    api-secret: ${EZDO_CLOUDINARY_API_SECRET:}
+
 timefold:
   solver:
     termination:

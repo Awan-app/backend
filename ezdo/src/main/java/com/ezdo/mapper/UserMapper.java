@@ -29,15 +29,17 @@ public class UserMapper {
         }
 
         return new UserProfileResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getBirthDate(),
-                user.getPoints(),
-                user.getStreak(),
-                user.getMaxStreak(),
-                preferencesResponse
+            user.getId(),
+            user.getEmail(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getBirthDate(),
+            user.getPoints(),
+            user.getStreak(),
+            user.getMaxStreak(),
+            user.getProfilePictureUrl(),
+            user.getIsNew(),
+            preferencesResponse
         );
     }
 

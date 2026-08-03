@@ -5,18 +5,17 @@ import com.ezdo.dto.UserProfileResponse;
 import com.ezdo.dto.profile.*;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
-import com.ezdo.exception.InsufficientPointsException;
-import com.ezdo.exception.InvalidSleepScheduleException;
-import com.ezdo.exception.InvalidTimezoneException;
-import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.*;
 import com.ezdo.mapper.UserMapper;
 import com.ezdo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +25,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CloudinaryService cloudinaryService;
+
+    private static final long MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/png", "image/webp");
 
     @Transactional(readOnly = true)
     public UserProfileResponse getProfile(UUID userId) {
@@ -68,6 +71,31 @@ public class UserService {
         userMapper.updateProfileFromRequest(request, user);
 
         return userMapper.toProfileResponse(userRepository.save(user));
+    }
+
+    public ProfilePictureResponse updateProfilePicture(UUID userId, MultipartFile file) {
+        validateProfilePicture(file);
+
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
+        String url = cloudinaryService.uploadProfilePicture(userId, file);
+        userRepository.updateProfilePictureUrl(userId, url);
+
+        return new ProfilePictureResponse(url);
+    }
+
+    private void validateProfilePicture(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new ProfilePictureEmptyException();
+        }
+        if (file.getSize() > MAX_PROFILE_PICTURE_SIZE) {
+            throw new ProfilePictureTooLargeException(file.getSize(), MAX_PROFILE_PICTURE_SIZE);
+        }
+        if (!ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
+            throw new UnsupportedImageTypeException(file.getContentType(), String.join(", ", ALLOWED_IMAGE_TYPES));
+        }
     }
 
     private boolean hasAnyPreferenceField(UpdateProfileRequest request) {
