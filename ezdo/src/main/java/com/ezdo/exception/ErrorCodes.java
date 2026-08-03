@@ -74,4 +74,9 @@ public class ErrorCodes {
 
     // Failed
     public static final String SCHEDULING_FAILED = "SCHEDULING_FAILED";
+
+    // Profile picture / Cloudinary
+    public static final String PROFILE_PICTURE_EMPTY = "PROFILE_PICTURE_EMPTY";
+    public static final String PROFILE_PICTURE_TOO_LARGE = "PROFILE_PICTURE_TOO_LARGE";
+    public static final String CLOUDINARY_UPLOAD_FAILED = "CLOUDINARY_UPLOAD_FAILED";
 }

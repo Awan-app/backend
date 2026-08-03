@@ -27,9 +27,10 @@ public class SessionController {
     public ResponseEntity<Map<LocalDate, List<SessionResponse>>> getByDateRange(
         @AuthenticationPrincipal UUID userId,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+        @RequestParam(required = false) SessionStatus status
     ) {
-        return ResponseEntity.ok(sessionService.getByDateRange(userId, startDate, endDate));
+        return ResponseEntity.ok(sessionService.getByDateRange(userId, startDate, endDate, status));
     }
 
     @GetMapping("/date/{date}")
@@ -37,9 +38,29 @@ public class SessionController {
         @AuthenticationPrincipal UUID userId,
         @PathVariable
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        LocalDate date,
+        @RequestParam(required = false) SessionStatus status
+    ) {
+        return ResponseEntity.ok(sessionService.getByDate(userId, date, status));
+    }
+
+    @GetMapping("/missed/{date}")
+    public ResponseEntity<List<SessionResponse>> getMissedOnDate(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate date
     ) {
-        return ResponseEntity.ok(sessionService.getByDate(userId, date));
+        return ResponseEntity.ok(sessionService.getMissedOnDate(userId, date));
+    }
+
+    @GetMapping("/missed/range")
+    public ResponseEntity<List<SessionResponse>> getMissedRange(
+        @AuthenticationPrincipal UUID userId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(sessionService.getMissedRange(userId, startDate, endDate));
     }
 
     @GetMapping("/{sessionId}")
@@ -63,6 +84,30 @@ public class SessionController {
         @RequestParam SessionStatus status
     ) {
         return ResponseEntity.ok(sessionService.updateStatus(userId, sessionId, status));
+    }
+
+    @PostMapping("/{sessionId}/complete")
+    public ResponseEntity<SessionResponse> complete(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID sessionId
+    ) {
+        return ResponseEntity.ok(sessionService.complete(userId, sessionId));
+    }
+
+    @PostMapping("/{sessionId}/uncomplete")
+    public ResponseEntity<SessionResponse> uncomplete(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID sessionId
+    ) {
+        return ResponseEntity.ok(sessionService.uncomplete(userId, sessionId));
+    }
+
+    @PostMapping("/{sessionId}/cancel")
+    public ResponseEntity<SessionResponse> cancel(
+        @AuthenticationPrincipal UUID userId,
+        @PathVariable UUID sessionId
+    ) {
+        return ResponseEntity.ok(sessionService.cancel(userId, sessionId));
     }
 
     @PatchMapping("/{sessionId}/lock")

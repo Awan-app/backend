@@ -125,7 +125,6 @@ public class GoalSchedulingService {
                 unscheduledResults.add(new UnscheduledTaskResult(
                         taskId,
                         task != null ? task.getTitle() : "Unknown Task",
-                        "NO_SUITABLE_ZONE",
                         "Timefold could not find a valid time slot for all chunks of this task."
                 ));
             } else {

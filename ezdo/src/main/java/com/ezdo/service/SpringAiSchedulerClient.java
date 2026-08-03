@@ -2,6 +2,7 @@ package com.ezdo.service;
 
 import com.ezdo.dto.ai.schedule.AiSchedulingPayload;
 import com.ezdo.dto.ai.schedule.AiSchedulingResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Service
 public class SpringAiSchedulerClient implements AiSchedulerClient {
 
@@ -31,8 +33,19 @@ public class SpringAiSchedulerClient implements AiSchedulerClient {
 
     @Override
     public AiSchedulingResult scheduleTasks(AiSchedulingPayload payload) {
+        try {
+            return callModel(payload);
+        } catch (RuntimeException first) {
+            log.warn("AI scheduling returned an invalid response, retrying once", first);
+            // second attempt — let any exception propagate to the caller
+            return callModel(payload);
+        }
+    }
 
-        System.out.println("Scheduling tasks with payload: " + payload);
+    // ── private ───────────────────────────────────────────────────────────────
+
+    private AiSchedulingResult callModel(AiSchedulingPayload payload) {
+        log.debug("Calling AI scheduler with payload for goal '{}'", payload.goalTitle());
 
         AiSchedulingResult result = chatClient.prompt()
                 .system(systemPrompt)
@@ -48,7 +61,8 @@ public class SpringAiSchedulerClient implements AiSchedulerClient {
                 .entity(AiSchedulingResult.class);
 
         if (result == null) {
-            throw new IllegalStateException("AI returned an empty response.");
+            throw new IllegalStateException("AI returned an empty (null) response for goal '"
+                    + payload.goalTitle() + "'");
         }
 
         return result;
