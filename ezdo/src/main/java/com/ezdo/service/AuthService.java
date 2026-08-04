@@ -6,6 +6,7 @@ import com.ezdo.exception.ErrorCodes;
 import com.ezdo.exception.InvalidRefreshTokenException;
 import com.ezdo.exception.OtpVerificationException;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +24,12 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public OtpResponse requestOtp(OtpRequest request) {
-        return otpService.requestOtp(normalizeEmail(request.email()));
+        return otpService.requestOtp(EmailUtil.normalize(request.email()));
     }
 
     @Transactional(noRollbackFor = OtpVerificationException.class)
-    public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
-        String email = normalizeEmail(request.email());
+    public AuthResponse verifyOtp(VerifyOtpRequest request) {
+        String email = EmailUtil.normalize(request.email());
 
         // Verify the OTP code
         otpService.verifyOtp(email, request.code());
@@ -50,12 +51,19 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // Generate tokens
+        return issueTokens(user, request.deviceId());
+    }
+
+    /**
+     * The single mint point for a session. Every login path goes through here so
+     * the OTP and Google flows cannot drift apart.
+     */
+    public AuthResponse issueTokens(User user, UUID deviceId) {
         String accessToken = jwtService.generateAccessToken(user);
         RefreshTokenService.RefreshTokenResult refreshResult =
-                refreshTokenService.createRefreshToken(user.getId(), request.deviceId());
+                refreshTokenService.createRefreshToken(user.getId(), deviceId);
 
-        return new VerifyOtpResponse(
+        return new AuthResponse(
                 accessToken,
                 jwtService.getAccessTokenExpirySeconds(),
                 refreshResult.rawToken(),
@@ -88,9 +96,5 @@ public class AuthService {
     @Transactional
     public void logout(UUID userId, LogoutRequest request) {
         refreshTokenService.revokeByUserAndDevice(userId, request.deviceId());
-    }
-
-    private String normalizeEmail(String email) {
-        return email.trim().toLowerCase();
     }
 }

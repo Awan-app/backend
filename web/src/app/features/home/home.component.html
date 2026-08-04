@@ -1,0 +1,40 @@
+<div class="min-h-screen bg-gray-50 px-4 py-10">
+  <div class="max-w-sm mx-auto bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+    @if (auth.user(); as user) {
+      @if (auth.profile(); as profile) {
+        <h1 class="text-lg font-semibold text-gray-900 mb-1">Welcome, {{ profile.firstName }}</h1>
+        <p class="text-sm text-gray-500 mb-6">{{ user.email }}</p>
+
+        <dl class="space-y-2 text-sm mb-6">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Streak</dt>
+            <dd class="text-gray-900">{{ profile.streak }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Best streak</dt>
+            <dd class="text-gray-900">{{ profile.maxStreak }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Points</dt>
+            <dd class="text-gray-900">{{ profile.points }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Timezone</dt>
+            <dd class="text-gray-900">{{ profile.preferences.timezone }}</dd>
+          </div>
+        </dl>
+      } @else {
+        <h1 class="text-lg font-semibold text-gray-900 mb-1">Welcome</h1>
+        <p class="text-sm text-gray-500 mb-6">{{ user.email }}</p>
+      }
+
+      <button
+        type="button"
+        (click)="logout()"
+        class="w-full rounded-md border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+        Sign out
+      </button>
+    }
+  </div>
+</div>

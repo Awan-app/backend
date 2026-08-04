@@ -98,6 +98,48 @@
           ]
         },
         {
+          "name": "Social Login (Firebase)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"<firebase-id-token>\",\n  \"deviceId\": \"c9751c89-b2cc-4957-928f-6ba5a00eb15a\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/firebase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "firebase"
+              ]
+            },
+            "description": "Exchange a Firebase ID token for an app session. The client signs in with Google or Apple via the Firebase SDK and posts the resulting ID token here; the backend verifies it against Google's JWKS (issuer `https://securetoken.google.com/<projectId>`, audience `<projectId>`). Verification is scoped to the Firebase project, not the platform, so web, Android and iOS clients all use this same endpoint unchanged.\n\nAccounts are keyed on **email**, the same key the OTP flow uses — so signing in socially with an address already registered by OTP lands on the same account.\n\nWhich providers are accepted is controlled by `ezdo.firebase.allowed-sign-in-providers` (default `google.com,apple.com`).\n\n> **Apple caveat:** with *Hide My Email* Apple sends a `@privaterelay.appleid.com` address. It is stable for that user, but by design cannot be correlated with their real address — so it becomes a separate account. Apple also sends the display name only on the very first authorization, so an Apple user typically arrives with no name and fills it in during onboarding.\n\n**Request Body:**\n- `idToken` (string, required) – Firebase ID token from `getIdToken()`.\n- `deviceId` (UUID, required) – Client-generated device identifier, persisted and reused.\n\n**Response (200):** identical shape to `POST /v1/auth/otp/verify`.\n- `accessToken` (string), `accessTokenExpiresIn` (long), `refreshToken` (string)\n- `user` (object): `id`, `email`, `isNew` – `true` on first login, so the client must run onboarding.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (422) – Missing `idToken` or `deviceId`.\n- `FIREBASE_TOKEN_INVALID` (401) – Bad signature, wrong issuer/audience, or expired.\n- `FIREBASE_PROVIDER_NOT_ALLOWED` (401) – Provider not in the allowed list.\n- `FIREBASE_EMAIL_MISSING` (401) – Provider asserted no email address.\n- `FIREBASE_EMAIL_NOT_VERIFIED` (401) – Provider did not assert `email_verified`. Enforced for every provider.\n- `FIREBASE_NOT_CONFIGURED` (503) – `EZDO_FIREBASE_PROJECT_ID` is unset on the server."
+          },
+          "response": [
+            {
+              "name": "Success (New User)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n  \"accessTokenExpiresIn\": 86400,\n  \"refreshToken\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"user\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"email\": \"user@gmail.com\",\n    \"isNew\": true\n  }\n}"
+            }
+          ]
+        },
+        {
           "name": "Refresh Token",
           "request": {
             "method": "POST",
