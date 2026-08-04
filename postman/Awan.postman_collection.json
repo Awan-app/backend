@@ -3160,8 +3160,46 @@
     },
     {
       "name": "Categories",
-      "description": "Global predefined categories shared by all users. Read-only list.\n\nZones, templates, and overrides reference a category by its `categoryId` (UUID). Fetch the available categories via **List Categories** and supply the id in zone payloads.",
+      "description": "Per-user categories. Every new account is seeded with 8 starter categories (General, Work, Personal, Health, Learning, Finance, Home, Social) on first sign-in, and the user can add more at any time.\n\nZones, templates, and overrides reference a category by its `categoryId` (UUID), which must belong to the authenticated user. Fetch the available categories via **List Categories** and supply the id in zone payloads.",
       "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "categories"
+              ]
+            },
+            "description": "Create a new category owned by the authenticated user.\n\n**Body:**\n- `name` (string, required) – Category name. Must be unique within the user's own categories (case-insensitive).\n\n**Response (201):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (400) – Blank name.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NAME_TAKEN` (409) – The user already has a category with that name."
+          }
+        },
         {
           "name": "List Categories",
           "request": {
@@ -3209,6 +3247,45 @@
               ]
             },
             "description": "Get a single category by ID.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) – Category identifier.\n\n**Response (200):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) – Category not found or does not belong to user."
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym Time\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "Rename one of the authenticated user's categories.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) – Category identifier.\n\n**Body:**\n- `name` (string, required) – New category name.\n\n**Response (200):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (400) – Blank name.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) – Category not found or does not belong to user.\n- `CATEGORY_NAME_TAKEN` (409) – The user already has another category with that name."
           }
         }
       ]

@@ -112,7 +112,7 @@ public class GoalDecompositionService {
 
         // The model was grounded with the real category list, but never trust it blindly:
         // strip any category id that doesn't actually belong to this user before persisting.
-        Set<UUID> validCategoryIds = categoryRepository.findAll().stream()
+        Set<UUID> validCategoryIds = categoryRepository.findByUserId(userId).stream()
             .map(Category::getId)
             .collect(Collectors.toSet());
         GoalProposal sanitized = sanitizeCategories(proposal, validCategoryIds, sessionId);

@@ -6,7 +6,13 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "categories")
+@Table(
+    name = "categories",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_categories_user_name",
+        columnNames = {"user_id", "name"}
+    )
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +24,10 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

@@ -56,7 +56,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(request.categoryId()))
+            .category(resolveCategory(userId, request.categoryId()))
             .template(template)
             .build();
 
@@ -75,7 +75,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(request.categoryId()))
+            .category(resolveCategory(userId, request.categoryId()))
             .templateOverride(override)
             .build();
 
@@ -177,7 +177,7 @@ public class ZoneService {
         zone.setStartTime(request.startTime());
         zone.setEndTime(request.endTime());
         zone.setColor(request.color());
-        zone.setCategory(resolveCategory(request.categoryId()));
+        zone.setCategory(resolveCategory(userId, request.categoryId()));
         return zoneMapper.toZoneResponse(zone);
     }
 
@@ -186,8 +186,8 @@ public class ZoneService {
             .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
-    private Category resolveCategory(UUID categoryId) {
-        return categoryRepository.findById(categoryId)
+    private Category resolveCategory(UUID userId, UUID categoryId) {
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 

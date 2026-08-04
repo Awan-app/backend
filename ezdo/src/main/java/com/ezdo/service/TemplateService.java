@@ -66,7 +66,7 @@ public class TemplateService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(resolveCategory(zr.categoryId()))
+                    .category(resolveCategory(userId, zr.categoryId()))
                     .template(template)
                     .build();
                 template.getZones().add(zone);
@@ -130,7 +130,7 @@ public class TemplateService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
-                    .category(resolveCategory(item.categoryId()))
+                    .category(resolveCategory(userId, item.categoryId()))
                     .template(template)
                     .build());
             } else {
@@ -144,7 +144,7 @@ public class TemplateService {
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
-                existing.setCategory(resolveCategory(item.categoryId()));
+                existing.setCategory(resolveCategory(userId, item.categoryId()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -183,8 +183,8 @@ public class TemplateService {
 //        }
 //    }
 
-    private Category resolveCategory(UUID categoryId) {
-        return categoryRepository.findById(categoryId)
+    private Category resolveCategory(UUID userId, UUID categoryId) {
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 

@@ -62,7 +62,7 @@ public class TemplateOverrideService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(resolveCategory(zr.categoryId()))
+                    .category(resolveCategory(userId, zr.categoryId()))
                     .templateOverride(override)
                     .build();
                 override.getZones().add(zone);
@@ -122,7 +122,7 @@ public class TemplateOverrideService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
-                    .category(resolveCategory(item.categoryId()))
+                    .category(resolveCategory(userId, item.categoryId()))
                     .templateOverride(override)
                     .build());
             } else {
@@ -136,7 +136,7 @@ public class TemplateOverrideService {
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
-                existing.setCategory(resolveCategory(item.categoryId()));
+                existing.setCategory(resolveCategory(userId, item.categoryId()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -168,8 +168,8 @@ public class TemplateOverrideService {
         }
     }
 
-    private Category resolveCategory(UUID categoryId) {
-        return categoryRepository.findById(categoryId)
+    private Category resolveCategory(UUID userId, UUID categoryId) {
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
             .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
