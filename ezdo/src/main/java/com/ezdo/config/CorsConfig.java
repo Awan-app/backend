@@ -1,5 +1,6 @@
 package com.ezdo.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 public class CorsConfig {
 
@@ -22,8 +24,15 @@ public class CorsConfig {
 
         List<String> origins = Arrays.stream(allowedOrigins.split(","))
             .map(String::trim)
+            .map(s -> s.endsWith("/") ? s.substring(0, s.length() - 1) : s)
             .filter(s -> !s.isEmpty())
             .toList();
+
+        if (origins.isEmpty()) {
+            log.warn("ezdo.cors.allowed-origins is empty — every cross-origin browser request will be blocked");
+        } else {
+            log.info("CORS allowed origins: {}", origins);
+        }
         configuration.setAllowedOrigins(origins);
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

@@ -43,6 +43,13 @@ public class ErrorCodes {
     public static final String OTP_INVALID_CODE = "OTP_INVALID_CODE";
     public static final String OTP_LOCKED = "OTP_LOCKED";
 
+    // Auth - Firebase (Google sign-in)
+    public static final String FIREBASE_NOT_CONFIGURED = "FIREBASE_NOT_CONFIGURED";
+    public static final String FIREBASE_TOKEN_INVALID = "FIREBASE_TOKEN_INVALID";
+    public static final String FIREBASE_PROVIDER_NOT_ALLOWED = "FIREBASE_PROVIDER_NOT_ALLOWED";
+    public static final String FIREBASE_EMAIL_MISSING = "FIREBASE_EMAIL_MISSING";
+    public static final String FIREBASE_EMAIL_NOT_VERIFIED = "FIREBASE_EMAIL_NOT_VERIFIED";
+
     // Auth - Refresh Token
     public static final String REFRESH_TOKEN_INVALID = "REFRESH_TOKEN_INVALID";
     public static final String REFRESH_TOKEN_EXPIRED = "REFRESH_TOKEN_EXPIRED";

@@ -19,11 +19,20 @@ export interface AuthUser {
   isNew: boolean;
 }
 
-export interface VerifyOtpResponse {
+/** Returned by every login path — POST /auth/otp/verify and POST /auth/firebase alike. */
+export interface AuthResponse {
   accessToken: string;
   accessTokenExpiresIn: number;
   refreshToken: string;
   user: AuthUser;
+}
+
+/** @deprecated Kept as an alias; the backend returns the same shape for both login paths. */
+export type VerifyOtpResponse = AuthResponse;
+
+export interface FirebaseLoginRequest {
+  idToken: string;
+  deviceId: string; // UUID
 }
 
 export interface RefreshRequest {
@@ -58,5 +67,10 @@ export const ErrorCode = {
   REFRESH_TOKEN_INVALID: 'REFRESH_TOKEN_INVALID',
   REFRESH_TOKEN_EXPIRED: 'REFRESH_TOKEN_EXPIRED',
   REFRESH_TOKEN_REUSE_DETECTED: 'REFRESH_TOKEN_REUSE_DETECTED',
+  FIREBASE_NOT_CONFIGURED: 'FIREBASE_NOT_CONFIGURED',
+  FIREBASE_TOKEN_INVALID: 'FIREBASE_TOKEN_INVALID',
+  FIREBASE_PROVIDER_NOT_ALLOWED: 'FIREBASE_PROVIDER_NOT_ALLOWED',
+  FIREBASE_EMAIL_MISSING: 'FIREBASE_EMAIL_MISSING',
+  FIREBASE_EMAIL_NOT_VERIFIED: 'FIREBASE_EMAIL_NOT_VERIFIED',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
 } as const;

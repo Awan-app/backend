@@ -42,6 +42,13 @@ export class LoginComponent {
     });
   }
 
+  signInWithGoogle(): void {
+    if (this.auth.loading()) return;
+    this.auth.loginWithGoogle().subscribe({
+      next: (res) => this.router.navigateByUrl(res.user.isNew ? '/onboarding' : '/'),
+    });
+  }
+
   resend(): void {
     this.auth.resendOtp()?.subscribe();
   }
