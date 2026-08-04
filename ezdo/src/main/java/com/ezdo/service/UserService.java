@@ -141,64 +141,6 @@ public class UserService {
     }
 
     @Transactional
-    public UserProgressResponse incrementStreak(UUID userId) {
-        User user = findUser(userId);
-
-        user.setStreak(user.getStreak() + 1);
-
-        if (user.getStreak() > user.getMaxStreak()) {
-            user.setMaxStreak(user.getStreak());
-        }
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
-    public UserProgressResponse resetStreak(UUID userId) {
-        User user = findUser(userId);
-
-        user.setStreak(0);
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
-    public UserProgressResponse awardPoints(UUID userId, AwardPointsRequest request) {
-        User user = findUser(userId);
-
-        // TODO: Add points validation rules...
-        user.setPoints(user.getPoints() + request.points());
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
-    public UserProgressResponse deductPoints(UUID userId, DeductPointsRequest request) {
-        User user = findUser(userId);
-
-        // TODO: Add points validation rules...
-        if (request.points() > user.getPoints()) {
-            throw new InsufficientPointsException(user.getPoints(), request.points());
-        }
-
-        user.setPoints(user.getPoints() - request.points());
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
     public UserProfileResponse updateTimezone(UUID userId, UpdateTimezoneRequest request) {
         Preferences preferences = findPreferences(userId);
 

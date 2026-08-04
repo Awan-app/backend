@@ -7,9 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -41,6 +40,9 @@ public class Session {
 
     @Builder.Default
     private boolean locked = false;
+
+    @Column(name = "first_completed_at")
+    private Instant firstCompletedAt;
 
     // --- belongs_to (N side) ---
     @ManyToOne(fetch = FetchType.LAZY)

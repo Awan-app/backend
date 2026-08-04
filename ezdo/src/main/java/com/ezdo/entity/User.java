@@ -31,15 +31,6 @@ public class User {
 
     private LocalDate birthDate;
 
-    @Builder.Default
-    private Integer streak = 0;
-
-    @Builder.Default
-    private Integer maxStreak = 0;
-
-    @Builder.Default
-    private Integer points = 0;
-
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
@@ -58,6 +49,12 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Preferences preferences;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Wallet wallet;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Streak streak;
 
     // --- creates (1:N) ---
     @Builder.Default

@@ -3,12 +3,18 @@ package com.ezdo.mapper;
 import com.ezdo.dto.PreferencesResponse;
 import com.ezdo.dto.UpdateProfileRequest;
 import com.ezdo.dto.UserProfileResponse;
+import com.ezdo.dto.profile.UserProgressResponse;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
+import com.ezdo.service.UserClockService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
+
+    private final UserClockService userClockService;
 
     public UserProfileResponse toProfileResponse(User user) {
         if (user == null) {
@@ -28,15 +34,18 @@ public class UserMapper {
             );
         }
 
+        UserProgressResponse progress = UserProgressResponse.of(
+            user.getWallet(), user.getStreak(), userClockService.today(user));
+
         return new UserProfileResponse(
             user.getId(),
             user.getEmail(),
             user.getFirstName(),
             user.getLastName(),
             user.getBirthDate(),
-            user.getPoints(),
-            user.getStreak(),
-            user.getMaxStreak(),
+            progress.points(),
+            progress.streak(),
+            progress.maxStreak(),
             user.getProfilePictureUrl(),
             user.getIsNew(),
             preferencesResponse

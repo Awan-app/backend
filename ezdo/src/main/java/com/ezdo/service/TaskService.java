@@ -37,6 +37,7 @@ public class TaskService {
     private final CategoryRepository categoryRepository;
     private final TaskMapper taskMapper;
     private final SessionMapper sessionMapper;
+    private final SessionRepository sessionRepository;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -214,7 +215,7 @@ public class TaskService {
             task.getSessions().add(session);
         }
 
-        taskRepository.save(task);
+        sessionRepository.saveAll(newSessions);
         return newSessions.stream().map(sessionMapper::toResponse).toList();
     }
 

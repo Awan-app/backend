@@ -5,6 +5,7 @@ import com.ezdo.dto.SessionResponse;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
+import com.ezdo.entity.User;
 import com.ezdo.exception.InvalidOperationException;
 import com.ezdo.exception.InvalidSessionTimeRangeException;
 import com.ezdo.exception.SessionNotFoundException;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,6 +35,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final SessionMapper sessionMapper;
     private final UserRepository userRepository;
+    private final GamificationService gamificationService;
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getByTask(UUID taskId, UUID userId, SessionStatus status) {
@@ -133,6 +136,14 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.COMPLETED);
         session.setStatus(SessionStatus.COMPLETED);
+
+        // Rewards fire once per session, ever. Since a session can be un-completed
+        // and completed again, this stamp is what stops the toggle from farming.
+        if (session.getFirstCompletedAt() == null) {
+            session.setFirstCompletedAt(Instant.now());
+            gamificationService.onSessionCompleted(findUser(userId), session);
+        }
+
         return sessionMapper.toResponse(session);
     }
 
@@ -180,9 +191,13 @@ public class SessionService {
         }
     }
 
+    private User findUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
     private LocalDateTime resolveNow(UUID userId) {
-        Preferences prefs = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId)).getPreferences();
+        Preferences prefs = findUser(userId).getPreferences();
         ZoneId zone = (prefs != null && prefs.getTimezone() != null)
                 ? ZoneId.of(prefs.getTimezone())
                 : ZoneId.of("UTC");

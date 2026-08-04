@@ -70,10 +70,14 @@ estimatedDuration
   duration should agree with that span.
 
 estimatedPoints
-- Relative effort/complexity of this task compared to the OTHER tasks in this
-  same source — a quick errand is low, a task requiring research, coordination,
-  or sustained creative/technical work is higher. When the source describes only
-  one task, judge it on its own terms.
+- The reward the user earns for completing ONE session of this task, not for
+  the whole task. Relative effort/complexity of this task compared to the OTHER
+  tasks in this same source — a quick errand is low, a task requiring research,
+  coordination, or sustained creative/technical work is higher. When the source
+  describes only one task, judge it on its own terms.
+- A long task with allowTaskSplitting=true will be worked across several
+  sessions and paid for each one, so keep its per-session value proportionate
+  rather than pricing the entire task into it.
 
 mandatory
 - true unless the entry itself signals this is optional, a stretch goal, or

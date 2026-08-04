@@ -70,36 +70,6 @@ public class UserController {
         return ResponseEntity.ok(userService.updateBirthDate(userId, request));
     }
 
-    @PatchMapping("/me/streak/increment")
-    public ResponseEntity<UserProgressResponse> incrementStreak(
-        @AuthenticationPrincipal UUID userId
-    ) {
-        return ResponseEntity.ok(userService.incrementStreak(userId));
-    }
-
-    @PatchMapping("/me/streak/reset")
-    public ResponseEntity<UserProgressResponse> resetStreak(
-        @AuthenticationPrincipal UUID userId
-    ) {
-        return ResponseEntity.ok(userService.resetStreak(userId));
-    }
-
-    @PatchMapping("/me/points/award")
-    public ResponseEntity<UserProgressResponse> awardPoints(
-        @AuthenticationPrincipal UUID userId,
-        @Valid @RequestBody AwardPointsRequest request
-    ) {
-        return ResponseEntity.ok(userService.awardPoints(userId, request));
-    }
-
-    @PatchMapping("/me/points/deduct")
-    public ResponseEntity<UserProgressResponse> deductPoints(
-        @AuthenticationPrincipal UUID userId,
-        @Valid @RequestBody DeductPointsRequest request
-        ) {
-        return ResponseEntity.ok(userService.deductPoints(userId, request));
-    }
-
     @PatchMapping("/me/preferences/timezone")
     public ResponseEntity<UserProfileResponse> updateTimezone(
         @AuthenticationPrincipal UUID userId,
