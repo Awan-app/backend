@@ -47,6 +47,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+		<!--
+			Only for NimbusJwtDecoder, used to verify Firebase ID tokens against Google's
+			JWKS (fetching, caching, key rotation). We are NOT an OAuth2 resource server:
+			our own access tokens stay HS256 via JwtService + JwtAuthenticationFilter.
+		-->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-jose</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>

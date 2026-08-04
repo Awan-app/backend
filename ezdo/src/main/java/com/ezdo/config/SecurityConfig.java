@@ -41,6 +41,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/v1/auth/otp/**",
+                    "/api/v1/auth/firebase",
                     "/api/v1/auth/refresh",
                     "/api/v1/time",
                     "/actuator/**",

@@ -4,7 +4,9 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { TokenStorageService } from '../services/token-storage.service';
 
-const AUTH_ENDPOINTS = ['/otp/request', '/otp/verify', '/refresh'];
+// Endpoints that mint a session. A 401 from these means bad credentials, not an expired
+// access token, so the refresh-and-replay below must not fire for them.
+const AUTH_ENDPOINTS = ['/otp/request', '/otp/verify', '/firebase', '/refresh'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokens = inject(TokenStorageService);

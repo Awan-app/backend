@@ -2,6 +2,7 @@ package com.ezdo.controller;
 
 import com.ezdo.dto.*;
 import com.ezdo.service.AuthService;
+import com.ezdo.service.FirebaseAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final AuthService authService;
+    private final FirebaseAuthService firebaseAuthService;
 
     @PostMapping("/otp/request")
     public ResponseEntity<OtpResponse> requestOtp(@Valid @RequestBody OtpRequest request) {
@@ -26,8 +28,14 @@ public class AuthController {
     }
 
     @PostMapping("/otp/verify")
-    public ResponseEntity<VerifyOtpResponse> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+    public ResponseEntity<AuthResponse> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
         return ResponseEntity.ok(authService.verifyOtp(request));
+    }
+
+    /** Google sign-in: the client signs in with Firebase and posts the resulting ID token here. */
+    @PostMapping("/firebase")
+    public ResponseEntity<AuthResponse> firebaseLogin(@Valid @RequestBody FirebaseLoginRequest request) {
+        return ResponseEntity.ok(firebaseAuthService.login(request));
     }
 
     @PostMapping("/refresh")

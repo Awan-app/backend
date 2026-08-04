@@ -1,20 +1,23 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, finalize, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, EMPTY, finalize, from, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TokenStorageService } from './token-storage.service';
 import { DeviceService } from './device.service';
+import { FirebaseAuthService, PopupCancelledError } from './firebase-auth.service';
 import { UserProfileResponse } from '../models/onboarding.models';
+
 import {
   ApiErrorResponse,
+  AuthResponse,
   AuthUser,
   ErrorCode,
+  FirebaseLoginRequest,
   OtpRequest,
   OtpResponse,
   RefreshRequest,
   RefreshResponse,
   VerifyOtpRequest,
-  VerifyOtpResponse,
   LogoutRequest,
 } from '../models/auth.models';
 
@@ -25,8 +28,13 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly tokens = inject(TokenStorageService);
   private readonly device = inject(DeviceService);
+  private readonly firebaseAuth = inject(FirebaseAuthService);
+
+  /** Drives whether the login screen offers "Continue with Google". */
+  readonly googleAvailable = this.firebaseAuth.isConfigured;
 
   private readonly baseUrl = `${environment.apiUrl}/api/v1/auth`;
+  private readonly usersUrl = `${environment.apiUrl}/api/v1/users`;
 
   // --- session state ---
   readonly user = signal<AuthUser | null>(null);
@@ -63,7 +71,32 @@ export class AuthService {
     );
   }
 
-  verifyOtp(code: string): Observable<VerifyOtpResponse> {
+  /**
+   * Google sign-in. Firebase handles the popup and returns an ID token, which the backend
+   * verifies and swaps for the same session any other login path produces.
+   *
+   * Completes without emitting if the user closes the popup.
+   */
+  loginWithGoogle(): Observable<AuthResponse> {
+    this.loading.set(true);
+    this.error.set(null);
+    this.remainingAttempts.set(null);
+
+    return from(this.firebaseAuth.signInWithGoogle()).pipe(
+      switchMap((idToken) => {
+        const body: FirebaseLoginRequest = { idToken, deviceId: this.device.deviceId };
+        return this.http.post<AuthResponse>(`${this.baseUrl}/firebase`, body);
+      }),
+      tap((res) => this.applySession(res)),
+      catchError((err) => {
+        if (err instanceof PopupCancelledError) return EMPTY; // user backed out; not an error
+        return this.handleError(err);
+      }),
+      finalize(() => this.loading.set(false)),
+    );
+  }
+
+  verifyOtp(code: string): Observable<AuthResponse> {
     this.loading.set(true);
     this.error.set(null);
     this.remainingAttempts.set(null);
@@ -74,7 +107,7 @@ export class AuthService {
       deviceId: this.device.deviceId,
     };
 
-    return this.http.post<VerifyOtpResponse>(`${this.baseUrl}/otp/verify`, body).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/otp/verify`, body).pipe(
       tap((res) => this.applySession(res)),
       catchError((err) => this.handleError(err)),
       finalize(() => this.loading.set(false)),
@@ -152,8 +185,25 @@ export class AuthService {
     if (storedUser) this.user.set(storedUser);
 
     return this.refresh().pipe(
+      // The profile is memory-only, so a reload has to fetch it again or the home
+      // screen falls back to showing just the email.
+      switchMap(() => this.loadProfile()),
       map(() => true),
       catchError(() => of(false)),
+    );
+  }
+
+  /**
+   * Fetches the profile the home screen renders. Never fails the caller — a profile we
+   * could not load just leaves the screen in its reduced state rather than killing the
+   * session restore.
+   */
+  loadProfile(): Observable<UserProfileResponse | null> {
+    if (this.user()?.isNew) return of(null); // no profile until onboarding is done
+
+    return this.http.get<UserProfileResponse>(`${this.usersUrl}/me`).pipe(
+      tap((profile) => this.profile.set(profile)),
+      catchError(() => of(null)),
     );
   }
 
@@ -168,16 +218,21 @@ export class AuthService {
     }
   }
 
-  private applySession(res: VerifyOtpResponse): void {
+  private applySession(res: AuthResponse): void {
     this.tokens.setAccessToken(res.accessToken, res.accessTokenExpiresIn);
     this.tokens.setRefreshToken(res.refreshToken);
     this.tokens.setUser(res.user);
     this.user.set(res.user);
     this.scheduleRefresh(res.accessTokenExpiresIn);
     this.stopCooldown();
+    // A returning user goes straight to home, which needs the profile. A new user goes to
+    // onboarding, which produces it — loadProfile() no-ops for them.
+    this.loadProfile().subscribe();
   }
 
   private clearSession(): void {
+    // Drop the Firebase session too, or the next popup silently reuses the old Google account.
+    this.firebaseAuth.signOut().catch(() => undefined);
     this.tokens.clearAll();
     this.user.set(null);
     this.profile.set(null);
@@ -213,8 +268,9 @@ export class AuthService {
     this.resendRemaining.set(0);
   }
 
-  private handleError(err: HttpErrorResponse): Observable<never> {
-    const body = err.error as ApiErrorResponse | undefined;
+  // `unknown` rather than HttpErrorResponse: the Google path can also fail inside the Firebase SDK.
+  private handleError(err: unknown): Observable<never> {
+    const body = (err as HttpErrorResponse)?.error as ApiErrorResponse | undefined;
     this.error.set(body?.message ?? 'Something went wrong. Please try again.');
 
     if (body?.errorCode === ErrorCode.OTP_INVALID_CODE) {
