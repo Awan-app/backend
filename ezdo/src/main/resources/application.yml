@@ -72,11 +72,7 @@ ezdo:
   refresh-token:
     expiry-days: 30
   firebase:
-    # Firebase project ID — also the audience of the ID tokens it mints. Public value,
-    # not a secret. Leave empty to disable Google sign-in.
     project-id: ${EZDO_FIREBASE_PROJECT_ID:}
-    # Guard rail: only providers deliberately enabled in the Firebase console may mint a session.
-    # Comma-separated Firebase sign_in_provider values, e.g. google.com,apple.com.
     allowed-sign-in-providers: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:google.com,apple.com}
   mail:
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
@@ -87,9 +83,6 @@ ezdo:
       max-sessions-per-task: ${EZDO_AI_PLAN_MAX_SESSIONS:10}
       availability-horizon-days: ${EZDO_AI_PLAN_HORIZON_DAYS:14}
   cors:
-    # Comma-separated browser origins allowed to call /api/**. Origin = scheme + host + port,
-    # with no trailing slash. Wildcards are not supported — list each origin explicitly.
-    # Dev defaults: Angular CLI (4200), Next/CRA (3000), Vite (5173).
     allowed-origins: ${EZDO_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://localhost:5173}
 
   cloudinary:
