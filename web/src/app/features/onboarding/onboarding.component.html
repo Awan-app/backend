@@ -1,0 +1,129 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-10">
+  <div class="w-full max-w-md bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+    <h1 class="text-xl font-semibold text-gray-900 mb-1">Set up your account</h1>
+    <p class="text-sm text-gray-500 mb-6">Tell us a bit about yourself and your schedule.</p>
+
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First name</label>
+          <input
+            id="firstName"
+            type="text"
+            [value]="firstName()"
+            (input)="firstName.set($any($event.target).value)"
+            [disabled]="onboarding.loading()"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+          />
+        </div>
+        <div>
+          <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+          <input
+            id="lastName"
+            type="text"
+            [value]="lastName()"
+            (input)="lastName.set($any($event.target).value)"
+            [disabled]="onboarding.loading()"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="birthDate" class="block text-sm font-medium text-gray-700 mb-1">Birth date</label>
+        <input
+          id="birthDate"
+          type="date"
+          [value]="birthDate()"
+          (input)="birthDate.set($any($event.target).value)"
+          [disabled]="onboarding.loading()"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+        />
+      </div>
+
+      <div>
+        <label for="timezone" class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+        <input
+          id="timezone"
+          type="text"
+          [value]="timezone()"
+          (input)="timezone.set($any($event.target).value)"
+          [disabled]="onboarding.loading()"
+          placeholder="e.g. Africa/Cairo"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+        />
+        <p class="mt-1 text-xs text-gray-400">Detected automatically — adjust if it's wrong.</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="wakeupTime" class="block text-sm font-medium text-gray-700 mb-1">Wake-up time</label>
+          <input
+            id="wakeupTime"
+            type="time"
+            [value]="wakeupTime()"
+            (input)="wakeupTime.set($any($event.target).value)"
+            [disabled]="onboarding.loading()"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+          />
+        </div>
+        <div>
+          <label for="sleepTime" class="block text-sm font-medium text-gray-700 mb-1">Sleep time</label>
+          <input
+            id="sleepTime"
+            type="time"
+            [value]="sleepTime()"
+            (input)="sleepTime.set($any($event.target).value)"
+            [disabled]="onboarding.loading()"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="preferredSessionDuration" class="block text-sm font-medium text-gray-700 mb-1">
+            Session length (min)
+          </label>
+          <input
+            id="preferredSessionDuration"
+            type="number"
+            min="0"
+            [value]="preferredSessionDuration()"
+            (input)="updatePreferredSessionDuration($any($event.target).value)"
+            [disabled]="onboarding.loading()"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+          />
+        </div>
+        <div>
+          <label for="bufferBetweenSessions" class="block text-sm font-medium text-gray-700 mb-1">
+            Buffer (min)
+          </label>
+          <input
+            id="bufferBetweenSessions"
+            type="number"
+            min="0"
+            [value]="bufferBetweenSessions()"
+            (input)="updateBufferBetweenSessions($any($event.target).value)"
+            (keydown.enter)="submit()"
+            [disabled]="onboarding.loading()"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+          />
+        </div>
+      </div>
+
+      @if (onboarding.error()) {
+        <p class="text-sm text-red-600">{{ onboarding.error() }}</p>
+      }
+
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="!formValid() || onboarding.loading()"
+        class="w-full rounded-md bg-gray-900 py-2 text-sm font-medium text-white disabled:opacity-40"
+      >
+        {{ onboarding.loading() ? 'Saving…' : 'Finish setup' }}
+      </button>
+    </div>
+  </div>
+</div>

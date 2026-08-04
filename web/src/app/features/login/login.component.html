@@ -1,0 +1,116 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+  <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+    <h1 class="text-xl font-semibold text-gray-900 mb-1">Sign in</h1>
+
+    @if (auth.step() === 'email') {
+      <p class="text-sm text-gray-500 mb-6">Enter your email to receive a one-time code.</p>
+
+      <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        [value]="emailInput()"
+        (input)="onEmailInput($any($event.target).value)"
+        (keydown.enter)="submitEmail()"
+        [disabled]="auth.loading()"
+        placeholder="you@example.com"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:bg-gray-100"
+      />
+
+      @if (auth.error()) {
+        <p class="mt-2 text-sm text-red-600">{{ auth.error() }}</p>
+      }
+
+      <button
+        type="button"
+        (click)="submitEmail()"
+        [disabled]="!emailValid() || auth.loading()"
+        class="mt-4 w-full rounded-md bg-gray-900 py-2 text-sm font-medium text-white disabled:opacity-40"
+      >
+        {{ auth.loading() ? 'Sending…' : 'Send code' }}
+      </button>
+
+      @if (auth.googleAvailable) {
+        <div class="my-5 flex items-center gap-3">
+          <span class="h-px flex-1 bg-gray-200"></span>
+          <span class="text-xs uppercase tracking-wide text-gray-400">or</span>
+          <span class="h-px flex-1 bg-gray-200"></span>
+        </div>
+
+        <button
+          type="button"
+          (click)="signInWithGoogle()"
+          [disabled]="auth.loading()"
+          class="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 18 18" aria-hidden="true">
+            <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18Z"/>
+            <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33Z"/>
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58Z"/>
+          </svg>
+          Continue with Google
+        </button>
+      }
+    }
+
+    @if (auth.step() === 'otp') {
+      <p class="text-sm text-gray-500 mb-6">
+        Enter the 6-digit code sent to <span class="font-medium text-gray-700">{{ auth.email() }}</span>.
+      </p>
+
+      <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
+      <input
+        id="code"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        [value]="codeInput()"
+        (input)="onCodeInput($any($event.target).value)"
+        (keydown.enter)="submitCode()"
+        [disabled]="auth.loading()"
+        placeholder="000000"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm tracking-widest text-center outline-none focus:border-gray-500 disabled:bg-gray-100"
+      />
+
+      @if (auth.error()) {
+        <p class="mt-2 text-sm text-red-600">
+          {{ auth.error() }}
+          @if (auth.remainingAttempts(); as remaining) {
+            ({{ remaining }} attempt{{ remaining === 1 ? '' : 's' }} left)
+          }
+        </p>
+      }
+
+      <button
+        type="button"
+        (click)="submitCode()"
+        [disabled]="!codeValid() || auth.loading()"
+        class="mt-4 w-full rounded-md bg-gray-900 py-2 text-sm font-medium text-white disabled:opacity-40"
+      >
+        {{ auth.loading() ? 'Verifying…' : 'Verify' }}
+      </button>
+
+      <div class="mt-4 flex items-center justify-between text-sm">
+        <button type="button" (click)="changeEmail()" class="text-gray-500 hover:text-gray-700">
+          Use a different email
+        </button>
+
+        <button
+          type="button"
+          (click)="resend()"
+          [disabled]="auth.resendRemaining() > 0 || auth.loading()"
+          class="text-gray-900 font-medium disabled:text-gray-400"
+        >
+          @if (auth.resendRemaining() > 0) {
+            Resend in {{ auth.resendRemaining() }}s
+          } @else {
+            Resend code
+          }
+        </button>
+      </div>
+    }
+  </div>
+</div>
