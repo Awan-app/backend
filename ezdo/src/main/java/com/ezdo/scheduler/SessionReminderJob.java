@@ -54,6 +54,7 @@ public class SessionReminderJob extends QuartzJobBean {
             // Fire the multicast push notification
             boolean sent = fcmNotificationService.sendSessionReminderToUser(
                     user.getId(),
+                    session.getId(),
                     taskTitle,
                     sessionTime
             );

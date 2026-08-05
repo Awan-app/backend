@@ -27,12 +27,13 @@ public class FcmNotificationService {
     /**
      * Send session reminder to all user's devices using Multicast (1 network call)
      */
-    public boolean sendSessionReminderToUser(UUID userId, String taskTitle, String sessionTime) {
+    public boolean sendSessionReminderToUser(UUID userId, UUID sessionId, String taskTitle, String sessionTime) {
         List<String> tokens = getUserTokens(userId);
         if (tokens.isEmpty()) return false;
 
         Map<String, String> data = new HashMap<>();
         data.put("type", "SESSION_REMINDER");
+        data.put("sessionId", sessionId.toString());
         data.put("taskTitle", taskTitle);
         data.put("sessionTime", sessionTime);
 
