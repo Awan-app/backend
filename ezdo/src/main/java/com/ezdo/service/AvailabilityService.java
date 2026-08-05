@@ -8,6 +8,7 @@ import com.ezdo.entity.User;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class AvailabilityService {
      * planner asks for a 14-day horizon on every proposal it makes.
      */
     public Map<LocalDate, List<AvailableSlot>> getAvailableSlotsForRange(UUID userId, LocalDate startDate, LocalDate endDate) {
+        DateRangeValidator.validate(startDate, endDate);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         Preferences prefs = user.getPreferences();

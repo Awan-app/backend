@@ -9,6 +9,7 @@ import com.ezdo.entity.User;
 import com.ezdo.entity.Zone;
 import com.ezdo.exception.CategoryNotFoundException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
+import com.ezdo.exception.TemplateOverrideDateTakenException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.exception.ZoneNotFoundException;
@@ -42,6 +43,10 @@ public class TemplateOverrideService {
     public TemplateOverrideResponse create(UUID userId , TemplateOverrideRequest templateOverrideRequest){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (templateOverrideRepository.existsByUserIdAndDateOfDay(userId, templateOverrideRequest.dateOfDay())) {
+            throw new TemplateOverrideDateTakenException(templateOverrideRequest.dateOfDay());
+        }
 
         TemplateOverride override = TemplateOverride.builder().
                 name(templateOverrideRequest.name())
@@ -88,7 +93,12 @@ public class TemplateOverrideService {
 
     public TemplateOverrideResponse updateTemplate(UUID userId, UUID overrideId, TemplateOverrideRequest request) {
         TemplateOverride override = templateOverrideRepository.findByIdAndUserId(overrideId, userId)
-                .orElseThrow(()-> new TemplateOverrideNotFoundException(overrideId));
+                .orElseThrow(() -> new TemplateOverrideNotFoundException(overrideId));
+
+        if (templateOverrideRepository.existsByUserIdAndDateOfDayAndIdNot(
+                userId, request.dateOfDay(), overrideId)) {
+            throw new TemplateOverrideDateTakenException(request.dateOfDay());
+        }
 
         override.setName(request.name());
         override.setDateOfDay(request.dateOfDay());
@@ -148,7 +158,7 @@ public class TemplateOverrideService {
             .toList();
         if (!toDelete.isEmpty()) {
             sessionRepository.nullifyZoneId(
-                toDelete.stream().map(Zone::getId).toList());
+                userId, toDelete.stream().map(Zone::getId).toList());
         }
         zoneRepository.deleteAll(toDelete);
 

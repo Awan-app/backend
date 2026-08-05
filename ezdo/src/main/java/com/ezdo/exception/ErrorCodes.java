@@ -59,6 +59,7 @@ public class ErrorCodes {
     public static final String ZONE_OVERLAP = "ZONE_OVERLAP";
     public static final String TEMPLATE_NOT_FOUND = "TEMPLATE_NOT_FOUND";
     public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATE_OVERRIDE_NOT_FOUND";
+    public static final String TEMPLATE_OVERRIDE_DATE_TAKEN = "TEMPLATE_OVERRIDE_DATE_TAKEN";
     public static final String INVALID_ZONE_TIME_RANGE = "INVALID_ZONE_TIME_RANGE";
     public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
     public static final String DAY_NOT_FOUND = "DAY_NOT_FOUND";

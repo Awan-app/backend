@@ -18,6 +18,7 @@ import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.*;
 import com.ezdo.scheduler.SessionSchedulerService;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -344,9 +345,7 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, List<TaskWithSessionsResponse>> getTasksByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);

@@ -156,7 +156,7 @@ public class TemplateService {
             .toList();
         if (!toDelete.isEmpty()) {
             sessionRepository.nullifyZoneId(
-                toDelete.stream().map(Zone::getId).toList());
+                userId, toDelete.stream().map(Zone::getId).toList());
         }
         zoneRepository.deleteAll(toDelete);
 

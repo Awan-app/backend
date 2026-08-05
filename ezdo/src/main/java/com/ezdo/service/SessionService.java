@@ -13,6 +13,7 @@ import com.ezdo.mapper.SessionMapper;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.scheduler.SessionSchedulerService;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,9 +62,7 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, List<SessionResponse>> getByDateRange(UUID userId, LocalDate startDate, LocalDate endDate, SessionStatus status) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         List<SessionResponse> sessions = sessionRepository.findByUserIdAndDateRange(userId, start, end, status).stream()
@@ -95,9 +94,7 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getMissedRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime now = resolveNow(userId);
         return sessionRepository.findMissed(userId, now,
                 startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay()).stream()
