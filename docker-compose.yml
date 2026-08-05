@@ -92,16 +92,16 @@ services:
       - "8025:8025"
     restart: unless-stopped
 
-  qdrant:
-   image: qdrant/qdrant:latest
-   container_name: qdrant
-   restart: unless-stopped
-   ports:
-     - "6333:6333"
-     - "6334:6334"
-   volumes:
-     - qdrant_data:/qdrant/storage
+#  qdrant:
+#   image: qdrant/qdrant:latest
+#   container_name: qdrant
+#   restart: unless-stopped
+#   ports:
+#     - "6333:6333"
+#     - "6334:6334"
+#   volumes:
+#     - qdrant_data:/qdrant/storage
 
 volumes:
   mysql_data:
-  qdrant_data:
+#  qdrant_data:

@@ -65,25 +65,20 @@ spring:
         chat:
           model: ${SPRING_GENAI_CHAT_MODEL:gemini-3.5-flash-lite}
           temperature: ${SPRING_GENAI_CHAT_TEMPERATURE:0.4}
+        embedding:
+          api-key: ${SPRING_GENAI_API_KEY:}
+          text:
+            model: text-embedding-004
+#    vectorstore:
+#      qdrant:
+#        host: localhost
+#        port: 6334
+#        collection-name: ezdo-memory
 
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
-    google:
-      genai:
-        api-key: ${GEMINI_API_KEY}
-
-        embedding:
-          text:
-            model: text-embedding-004
-
-      vectorstore:
-        qdrant:
-          host: localhost
-          port: 6334
-          collection-name: ezdo-memory
 
 logging:
   level:
