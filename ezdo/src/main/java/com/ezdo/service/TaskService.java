@@ -32,6 +32,7 @@ import java.util.*;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final SessionRepository sessionRepository;
     private final GoalRepository goalRepository;
     private final GoalService goalService;
     private final UserRepository userRepository;
@@ -219,9 +220,9 @@ public class TaskService {
             task.getSessions().add(session);
         }
 
-        taskRepository.save(task);
-        scheduleReminders(userId, newSessions);
-        return newSessions.stream().map(sessionMapper::toResponse).toList();
+        List<Session> saved = sessionRepository.saveAll(newSessions);
+        scheduleReminders(userId, saved);
+        return saved.stream().map(sessionMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
