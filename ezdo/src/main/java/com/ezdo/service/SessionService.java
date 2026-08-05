@@ -12,6 +12,7 @@ import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.scheduler.SessionSchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final SessionMapper sessionMapper;
     private final UserRepository userRepository;
+    private final SessionSchedulerService sessionSchedulerService;
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getByTask(UUID taskId, UUID userId, SessionStatus status) {
@@ -115,6 +117,7 @@ public class SessionService {
             validateTransition(session.getStatus(), request.status());
             session.setStatus(request.status());
         }
+        syncReminder(userId, session);
         return sessionMapper.toResponse(session);
     }
 
@@ -124,6 +127,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), status);
         session.setStatus(status);
+        syncReminder(userId, session);
         return sessionMapper.toResponse(session);
     }
 
@@ -133,6 +137,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.COMPLETED);
         session.setStatus(SessionStatus.COMPLETED);
+        sessionSchedulerService.cancelReminder(session.getId());
         return sessionMapper.toResponse(session);
     }
 
@@ -142,6 +147,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.SCHEDULED);
         session.setStatus(SessionStatus.SCHEDULED);
+        sessionSchedulerService.scheduleReminder(session, userId);
         return sessionMapper.toResponse(session);
     }
 
@@ -151,6 +157,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.CANCELLED);
         session.setStatus(SessionStatus.CANCELLED);
+        sessionSchedulerService.cancelReminder(session.getId());
         return sessionMapper.toResponse(session);
     }
 
@@ -171,7 +178,21 @@ public class SessionService {
     public void delete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
+        sessionSchedulerService.cancelReminder(session.getId());
         sessionRepository.delete(session);
+    }
+
+    /**
+     * Keeps the reminder job aligned with the session's current state: scheduled
+     * sessions get a reminder, anything else (completed/cancelled) has its
+     * reminder removed.
+     */
+    private void syncReminder(UUID userId, Session session) {
+        if (session.getStatus() == SessionStatus.SCHEDULED) {
+            sessionSchedulerService.scheduleReminder(session, userId);
+        } else {
+            sessionSchedulerService.cancelReminder(session.getId());
+        }
     }
 
     private void validateTimeRange(LocalDateTime start, LocalDateTime end) {

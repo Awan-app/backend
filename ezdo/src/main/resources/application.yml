@@ -30,6 +30,28 @@ spring:
         format_sql: true
         highlight_sql: true
 
+  quartz:
+    job-store-type: jdbc  # persist jobs/triggers in the DB instead of memory
+    jdbc:
+      initialize-schema: always     # auto-creates Quartz's tables on startup
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: EzdoScheduler
+            instanceId: AUTO                      # needed even for a single instance, harmless if we scale later
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore   # class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: false                     # true only if we run multiple app instances later
+            misfireThreshold: 60000
+
   ai:
     openai:
       api-key: ${SPRING_OPENAI_API_KEY:}
@@ -89,6 +111,9 @@ ezdo:
     cloud-name: ${EZDO_CLOUDINARY_CLOUD_NAME:}
     api-key: ${EZDO_CLOUDINARY_API_KEY:}
     api-secret: ${EZDO_CLOUDINARY_API_SECRET:}
+
+  firebase:
+    service-account-path: ${EZDO_FIREBASE_SERVICE_ACCOUNT_PATH:classpath:firebase-service-account.json}
 
 timefold:
   solver:

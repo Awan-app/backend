@@ -17,6 +17,7 @@ import com.ezdo.exception.*;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.*;
+import com.ezdo.scheduler.SessionSchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class TaskService {
     private final CategoryRepository categoryRepository;
     private final TaskMapper taskMapper;
     private final SessionMapper sessionMapper;
+    private final SessionSchedulerService sessionSchedulerService;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -118,6 +120,7 @@ public class TaskService {
         }
 
         Task saved = taskRepository.save(task);
+        scheduleReminders(userId, saved.getSessions());
         return new TaskWithSessionsResponse(
             taskMapper.toInfoResponse(saved),
             saved.getSessions().stream().map(sessionMapper::toResponse).toList()
@@ -180,6 +183,7 @@ public class TaskService {
         }
 
         List<Task> saved = taskRepository.saveAll(tasks);
+        saved.forEach(t -> scheduleReminders(userId, t.getSessions()));
         return new TasksWithSessionsResponse(
             saved.stream()
                 .map(t -> new TaskWithSessionsResponse(
@@ -215,6 +219,7 @@ public class TaskService {
         }
 
         taskRepository.save(task);
+        scheduleReminders(userId, newSessions);
         return newSessions.stream().map(sessionMapper::toResponse).toList();
     }
 
@@ -276,6 +281,7 @@ public class TaskService {
                 dependent.getDependsOn().remove(task);
             }
         }
+        task.getSessions().forEach(s -> sessionSchedulerService.cancelReminder(s.getId()));
         taskRepository.delete(task);
     }
 
@@ -370,6 +376,12 @@ public class TaskService {
         }
 
         return result;
+    }
+
+    private void scheduleReminders(UUID userId, java.util.Collection<Session> sessions) {
+        sessions.stream()
+                .filter(s -> s.getStatus() == SessionStatus.SCHEDULED)
+                .forEach(s -> sessionSchedulerService.scheduleReminder(s, userId));
     }
 
     private void validateSessionTimeRange(LocalDateTime start, LocalDateTime end) {

@@ -112,8 +112,9 @@ Dates
 Categories
 - Every task must be assigned to the best-matching category from the user's
   provided category list (see USER CONTEXT below). Use the exact id and name
-  from that list. If none of the user's categories fit, set "category": null
-  and briefly explain why in the accompanying "text" block.
+  from that list. If none of the user's categories genuinely fit, assign the
+  "General" category (exact id and name from the list) instead of leaving the
+  task uncategorized.
 - Do not invent categories or modify category IDs/names. Only use what is
   listed in the USER CONTEXT.
 
@@ -175,7 +176,7 @@ Hard constraints on every reply:
 - Every string value must be valid JSON (properly escaped quotes/newlines). Do
   not include any key not listed above.
 - "category" inside a task is required — set to the matching category object
-  from the user's list, or null if none fits. Never omit it.
+  from the user's list, or the "General" category if none fits. Never omit it.
 
 If you are ever unsure whether something belongs in "text", remember: the user
 sees the tasks and questions as the primary content. Text is only the thin

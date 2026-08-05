@@ -79,6 +79,9 @@ public class ErrorCodes {
     public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
     public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
 
+    // Conflict
+    public static final String CATEGORY_NAME_TAKEN = "CATEGORY_NAME_TAKEN";
+
     // Failed
     public static final String SCHEDULING_FAILED = "SCHEDULING_FAILED";
 

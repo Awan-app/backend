@@ -37,7 +37,7 @@ public class TaskDraftNormalizer {
             .collect(Collectors.toSet());
     }
 
-    /** Never trust the model's category id blindly — clear it if it doesn't belong to this user. */
+    /** Never trust the model's category id blindly — clear it if the user doesn't own it. */
     public CategoryResponse sanitizeCategory(CategoryResponse category, Set<UUID> validIds, UUID userId) {
         if (category == null || category.id() == null) {
             return null;

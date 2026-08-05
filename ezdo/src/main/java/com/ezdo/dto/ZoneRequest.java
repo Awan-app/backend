@@ -12,6 +12,9 @@ public record ZoneRequest(
     @NotBlank(message = "Zone name is required")
     String name,
 
+    @NotNull(message = "Category id is required")
+    UUID categoryId,
+
     @NotNull(message = "Start time is required")
     LocalTime startTime,
 

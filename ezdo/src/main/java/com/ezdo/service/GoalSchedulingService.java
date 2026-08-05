@@ -13,6 +13,7 @@ import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
+import com.ezdo.scheduler.SessionSchedulerService;
 import com.ezdo.timefold.ScheduleSolution;
 import com.ezdo.timefold.SchedulingPreprocessor;
 import com.ezdo.timefold.SessionChunk;
@@ -42,6 +43,7 @@ public class GoalSchedulingService {
     private final SessionRepository sessionRepository;
     private final TaskRepository taskRepository;
     private final ZoneRepository zoneRepository;
+    private final SessionSchedulerService sessionSchedulerService;
 
     @Transactional
     public GoalScheduleResponse scheduleGoal(UUID userId, GoalScheduleRequest request) {
@@ -144,6 +146,7 @@ public class GoalSchedulingService {
                             .build();
 
                     sessionRepository.save(session);
+                    sessionSchedulerService.scheduleReminder(session, userId);
 
                     scheduledResults.add(new ScheduledSessionResult(
                             session.getId(),
