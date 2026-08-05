@@ -28,6 +28,91 @@
         <p class="text-sm text-gray-500 mb-6">{{ user.email }}</p>
       }
 
+      <section class="border-t border-gray-200 pt-5 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-3">Push notifications</h2>
+
+        @if (push.permission() === 'unsupported') {
+          <p class="text-sm text-red-600 mb-3">
+            This browser does not support Web Push notifications.
+          </p>
+        } @else if (push.permission() === 'unconfigured') {
+          <p class="text-sm text-amber-600 mb-3">
+            Firebase is not configured. Paste your web-app config into
+            <code class="text-xs">src/environments/environment.ts</code> and
+            <code class="text-xs">public/firebase-messaging-sw.js</code>.
+          </p>
+        } @else {
+          <div class="space-y-2 text-sm mb-3">
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Permission</dt>
+              <dd class="text-gray-900 font-medium">{{ push.permission() }}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Registered</dt>
+              <dd class="text-gray-900 font-medium">{{ push.registered() ? 'Yes' : 'No' }}</dd>
+            </div>
+            @if (push.fcmToken(); as token) {
+              <div class="flex justify-between items-start gap-2">
+                <dt class="text-gray-500">FCM token</dt>
+                <dd class="text-gray-900 text-xs break-all max-w-[14rem]">{{ token }}</dd>
+              </div>
+            }
+          </div>
+
+          @if (push.error(); as error) {
+            <p class="text-sm text-red-600 mb-3">{{ error }}</p>
+          }
+
+          <div class="flex gap-2 mb-4">
+            @if (!push.registered()) {
+              <button
+                type="button"
+                (click)="enableNotifications()"
+                [disabled]="push.busy()"
+                class="flex-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {{ push.busy() ? 'Enabling…' : 'Enable notifications' }}
+              </button>
+            }
+            @if (push.fcmToken(); as token) {
+              <button
+                type="button"
+                (click)="copyToken()"
+                class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Copy token
+              </button>
+            }
+            @if (push.registered()) {
+              <button
+                type="button"
+                (click)="disableNotifications()"
+                [disabled]="push.busy()"
+                class="flex-1 rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+              >
+                Disable
+              </button>
+            }
+          </div>
+
+          @if (push.messages(); as messages) {
+            @if (messages.length) {
+              <div class="border border-gray-200 rounded-md p-3">
+                <p class="text-xs font-semibold text-gray-500 mb-2">Received while this tab is open</p>
+                <ul class="space-y-2 text-xs">
+                  @for (msg of messages; track $index) {
+                    <li class="border-b border-gray-100 last:border-0 pb-1">
+                      <p class="font-medium text-gray-900">{{ msg.title }}</p>
+                      <p class="text-gray-600">{{ msg.body }}</p>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          }
+        }
+      </section>
+
       <button
         type="button"
         (click)="logout()"
