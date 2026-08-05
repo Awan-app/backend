@@ -133,6 +133,7 @@ public class GoalService {
         goalRepository.delete(goal); // cascades tasks via orphanRemoval
     }
 
+    @Transactional
     public List<TaskInfoResponse> bulkAddTasks(UUID userId,
                                                UUID goalId,
                                                BulkAddTasksRequest request) {
@@ -148,8 +149,10 @@ public class GoalService {
             if (newByTempId.containsKey(item.tempId())) {
                 throw new DuplicateTempIdException(item.tempId());
             }
-            Category category = categoryRepository.findByIdAndUserId(item.categoryId(), userId)
-                .orElseThrow(() -> new CategoryNotFoundException(item.categoryId()));
+            Category category = item.categoryId() != null
+                ? categoryRepository.findByIdAndUserId(item.categoryId(), userId)
+                    .orElseThrow(() -> new CategoryNotFoundException(item.categoryId()))
+                : null;
             newByTempId.put(item.tempId(), Task.builder()
                 .goal(goal)
                 .title(item.title())
