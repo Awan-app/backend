@@ -4,7 +4,7 @@
     "name": "Awan",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "38465583",
-    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** – no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing/invalid/expired JWT |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse – all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `CATEGORY_NOT_FOUND` | 404 | Category not found |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `SESSION_NOT_FOUND` | 404 | Session not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `ZONE_OVERLAP` | 409 | Zone time range overlaps with an existing zone |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
+    "description": "# Awan (EZDO) API\n\nSmart Productivity & Task Management Backend.\n\n## Base URL\n\n`http://localhost:8080/api/v1`\n\n## Authentication\n\n- **OTP-based email authentication** – no passwords.\n- Protected endpoints require `Authorization: Bearer {{accessToken}}` header.\n- Access tokens expire after 24 hours. Use refresh token rotation to get new ones.\n- On `401` responses: `TOKEN_EXPIRED` means the access token has expired - refresh via the refresh token.\n  `TOKEN_INVALID` or `AUTHENTICATION_FAILED` means the token is missing/invalid - re-authenticate.\n\n## Error Response Format\n\nAll errors return a consistent JSON structure:\n```json\n{\n  \"message\": \"Human-readable message\",\n  \"statusCode\": 400,\n  \"errorCode\": \"ERROR_CODE\",\n  \"info\": {},\n  \"timestamp\": \"2024-01-01T12:00:00\"\n}\n```\n\nValidation errors include field-level details in `info.errors`:\n```json\n{\n  \"info\": {\n    \"errors\": [\n      {\"field\": \"email\", \"message\": \"must be a well-formed email address\", \"rejectedValue\": \"bad\"}\n    ]\n  }\n}\n```\n\n## Error Codes Reference\n\n| Error Code | HTTP Status | Description |\n|---|---|---|\n| `VALIDATION_ERROR` | 422 | Request body validation failed |\n| `MALFORMED_REQUEST_BODY` | 400 | Invalid or missing JSON body |\n| `MISSING_PARAMETER` | 400 | Required query/param missing |\n| `TYPE_MISMATCH` | 400 | Parameter type mismatch |\n| `ROUTE_NOT_FOUND` | 404 | Endpoint does not exist |\n| `METHOD_NOT_ALLOWED` | 405 | HTTP method not supported |\n| `MEDIA_TYPE_NOT_SUPPORTED` | 415 | Unsupported Content-Type |\n| `ACCESS_DENIED` | 403 | No permission |\n| `AUTHENTICATION_FAILED` | 401 | Missing or unverifiable JWT - re-authenticate |\n| `TOKEN_EXPIRED` | 401 | Access token expired - refresh via refresh token |\n| `TOKEN_INVALID` | 401 | Access token malformed/invalid - re-login |\n| `OTP_RATE_LIMIT_EXCEEDED` | 429 | Too many OTP requests (3 per 10min) |\n| `OTP_EXPIRED_OR_NOT_FOUND` | 404 | OTP code expired / invalid email |\n| `OTP_INVALID_CODE` | 401 | Wrong OTP code |\n| `OTP_LOCKED` | 423 | Too many wrong attempts (max 5) |\n| `REFRESH_TOKEN_INVALID` | 401 | Refresh token not found |\n| `REFRESH_TOKEN_EXPIRED` | 401 | Refresh token expired |\n| `REFRESH_TOKEN_REUSE_DETECTED` | 401 | Token reuse – all sessions revoked |\n| `USER_NOT_FOUND` | 404 | User not found |\n| `SOMETHING_NOT_FOUND` | 404 | Generic resource not found |\n| `GOAL_NOT_FOUND` | 404 | Goal not found / not owned |\n| `TASK_NOT_FOUND` | 404 | Task not found / not owned |\n| `CATEGORY_NOT_FOUND` | 404 | Category not found |\n| `SESSION_NOT_FOUND` | 404 | Session not found / not owned |\n| `TEMPLATE_NOT_FOUND` | 404 | Template not found / not owned |\n| `TEMPLATE_OVERRIDE_NOT_FOUND` | 404 | Template override not found / not owned |\n| `ZONE_NOT_FOUND` | 404 | Zone not found / not owned |\n| `DAY_NOT_FOUND` | 404 | Weekly template day not found |\n| `GOAL_DECOMPOSITION_SESSION_NOT_FOUND` | 404 | Decomposition session not found / not owned |\n| `ONBOARDING_ALREADY_COMPLETED` | 400 | User already onboarded |\n| `INVALID_TIMEZONE` | 400 | Invalid timezone string |\n| `INVALID_OPERATION` | 400 | Business logic violation |\n| `INVALID_DECOMPOSITION` | 400 | Invalid decomposition session state |\n| `INVALID_ZONE_TIME_RANGE` | 400 | End time must be after start time |\n| `INVALID_SLEEP_SCHEDULE` | 400 | Wake up must be before sleep time |\n| `INSUFFICIENT_POINTS` | 400 | Not enough points to deduct |\n| `TASK_CYCLIC_DEPENDENCY` | 400 | Dependency would create a cycle |\n| `DUPLICATE_TEMP_ID` | 400 | Duplicate tempId in batch |\n| `UNKNOWN_TEMP_ID` | 400 | Referenced tempId not found in batch |\n| `DAY_ALREADY_ASSIGNED` | 409 | Day(s) already belong to another weekly template |\n| `ZONE_OVERLAP` | 409 | Zone time range overlaps with an existing zone |\n| `DATA_INTEGRITY_VIOLATION` | 409 | Database constraint violation |\n| `AI_UNAVAILABLE` | 503 | AI service is temporarily unavailable |\n| `UNSUPPORTED_IMAGE_TYPE` | 400 / 415 | Unsupported image format (400 for profile pictures, 415 for AI image upload) |\n| `PROFILE_PICTURE_EMPTY` | 400 | No profile picture file sent, or the file is empty |\n| `PROFILE_PICTURE_TOO_LARGE` | 400 | Profile picture exceeds 5MB |\n| `CLOUDINARY_UPLOAD_FAILED` | 502 | Profile picture upload to Cloudinary failed |\n| `SCHEDULING_FAILED` | 500 | The scheduler could not produce a plan |\n| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |\n\n## Collection Variables\n\n| Variable | Default Value | Description |\n|---|---|---|\n| `baseUrl` | `http://localhost:8080/api` | Base URL (full path: `/api/v1/...`) |\n| `accessToken` | (empty) | Set after OTP Verify or Refresh |"
   },
   "item": [
     {
@@ -94,6 +94,48 @@
                 }
               ],
               "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n  \"accessTokenExpiresIn\": 86400,\n  \"refreshToken\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"user\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"email\": \"user@example.com\",\n    \"isNew\": true\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Social Login (Firebase)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"<firebase-id-token>\",\n  \"deviceId\": \"c9751c89-b2cc-4957-928f-6ba5a00eb15a\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/auth/firebase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "firebase"
+              ]
+            },
+            "description": "Exchange a Firebase ID token for an app session. The client signs in with Google or Apple via the Firebase SDK and posts the resulting ID token here; the backend verifies it against Google's JWKS (issuer `https://securetoken.google.com/<projectId>`, audience `<projectId>`). Verification is scoped to the Firebase project, not the platform, so web, Android and iOS clients all use this same endpoint unchanged.\n\nAccounts are keyed on **email**, the same key the OTP flow uses — so signing in socially with an address already registered by OTP lands on the same account.\n\nWhich providers are accepted is controlled by `ezdo.firebase.allowed-sign-in-providers` (default `google.com,apple.com`).\n\n> **Apple caveat:** with *Hide My Email* Apple sends a `@privaterelay.appleid.com` address. It is stable for that user, but by design cannot be correlated with their real address — so it becomes a separate account. Apple also sends the display name only on the very first authorization, so an Apple user typically arrives with no name and fills it in during onboarding.\n\n**Request Body:**\n- `idToken` (string, required) – Firebase ID token from `getIdToken()`.\n- `deviceId` (UUID, required) – Client-generated device identifier, persisted and reused.\n\n**Response (200):** identical shape to `POST /v1/auth/otp/verify`.\n- `accessToken` (string), `accessTokenExpiresIn` (long), `refreshToken` (string)\n- `user` (object): `id`, `email`, `isNew` – `true` on first login, so the client must run onboarding.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (422) – Missing `idToken` or `deviceId`.\n- `FIREBASE_TOKEN_INVALID` (401) – Bad signature, wrong issuer/audience, or expired.\n- `FIREBASE_PROVIDER_NOT_ALLOWED` (401) – Provider not in the allowed list.\n- `FIREBASE_EMAIL_MISSING` (401) – Provider asserted no email address.\n- `FIREBASE_EMAIL_NOT_VERIFIED` (401) – Provider did not assert `email_verified`. Enforced for every provider.\n- `FIREBASE_NOT_CONFIGURED` (503) – `EZDO_FIREBASE_PROJECT_ID` is unset on the server."
+          },
+          "response": [
+            {
+              "name": "Success (New User)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\",\n  \"accessTokenExpiresIn\": 86400,\n  \"refreshToken\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"user\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"email\": \"user@gmail.com\",\n    \"isNew\": true\n  }\n}"
             }
           ]
         },
@@ -231,7 +273,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 0,\n  \"streak\": 0,\n  \"maxStreak\": 0,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 0,\n  \"streak\": 0,\n  \"maxStreak\": 0,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
             }
           ]
         }
@@ -266,7 +308,7 @@
                     "me"
                   ]
                 },
-                "description": "Get the authenticated user's full profile and preferences.\n\n**Query Parameters:** None.\n\n**Response (200):** `UserProfileResponse`\n- `id` (UUID) – User ID.\n- `email` (string) – Email address.\n- `firstName` (string or null) – First name.\n- `lastName` (string or null) – Last name.\n- `birthDate` (LocalDate or null) – Date of birth.\n- `points` (int) – Total earned points.\n- `streak` (int) – Current streak count.\n- `maxStreak` (int) – Highest streak ever.\n- `preferences` (object):\n  - `timezone` (string) – IANA timezone.\n  - `preferredSessionDuration` (int) – Minutes per session.\n  - `bufferBetweenSessions` (int) – Minutes between sessions.\n  - `wakeupTime` (LocalTime) – Wake-up time.\n  - `sleepTime` (LocalTime) – Bed time.\n  - `schedulingType` (string) – `BALANCED`, `EASIEST_FIRST`, or `HARDEST_FIRST`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid access token.\n- `USER_NOT_FOUND` (404) – User not found (should not happen if token is valid)."
+                "description": "Get the authenticated user's full profile and preferences.\n\n**Query Parameters:** None.\n\n**Response (200):** `UserProfileResponse`\n- `id` (UUID) – User ID.\n- `email` (string) – Email address.\n- `firstName` (string or null) – First name.\n- `lastName` (string or null) – Last name.\n- `birthDate` (LocalDate or null) – Date of birth.\n- `points` (int) – Total earned points.\n- `streak` (int) – Current streak count.\n- `maxStreak` (int) – Highest streak ever.\n- `profilePictureUrl` (string or null) – Cloudinary url of the profile picture, `null` until one is uploaded.\n- `isNew` (boolean) – `true` while onboarding is incomplete.\n- `preferences` (object):\n  - `timezone` (string) – IANA timezone.\n  - `preferredSessionDuration` (int) – Minutes per session.\n  - `bufferBetweenSessions` (int) – Minutes between sessions.\n  - `wakeupTime` (LocalTime) – Wake-up time.\n  - `sleepTime` (LocalTime) – Bed time.\n  - `schedulingType` (string) – `BALANCED`, `EASIEST_FIRST`, or `HARDEST_FIRST`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid access token.\n- `USER_NOT_FOUND` (404) – User not found (should not happen if token is valid)."
               },
               "response": [
                 {
@@ -279,7 +321,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
                 }
               ]
             },
@@ -332,6 +374,118 @@
                     }
                   ],
                   "body": "{\n  \"isNew\": false\n}"
+                }
+              ]
+            },
+            {
+              "name": "Update Profile Picture",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "image",
+                      "type": "file",
+                      "src": [],
+                      "description": "Image file (JPEG, PNG or WebP, max 5MB)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/profile/picture",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "profile",
+                    "picture"
+                  ]
+                },
+                "description": "Upload or replace the authenticated user's profile picture.\n\nThe image is uploaded to Cloudinary under a public id derived from the user id, so a new upload always replaces the previous picture — there is never more than one stored image per user. Cloudinary re-encodes it (`quality=auto:good`, `format=auto`) and the returned url carries a fresh version prefix, so clients can cache it indefinitely.\n\n**Multipart Form-Data Fields:**\n- `image` (file, required) — The picture. Allowed types: `image/jpeg`, `image/png`, `image/webp`. Max size: 5MB.\n\n**Response (200):** `ProfilePictureResponse`\n- `profilePictureUrl` (string) — Secure Cloudinary url of the newly uploaded picture. The same value is returned in `profilePictureUrl` on `GET /v1/users/me`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `PROFILE_PICTURE_EMPTY` (400) — No file sent or the file is empty.\n- `PROFILE_PICTURE_TOO_LARGE` (400) — File exceeds 5MB. `info` carries `maxSizeBytes` and `actualSizeBytes`.\n- `UNSUPPORTED_IMAGE_TYPE` (400) — Content type is not JPEG, PNG or WebP.\n- `USER_NOT_FOUND` (404) — User not found.\n- `MEDIA_TYPE_NOT_SUPPORTED` (415) — Request was not sent as `multipart/form-data`.\n- `CLOUDINARY_UPLOAD_FAILED` (502) — Upload to Cloudinary failed."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\"\n}"
+                },
+                {
+                  "name": "Too Large",
+                  "status": "Bad Request",
+                  "code": 400,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Profile picture exceeds the maximum size of 5MB\",\n  \"statusCode\": 400,\n  \"errorCode\": \"PROFILE_PICTURE_TOO_LARGE\",\n  \"info\": {\n    \"maxSizeBytes\": 5242880,\n    \"actualSizeBytes\": 8388608\n  },\n  \"timestamp\": \"2026-08-03T12:00:00\"\n}"
+                },
+                {
+                  "name": "Unsupported Type",
+                  "status": "Bad Request",
+                  "code": 400,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Unsupported image type: image/gif. Supported types are image/jpeg, image/png, image/webp\",\n  \"statusCode\": 400,\n  \"errorCode\": \"UNSUPPORTED_IMAGE_TYPE\",\n  \"info\": {\n    \"supportedTypes\": \"image/jpeg, image/png, image/webp\"\n  },\n  \"timestamp\": \"2026-08-03T12:00:00\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Remove Profile Picture",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/profile/picture",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "profile",
+                    "picture"
+                  ]
+                },
+                "description": "Remove the authenticated user's profile picture. The stored Cloudinary asset is deleted and `profilePictureUrl` is cleared back to `null` on the profile.\n\n**Request Body:** None.\n\n**Response (204):** No content.\n\nIdempotent — calling it for a user who has no picture succeeds with the same `204`, so the client does not need to check first and retries are safe.\n\nThere is no need to call this before uploading a replacement: an upload already overwrites the previous picture.\n\nA failure to delete the remote asset does not fail the request — the stored url is cleared regardless and the call still returns `204`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `USER_NOT_FOUND` (404) — User not found."
+              },
+              "response": [
+                {
+                  "name": "No Content",
+                  "status": "No Content",
+                  "code": 204,
+                  "header": [],
+                  "body": ""
                 }
               ]
             },
@@ -773,7 +927,7 @@
     },
     {
       "name": "Goals",
-      "description": "Goal and task management. Goals contain tasks. Each user has an auto-created Inbox goal for unassigned tasks.\n\n**Goal Statuses:** `ACTIVE` (default), `ACHIEVED`.\n**Task Statuses:** `SCHEDULED` (default), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.",
+      "description": "Goal and task management. Goals contain tasks. Each user has an auto-created Inbox goal for unassigned tasks.\n\n**Goal Statuses:** `ACTIVE` (default), `ACHIEVED`.\n**Task Statuses:** `ACTIVE`, `SCHEDULED` (default), `COMPLETED`, `CANCELLED`.",
       "item": [
         {
           "name": "Create Goal",
@@ -1067,7 +1221,7 @@
     },
     {
       "name": "Tasks",
-      "description": "Task CRUD, moving between goals, and dependency management.\n\n**Task Statuses:** `SCHEDULED` (default on create), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Dependencies:** Tasks can depend on other tasks **within the same goal only**. Circular dependencies are prevented.",
+      "description": "Task CRUD, moving between goals, and dependency management.\n\n**Task Statuses:** `ACTIVE`, `SCHEDULED` (default on create), `COMPLETED`, `CANCELLED`.\n\n**Dependencies:** Tasks can depend on other tasks **within the same goal only**. Circular dependencies are prevented.",
       "item": [
         {
           "name": "Get Tasks by Date",
@@ -1238,7 +1392,7 @@
                 "with-sessions"
               ]
             },
-            "description": "Create a task with one or more pre-scheduled sessions in a single request. Sessions can optionally be associated with a zone.\n\n**Request Body:**\n- `task` (object, required) – Task fields (same as Create Task):\n  - `title` (string, required) – Max 255 chars.\n  - `description` (string, optional) – Max 2000 chars.\n  - `estimatedDuration` (int, optional) – Estimated total minutes. Defaults to user's `preferredSessionDuration`.\n  - `mandatory` (boolean, optional) – Default: `false`.\n  - `estimatedPoints` (int, optional) – Default: 0.\n  - `allowTaskSplitting` (boolean, optional) – Default: `false`.\n  - `goalId` (UUID, optional) – Target goal. **Null/omitted → task goes to Inbox.**\n- `sessions` (array, optional) – Max 50 sessions. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `SKIPPED`.\n\n**Response (201):** `TaskWithSessionsResponse`\n- `task` (object) – `TaskInfoResponse` (task details).\n- `sessions` (array) – List of `SessionResponse`:\n  - `id` (UUID) – Session ID.\n  - `start` (LocalDateTime) – Start time.\n  - `end` (LocalDateTime) – End time.\n  - `status` (string) – Current status.\n  - `locked` (boolean) – Whether the session is locked.\n  - `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `GOAL_NOT_FOUND` (404) – If `goalId` provided but doesn't exist/not owned.\n- `ZONE_NOT_FOUND` (404) – If `zoneId` provided but doesn't exist/not owned.\n- `INVALID_OPERATION` (400) – Session `end` must be after `start`."
+            "description": "Create a task with one or more pre-scheduled sessions in a single request. Sessions can optionally be associated with a zone.\n\n**Request Body:**\n- `task` (object, required) – Task fields (same as Create Task):\n  - `title` (string, required) – Max 255 chars.\n  - `description` (string, optional) – Max 2000 chars.\n  - `estimatedDuration` (int, optional) – Estimated total minutes. Defaults to user's `preferredSessionDuration`.\n  - `mandatory` (boolean, optional) – Default: `false`.\n  - `estimatedPoints` (int, optional) – Default: 0.\n  - `allowTaskSplitting` (boolean, optional) – Default: `false`.\n  - `goalId` (UUID, optional) – Target goal. **Null/omitted → task goes to Inbox.**\n- `sessions` (array, optional) – Max 50 sessions. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (201):** `TaskWithSessionsResponse`\n- `task` (object) – `TaskInfoResponse` (task details).\n- `sessions` (array) – List of `SessionResponse`:\n  - `id` (UUID) – Session ID.\n  - `start` (LocalDateTime) – Start time.\n  - `end` (LocalDateTime) – End time.\n  - `status` (string) – Current status.\n  - `locked` (boolean) – Whether the session is locked.\n  - `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `GOAL_NOT_FOUND` (404) – If `goalId` provided but doesn't exist/not owned.\n- `ZONE_NOT_FOUND` (404) – If `zoneId` provided but doesn't exist/not owned.\n- `INVALID_OPERATION` (400) – Session `end` must be after `start`."
           },
           "response": [
             {
@@ -1256,6 +1410,55 @@
           ]
         },
         {
+          "name": "Bulk Create Tasks with Sessions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": null,\n        \"categoryId\": \"cat-uuid-1\"\n      },\n      \"sessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"categoryId\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/with-sessions/bulk",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "with-sessions",
+                "bulk"
+              ]
+            },
+            "description": "Create multiple tasks with their pre-scheduled sessions in a single request. This is the bulk version of `POST /api/v1/tasks/with-sessions`.\n\nAll tasks are created atomically — either all succeed or none are persisted.\n\n**Request Body:**\n- `tasks` (array, required, max 50) — List of task-with-sessions objects.\n  Each item follows the same structure as `POST /api/v1/tasks/with-sessions`:\n  - `task` (object, required) — Task fields:\n    - `title` (string, required) – Max 255 chars.\n    - `description` (string, optional) – Max 2000 chars.\n    - `estimatedDuration` (int, optional) – Minutes. Defaults to user's `preferredSessionDuration`.\n    - `mandatory` (boolean, optional) – Default: `false`.\n    - `estimatedPoints` (int, optional) – Default: 0.\n    - `allowTaskSplitting` (boolean, optional) – Default: `false`.\n    - `goalId` (UUID, optional) – Target goal. **Null → task goes to Inbox.**\n    - `categoryId` (UUID, optional) – Category to assign.\n  - `sessions` (array, optional, max 50 per task) – Pre-scheduled sessions:\n    - `zoneId` (UUID, optional) – Zone to associate.\n    - `start` (LocalDateTime, required) – Format: `YYYY-MM-DDTHH:mm:ss`.\n    - `end` (LocalDateTime, required) – Must be after `start`.\n    - `status` (enum, optional) – Default: `SCHEDULED`.\n\n**Response (201):** `TasksWithSessionsResponse`\n- `tasks` (array) – List of created `TaskWithSessionsResponse`:\n  - `task` (object) – `TaskInfoResponse` (task details with generated ID).\n  - `sessions` (array) – `SessionResponse[]` with generated IDs.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed (e.g. empty list, too many tasks, invalid fields).\n- `GOAL_NOT_FOUND` (404) – If any `goalId` doesn't exist/not owned.\n- `ZONE_NOT_FOUND` (404) – If any `zoneId` doesn't exist/not owned.\n- `CATEGORY_NOT_FOUND` (404) – If any `categoryId` doesn't exist.\n- `INVALID_SESSION_TIME_RANGE` (400) – Session start/end are null or end is not after start.\n- `INVALID_OPERATION` (400) – Any other validation failure."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
           "name": "Get Task Sessions",
           "request": {
             "method": "GET",
@@ -1267,7 +1470,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/sessions",
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/sessions?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1276,9 +1479,16 @@
                 "tasks",
                 "{{taskId}}",
                 "sessions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
+                }
               ]
             },
-            "description": "List all sessions for a given task.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (task-scoped sessions may be zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+            "description": "List all sessions for a given task.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Query Parameters:**\n- `status` (enum, optional) – Filter by status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (task-scoped sessions may be zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
           },
           "response": [
             {
@@ -1292,6 +1502,55 @@
                 }
               ],
               "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Add Sessions to Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessions\": [\n    {\n      \"zoneId\": \"zone-uuid-here\",\n      \"start\": \"2026-07-30T14:00:00\",\n      \"end\": \"2026-07-30T15:00:00\",\n      \"status\": \"SCHEDULED\"\n    },\n    {\n      \"start\": \"2026-07-31T09:00:00\",\n      \"end\": \"2026-07-31T10:00:00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "sessions"
+              ]
+            },
+            "description": "Add new sessions to an existing task. Sessions are appended to the task's existing sessions.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task ID.\n\n**Request Body:**\n- `sessions` (array, required, max 50) – Sessions to add. Each item:\n  - `zoneId` (UUID, optional) – Zone to associate this session with. If omitted, session is zone-less.\n  - `start` (LocalDateTime, required) – Start datetime. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `end` (LocalDateTime, required) – Must be after `start`. Format: `YYYY-MM-DDTHH:mm:ss`.\n  - `status` (enum, optional) – Default: `SCHEDULED`. Options: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (201):** `SessionResponse[]` — The newly created sessions.\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Start time.\n- `end` (ISO datetime) – End time.\n- `status` (string) – Current status.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone ID (null if zone-less).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `TASK_NOT_FOUND` (404) – Task not found or not owned by user.\n- `ZONE_NOT_FOUND` (404) – If any `zoneId` doesn't exist/not owned.\n- `INVALID_SESSION_TIME_RANGE` (400) – Session start/end are null or end is not after start."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"new-session-uuid-1\",\n    \"start\": \"2026-07-30T14:00:00\",\n    \"end\": \"2026-07-30T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"zone-uuid-here\",\n    \"taskId\": \"task-uuid-here\"\n  },\n  {\n    \"id\": \"new-session-uuid-2\",\n    \"start\": \"2026-07-31T09:00:00\",\n    \"end\": \"2026-07-31T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"task-uuid-here\"\n  }\n]"
             }
           ]
         },
@@ -1333,7 +1592,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"status\": \"IN_PROGRESS\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
+              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"status\": \"COMPLETED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1351,7 +1610,7 @@
                 "{{taskId}}"
               ]
             },
-            "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
+            "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `ACTIVE`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
           }
         },
         {
@@ -1547,7 +1806,7 @@
     },
     {
       "name": "Sessions",
-      "description": "Session CRUD operations. Sessions are concrete scheduled occurrences within a task (and optionally a zone).\n\n**Session Statuses:** `SCHEDULED` (default on create), `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Locking:** Locked sessions cannot be updated, have their status changed, or be deleted.",
+      "description": "Session CRUD and lifecycle management. A Session is a concrete scheduled occurrence for a task (optionally within a zone).\n\n**Statuses:** `SCHEDULED` (default on create), `COMPLETED`, `CANCELLED`.\n- `ACTIVE` and `MISSED` are **derived**, not persisted: a `SCHEDULED` session whose window currently contains `now` is *active*; one whose `end` has already passed is *missed*.\n- Use **Get Missed Sessions by Date / Range** to list sessions that were scheduled but never resolved.\n\n**Lifecycle transitions** (enforced server-side, else `INVALID_OPERATION` 400):\n- `SCHEDULED → COMPLETED` (complete)\n- `SCHEDULED → CANCELLED` (cancel)\n- `COMPLETED → SCHEDULED` (uncomplete)\n- `CANCELLED` is terminal; a cancelled session cannot be reopened.\n\n**Locking:** `locked` is metadata used by the scheduling algorithm to avoid moving a session. It does not restrict editing, status changes, or deletion through this API.",
       "item": [
         {
           "name": "Get Sessions by Date",
@@ -1561,7 +1820,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/sessions/date/{{date}}",
+              "raw": "{{baseUrl}}/v1/sessions/date/{{date}}?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1570,9 +1829,16 @@
                 "sessions",
                 "date",
                 "{{date}}"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
+                }
               ]
             },
-            "description": "Get all sessions for a specific date, sorted by start time ascending.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – Target date. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid date format (must be `YYYY-MM-DD`)."
+            "description": "Get all sessions for a specific date, sorted by start time ascending.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – Target date. Format: `YYYY-MM-DD`.\n\n**Query Parameters:**\n- `status` (enum, optional) – Filter by status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all.\n\n**Response (200):** Array of `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid date format (must be `YYYY-MM-DD`)."
           },
           "response": [
             {
@@ -1601,7 +1867,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/sessions/range?startDate=2026-07-20&endDate=2026-07-22",
+              "raw": "{{baseUrl}}/v1/sessions/range?startDate=2026-07-20&endDate=2026-07-22&status=SCHEDULED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1620,10 +1886,15 @@
                   "key": "endDate",
                   "value": "2026-07-22",
                   "description": "End date (inclusive). Format: YYYY-MM-DD"
+                },
+                {
+                  "key": "status",
+                  "value": "SCHEDULED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
                 }
               ]
             },
-            "description": "Get all sessions within a date range, grouped by date and sorted by start time ascending within each group.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | — | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | — | End date (inclusive). Format: `YYYY-MM-DD`. |\n\n**Response (200):** Map of `LocalDate` to `SessionResponse[]`\n- Keys are dates in ascending order.\n- Each value is an array of `SessionResponse` sorted by `start` ascending:\n  - `id` (UUID) – Session ID.\n  - `start` (ISO datetime) – Session start.\n  - `end` (ISO datetime) – Session end.\n  - `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n  - `locked` (boolean) – Whether session is locked.\n  - `zoneId` (UUID or null) – Associated zone.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – Required query parameter missing.\n- `TYPE_MISMATCH` (400) – Invalid date format.\n- `INVALID_OPERATION` (400) – `endDate` is before `startDate`."
+            "description": "Get all sessions within a date range, grouped by date and sorted by start time ascending within each group.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | — | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | — | End date (inclusive). Format: `YYYY-MM-DD`. |\n| `status` | SessionStatus | No | — | Optional filter. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. |\n\n**Response (200):** Map of `LocalDate` to `SessionResponse[]`\n- Keys are dates in ascending order.\n- Each value is an array of `SessionResponse` sorted by `start` ascending:\n  - `id` (UUID) – Session ID.\n  - `start` (ISO datetime) – Session start.\n  - `end` (ISO datetime) – Session end.\n  - `status` (string) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n  - `locked` (boolean) – Whether session is locked.\n  - `zoneId` (UUID or null) – Associated zone.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – Required query parameter missing.\n- `TYPE_MISMATCH` (400) – Invalid date format.\n- `INVALID_OPERATION` (400) – `endDate` is before `startDate`."
           },
           "response": [
             {
@@ -1639,6 +1910,70 @@
               "body": "{\n  \"2026-07-20\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n      \"start\": \"2026-07-20T09:00:00\",\n      \"end\": \"2026-07-20T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n    }\n  ],\n  \"2026-07-22\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:30:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    },\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440004\",\n      \"start\": \"2026-07-22T14:00:00\",\n      \"end\": \"2026-07-22T15:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440005\"\n    }\n  ]\n}"
             }
           ]
+        },
+        {
+          "name": "Get Missed Sessions by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/missed/{{date}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "missed",
+                "{{date}}"
+              ]
+            },
+            "description": "Get sessions on a given date that were scheduled but never resolved (status is still `SCHEDULED` and the session's `end` time has already passed). Such sessions are \"missed\". Completed or cancelled sessions are never reported here.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – Target date. Format: `YYYY-MM-DD`. Sessions whose `start` falls on `date` are considered.\n\n**Response (200):** Array of `SessionResponse` (all `SCHEDULED`, with `end` in the past).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid date format (must be `YYYY-MM-DD`)."
+          }
+        },
+        {
+          "name": "Get Missed Sessions by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/missed/range?startDate=2026-07-20&endDate=2026-07-22",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "missed",
+                "range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-07-20",
+                  "description": "Start date (inclusive). Format: YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-07-22",
+                  "description": "End date (inclusive). Format: YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "Get sessions within a date range that were scheduled but never resolved (status still `SCHEDULED` and `end` already passed). This is the catch-up view for days the user missed.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `startDate` | LocalDate | Yes | — | Start date (inclusive). Format: `YYYY-MM-DD`. |\n| `endDate` | LocalDate | Yes | — | End date (inclusive). Format: `YYYY-MM-DD`. |\n\n**Response (200):** Array of `SessionResponse` – `SCHEDULED` sessions with `end` in the past and `start` within the range.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – Required query parameter missing.\n- `TYPE_MISMATCH` (400) – Invalid date format.\n- `INVALID_OPERATION` (400) – `endDate` is before `startDate`."
+          }
         },
         {
           "name": "Get Session",
@@ -1662,7 +1997,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Get a single session by ID.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
+            "description": "Get a single session by ID.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** `SessionResponse`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n- `locked` (boolean) – Whether the session is locked.\n- `zoneId` (UUID or null) – Associated zone (may be null for task-scoped sessions).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1692,7 +2027,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"IN_PROGRESS\"\n}",
+              "raw": "{\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"COMPLETED\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1710,7 +2045,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Update a session's time range and optionally its status.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Request Body:**\n- `start` (ISO datetime, required) – New start time.\n- `end` (ISO datetime, required) – New end time (must be after `start`).\n- `status` (string, optional) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, or `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `VALIDATION_ERROR` (400) – Session is locked and cannot be modified."
+            "description": "Update a session's time range and optionally its status.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Request Body:**\n- `start` (ISO datetime, required) – New start time.\n- `end` (ISO datetime, required) – New end time (must be after `start`).\n- `status` (string, optional) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
           },
           "response": [
             {
@@ -1723,7 +2058,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -1739,7 +2074,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/status?status=IN_PROGRESS",
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/status?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1752,12 +2087,12 @@
               "query": [
                 {
                   "key": "status",
-                  "value": "IN_PROGRESS",
-                  "description": "New status: SCHEDULED, IN_PROGRESS, COMPLETED, or CANCELLED"
+                  "value": "COMPLETED",
+                  "description": "New status: SCHEDULED, COMPLETED, or CANCELLED"
                 }
               ]
             },
-            "description": "Update only the status of a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Query Parameters:**\n- `status` (string, required) – New status. One of: `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – `status` query parameter is required.\n- `TYPE_MISMATCH` (400) – Invalid status value.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `VALIDATION_ERROR` (400) – Session is locked and cannot be modified."
+            "description": "Update only the status of a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Query Parameters:**\n- `status` (string, required) – New status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – `status` query parameter is required.\n- `TYPE_MISMATCH` (400) – Invalid status value.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
           },
           "response": [
             {
@@ -1770,9 +2105,87 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"IN_PROGRESS\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
+        },
+        {
+          "name": "Complete Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "{{sessionId}}",
+                "complete"
+              ]
+            },
+            "description": "Mark a `SCHEDULED` session as completed.\n\n**Transition:** `SCHEDULED → COMPLETED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: COMPLETED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be completed from its current status (e.g. already cancelled)."
+          }
+        },
+        {
+          "name": "Uncomplete Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/uncomplete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "{{sessionId}}",
+                "uncomplete"
+              ]
+            },
+            "description": "Revert a `COMPLETED` session back to `SCHEDULED` (mistake correction).\n\n**Transition:** `COMPLETED → SCHEDULED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: SCHEDULED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session is not `COMPLETED` (only a completed session can be uncompleted)."
+          }
+        },
+        {
+          "name": "Cancel Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/sessions/{{sessionId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "sessions",
+                "{{sessionId}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancel a `SCHEDULED` session. Cancellation is design terminal – a cancelled session cannot be reopened.\n\n**Transition:** `SCHEDULED → CANCELLED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: CANCELLED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be cancelled from its current status."
+          }
         },
         {
           "name": "Lock Session",
@@ -1797,7 +2210,7 @@
                 "lock"
               ]
             },
-            "description": "Lock a session to prevent modifications.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: true`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
+            "description": "Set the `locked` metadata flag on a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: true`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1837,7 +2250,7 @@
                 "unlock"
               ]
             },
-            "description": "Unlock a session to allow modifications again.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: false`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
+            "description": "Clear the `locked` metadata flag on a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `locked: false`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1876,7 +2289,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Delete a session. Locked sessions cannot be deleted.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (204):** No Content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `VALIDATION_ERROR` (400) – Session is locked and cannot be deleted."
+            "description": "Delete a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (204):** No Content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -1906,7 +2319,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"TUESDAY\",\n    \"WEDNESDAY\",\n    \"THURSDAY\",\n    \"FRIDAY\"\n  ],\n  \"zones\": [\n    {\n      \"name\": \"Morning Focus\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"11:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"Afternoon Work\",\n      \"startTime\": \"13:00:00\",\n      \"endTime\": \"17:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
+              "raw": "{\n  \"name\": \"Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"TUESDAY\",\n    \"WEDNESDAY\",\n    \"THURSDAY\",\n    \"FRIDAY\"\n  ],\n  \"zones\": [\n    {\n      \"name\": \"Morning Focus\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"11:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"Afternoon Work\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"13:00:00\",\n      \"endTime\": \"17:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1923,7 +2336,7 @@
                 "templates"
               ]
             },
-            "description": "Create a new weekly template with optional zones.\n\n**Request Body:**\n- `name` (string, required) – Template name.\n- `daysOfWeek` (Set of DayOfWeek, optional) – Days this template applies to. Values: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. Each day can only belong to one template.\n- `zones` (array, optional) – Max 50 zones. Each item:\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color code (e.g., `#4CAF50`).\n\n**Response (200):** `TemplateResponse`\n- `id` (UUID) – Template ID.\n- `name` (string) – Template name.\n- `daysOfWeek` (Set of DayOfWeek) – Active days.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/ invalid fields.\n- `DAY_ALREADY_ASSIGNED` (409) – One or more days are already used by another template.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
+            "description": "Create a new weekly template with optional zones.\n\n**Request Body:**\n- `name` (string, required) – Template name.\n- `daysOfWeek` (Set of DayOfWeek, optional) – Days this template applies to. Values: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. Each day can only belong to one template.\n- `zones` (array, optional) – Max 50 zones. Each item:\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color code (e.g., `#4CAF50`).\n\n**Response (200):** `TemplateResponse`\n- `id` (UUID) – Template ID.\n- `name` (string) – Template name.\n- `daysOfWeek` (Set of DayOfWeek) – Active days.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/ invalid fields.\n- `DAY_ALREADY_ASSIGNED` (409) – One or more days are already used by another template.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
           },
           "response": [
             {
@@ -2061,7 +2474,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Evening Review\",\n  \"startTime\": \"18:00:00\",\n  \"endTime\": \"19:00:00\",\n  \"color\": \"#FF9800\"\n}",
+              "raw": "{\n  \"name\": \"Evening Review\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startTime\": \"18:00:00\",\n  \"endTime\": \"19:00:00\",\n  \"color\": \"#FF9800\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2080,7 +2493,7 @@
                 "zones"
               ]
             },
-            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) – Zone ID.\n- `name` (string) – Zone name.\n- `startTime` (LocalTime) – Start time.\n- `endTime` (LocalTime) – End time.\n- `color` (string or null) – Hex color.\n- `templateId` (UUID or null) – Parent template ID.\n- `templateOverrideId` (UUID or null) – Parent override ID (null for template zones).\n- `category` (CategoryResponse or null) – Assigned category (auto-created from zone name).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this template."
+            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) – Zone ID.\n- `name` (string) – Zone name.\n- `startTime` (LocalTime) – Start time.\n- `endTime` (LocalTime) – End time.\n- `color` (string or null) – Hex color.\n- `templateId` (UUID or null) – Parent template ID.\n- `templateOverrideId` (UUID or null) – Parent override ID (null for template zones).\n- `category` (CategoryResponse) – Assigned category (provided by `categoryId`).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this template."
           },
           "response": [
             {
@@ -2148,14 +2561,14 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Focus\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"New Afternoon Slot\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"16:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
+              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Focus\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"New Afternoon Slot\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"16:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Replace all zones for a template in bulk. Provide the full desired set of zones — zones not included in the request are deleted.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones for this template. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. If omitted, creates a new zone.\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color code.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this template."
+            "description": "Replace all zones for a template in bulk. Provide the full desired set of zones — zones not included in the request are deleted.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones for this template. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. If omitted, creates a new zone.\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color code.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this template."
           }
         }
       ]
@@ -2177,7 +2590,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-25\",\n  \"zones\": [\n    {\n      \"name\": \"Leisure Morning\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"Family Time\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"18:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
+              "raw": "{\n  \"name\": \"Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-25\",\n  \"zones\": [\n    {\n      \"name\": \"Leisure Morning\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"Family Time\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"18:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2194,7 +2607,7 @@
                 "template-overrides"
               ]
             },
-            "description": "Create a one-off override for a specific date with optional zones.\n\n**Request Body:**\n- `name` (string, optional) – Override name.\n- `dateOfDay` (LocalDate, required) – The date this override applies to. Format: `YYYY-MM-DD`.\n- `zones` (array, optional) – Zones for this override. Each item:\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** `TemplateOverrideResponse`\n- `id` (UUID) – Override ID.\n- `name` (string) – Override name.\n- `dateOfDay` (LocalDate) – The target date.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
+            "description": "Create a one-off override for a specific date with optional zones.\n\n**Request Body:**\n- `name` (string, optional) – Override name.\n- `dateOfDay` (LocalDate, required) – The date this override applies to. Format: `YYYY-MM-DD`.\n- `zones` (array, optional) – Zones for this override. Each item:\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** `TemplateOverrideResponse`\n- `id` (UUID) – Override ID.\n- `name` (string) – Override name.\n- `dateOfDay` (LocalDate) – The target date.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
           },
           "response": [
             {
@@ -2332,7 +2745,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Extra Slot\",\n  \"startTime\": \"20:00:00\",\n  \"endTime\": \"21:00:00\",\n  \"color\": \"#00BCD4\"\n}",
+              "raw": "{\n  \"name\": \"Extra Slot\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startTime\": \"20:00:00\",\n  \"endTime\": \"21:00:00\",\n  \"color\": \"#00BCD4\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2351,7 +2764,7 @@
                 "zones"
               ]
             },
-            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this override."
+            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this override."
           }
         },
         {
@@ -2405,14 +2818,14 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Slot\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"13:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"New Evening Slot\",\n      \"startTime\": \"19:00:00\",\n      \"endTime\": \"21:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
+              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Slot\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"13:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"New Evening Slot\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"19:00:00\",\n      \"endTime\": \"21:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Replace all zones for a template override in bulk. Provide the full desired set — zones not included are deleted.\n\n**Path Parameters:**\n- `templateOverrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. Omit to create.\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this override."
+            "description": "Replace all zones for a template override in bulk. Provide the full desired set — zones not included are deleted.\n\n**Path Parameters:**\n- `templateOverrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. Omit to create.\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this override."
           }
         }
       ]
@@ -2458,7 +2871,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}/sessions",
+              "raw": "{{baseUrl}}/v1/zones/{{zoneId}}/sessions?status=COMPLETED",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2467,9 +2880,16 @@
                 "zones",
                 "{{zoneId}}",
                 "sessions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "description": "Optional filter: only sessions with this status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all."
+                }
               ]
             },
-            "description": "List all sessions for a given zone.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone ID.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID) – Associated zone ID.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+            "description": "List all sessions for a given zone.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone ID.\n\n**Query Parameters:**\n- `status` (enum, optional) – Filter by status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`. Omit for all.\n\n**Response (200):** `SessionResponse[]`\n- `id` (UUID) – Session ID.\n- `start` (ISO datetime) – Session start.\n- `end` (ISO datetime) – Session end.\n- `status` (string) – `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `locked` (boolean) – Whether session is locked.\n- `zoneId` (UUID) – Associated zone ID.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
           },
           "response": [
             {
@@ -2525,7 +2945,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Focus Time\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"color\": \"#673AB7\"\n}",
+              "raw": "{\n  \"name\": \"Updated Focus Time\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"color\": \"#673AB7\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2543,7 +2963,7 @@
                 "{{zoneId}}"
               ]
             },
-            "description": "Update a zone's name, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) – Zone not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in the same template or override."
+            "description": "Update a zone's name, category, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) – Zone not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in the same template or override."
           }
         },
         {
@@ -2570,6 +2990,101 @@
             },
             "description": "Delete a zone.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone identifier.\n\n**Response:** `204 No Content`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) – Zone not found / not owned."
           }
+        }
+      ]
+    },
+    {
+      "name": "Availability",
+      "description": "Free time slots computed from the user's zone templates minus already-booked sessions. This is the same availability the AI scheduler consumes.",
+      "item": [
+        {
+          "name": "Get Available Slots by Date",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/availability/date/{{date}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "availability",
+                "date",
+                "{{date}}"
+              ]
+            },
+            "description": "Free schedulable slots for a single day, with existing sessions already subtracted from zone time.\n\n**Path Parameters:**\n- `date` (LocalDate, required) – `YYYY-MM-DD`.\n\n**Response (200):** `AvailableSlot[]`\n- `start` / `end` (LocalDateTime) – Slot boundaries.\n- `zoneId` (UUID or null) – Owning zone, `null` for gaps outside any zone.\n- `zoneName` (string or null) – Zone name.\n- `zoneColor` (string or null) – Zone color.\n- `category` (object or null) – The zone's category.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TYPE_MISMATCH` (400) – Malformed date."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"start\": \"2026-08-03T09:00:00\",\n    \"end\": \"2026-08-03T11:30:00\",\n    \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n    \"zoneName\": \"Deep Work\",\n    \"zoneColor\": \"#4F46E5\",\n    \"category\": {\n      \"id\": \"9c858901-8a57-4791-81fe-4c455b099bc9\",\n      \"name\": \"Study\"\n    }\n  },\n  {\n    \"start\": \"2026-08-03T14:00:00\",\n    \"end\": \"2026-08-03T15:00:00\",\n    \"zoneId\": null,\n    \"zoneName\": null,\n    \"zoneColor\": null,\n    \"category\": null\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Available Slots by Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/availability/range?startDate=2026-08-03&endDate=2026-08-05",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "availability",
+                "range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-08-03"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-08-05"
+                }
+              ]
+            },
+            "description": "Free schedulable slots for each day in an inclusive date range.\n\n**Query Parameters:**\n- `startDate` (LocalDate, required) – `YYYY-MM-DD`.\n- `endDate` (LocalDate, required) – `YYYY-MM-DD`.\n\n**Response (200):** `Map<LocalDate, AvailableSlot[]>` – Keyed by date; days with no free time map to an empty array.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `MISSING_PARAMETER` (400) – `startDate` or `endDate` omitted.\n- `TYPE_MISMATCH` (400) – Malformed date."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"2026-08-03\": [\n    {\n      \"start\": \"2026-08-03T09:00:00\",\n      \"end\": \"2026-08-03T11:30:00\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"zoneName\": \"Deep Work\",\n      \"zoneColor\": \"#4F46E5\",\n      \"category\": null\n    }\n  ],\n  \"2026-08-04\": [],\n  \"2026-08-05\": [\n    {\n      \"start\": \"2026-08-05T18:00:00\",\n      \"end\": \"2026-08-05T20:00:00\",\n      \"zoneId\": null,\n      \"zoneName\": null,\n      \"zoneColor\": null,\n      \"category\": null\n    }\n  ]\n}"
+            }
+          ]
         }
       ]
     },
@@ -2608,12 +3123,44 @@
               "body": "\"Working!!\""
             }
           ]
+        },
+        {
+          "name": "Current Time",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/time",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "time"
+              ]
+            },
+            "description": "Get the current server time. No authentication required.\n\n**Query Parameters:** None.\n\n**Response (200):** ISO local datetime string.\n- Returns the current server time in ISO-8601 format (e.g., `2026-07-28T10:30:00`).\n\n**Possible Errors:** None."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "\"2026-07-28T10:30:00\""
+            }
+          ]
         }
       ]
     },
     {
       "name": "Categories",
-      "description": "Category management for zones and tasks. Categories are auto-created when zones are created, but can also be managed independently.\n\nEach category is user-scoped — you only see your own categories.",
+      "description": "Per-user categories. Every new account is seeded with 8 starter categories (General, Work, Personal, Health, Learning, Finance, Home, Social) on first sign-in, and the user can add more at any time.\n\nZones, templates, and overrides reference a category by its `categoryId` (UUID), which must belong to the authenticated user. Fetch the available categories via **List Categories** and supply the id in zone payloads.",
       "item": [
         {
           "name": "Create Category",
@@ -2624,8 +3171,22 @@
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/v1/categories",
               "host": [
@@ -2636,16 +3197,7 @@
                 "categories"
               ]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Work\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "description": "Create a new category.\n\n**Request Body:**\n- `name` (string, required) – Category name.\n\n**Response (201):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid name."
+            "description": "Create a new category owned by the authenticated user.\n\n**Body:**\n- `name` (string, required) – Category name. Must be unique within the user's own categories (case-insensitive).\n\n**Response (201):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (400) – Blank name.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NAME_TAKEN` (409) – The user already has a category with that name."
           }
         },
         {
@@ -2706,8 +3258,22 @@
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym Time\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/v1/categories/{{categoryId}}",
               "host": [
@@ -2719,16 +3285,7 @@
                 "{{categoryId}}"
               ]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "description": "Update a category name.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) – Category identifier.\n\n**Request Body:**\n- `name` (string, required) – New category name.\n\n**Response (200):** `CategoryResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) – Category not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid name."
+            "description": "Rename one of the authenticated user's categories.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) – Category identifier.\n\n**Body:**\n- `name` (string, required) – New category name.\n\n**Response (200):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (400) – Blank name.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) – Category not found or does not belong to user.\n- `CATEGORY_NAME_TAKEN` (409) – The user already has another category with that name."
           }
         }
       ]
@@ -2803,6 +3360,144 @@
             },
             "description": "Schedule a single unscheduled task using the AI scheduling engine. Optionally specify a scheduling horizon (default is typically 14 days).\n\n**Request Body:**\n- `taskId` (UUID, required) – The task to schedule.\n- `horizonDays` (int, optional) – Number of days to look ahead for available slots (default: 14).\n\n**Response (200):** `TaskScheduleResponse`\n- `taskId` (UUID) – The task ID.\n- `scheduledSessions` (array) – List of scheduled session results:\n  - `sessionId` (UUID) – Created session ID.\n  - `taskId` (UUID) – The task ID.\n  - `zoneId` (UUID) – Zone ID.\n  - `start` (ISO datetime) – Session start.\n  - `end` (ISO datetime) – Session end.\n- `unscheduledTasks` (array) – If the task couldn't be scheduled:\n  - `taskId` (UUID) – Task ID.\n  - `taskTitle` (string) – Task title.\n  - `reason` (enum) – Failure reason.\n  - `message` (string) – Explanation.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `AI_UNAVAILABLE` (503) – AI service is temporarily unavailable."
           }
+        },
+        {
+          "name": "AI Schedule Goal (Proposal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goalId\": \"8d2f1c44-1f3e-4a1a-9c2b-6d0a3b7f1e55\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/schedule",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "schedule"
+              ]
+            },
+            "description": "Ask the AI to plan sessions for every task in a goal. **Nothing is persisted** – the client reviews the proposal and calls `POST /v1/ai/schedule/confirm` with the sessions the user accepted.\n\n**Request Body:**\n- `goalId` (UUID, required) – Goal to schedule.\n\n**Response (200):** `AiGoalScheduleResponse`\n- `goalId` (UUID).\n- `proposedSessions` (array) – In-zone placements with enough free time. Each: `taskId`, `taskTitle`, `zoneId`, `start`, `end`.\n- `suggestions` (array) – Placements needing user review. Adds `suggestionType` (`NO_ZONE` – placed outside any zone, `zoneId` is `null`; `OVERLAP` – placed over an existing unlocked session), `reason`, and `overlapInfo` (non-null only for `OVERLAP`: `taskTitle`, `start`, `end`, `mandatory`, `points`).\n- `unscheduledTasks` (array) – Tasks the AI could not place: `taskId`, `taskTitle`, `message`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – `goalId` missing.\n- `GOAL_NOT_FOUND` (404) – Goal not found / not owned.\n- `SCHEDULING_FAILED` (500) – The scheduler could not produce a plan.\n- `AI_UNAVAILABLE` (503) – AI service unavailable."
+          },
+          "response": [
+            {
+              "name": "Proposal",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"goalId\": \"8d2f1c44-1f3e-4a1a-9c2b-6d0a3b7f1e55\",\n  \"proposedSessions\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000001\",\n      \"taskTitle\": \"Read chapter 1\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"start\": \"2026-08-04T09:00:00\",\n      \"end\": \"2026-08-04T10:00:00\"\n    }\n  ],\n  \"suggestions\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000002\",\n      \"taskTitle\": \"Write summary\",\n      \"zoneId\": null,\n      \"start\": \"2026-08-04T20:00:00\",\n      \"end\": \"2026-08-04T21:00:00\",\n      \"suggestionType\": \"NO_ZONE\",\n      \"reason\": \"No study zone had enough free time, so this was placed in an unzoned evening gap.\",\n      \"overlapInfo\": null\n    },\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000003\",\n      \"taskTitle\": \"Practice problems\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"start\": \"2026-08-05T09:00:00\",\n      \"end\": \"2026-08-05T10:00:00\",\n      \"suggestionType\": \"OVERLAP\",\n      \"reason\": \"No free time remained; this overlaps a lower-value unlocked session.\",\n      \"overlapInfo\": {\n        \"taskTitle\": \"Email triage\",\n        \"start\": \"2026-08-05T09:00:00\",\n        \"end\": \"2026-08-05T09:30:00\",\n        \"mandatory\": false,\n        \"points\": 5\n      }\n    }\n  ],\n  \"unscheduledTasks\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000004\",\n      \"taskTitle\": \"Final revision\",\n      \"message\": \"No free time in the planning horizon could fit this task.\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirm AI Schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goalId\": \"8d2f1c44-1f3e-4a1a-9c2b-6d0a3b7f1e55\",\n  \"sessions\": [\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000001\",\n      \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n      \"start\": \"2026-08-04T09:00:00\",\n      \"end\": \"2026-08-04T10:00:00\"\n    },\n    {\n      \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000002\",\n      \"zoneId\": null,\n      \"start\": \"2026-08-04T20:00:00\",\n      \"end\": \"2026-08-04T21:00:00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/schedule/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "schedule",
+                "confirm"
+              ]
+            },
+            "description": "Persist the sessions the user accepted from an `AI Schedule Goal (Proposal)` response. Send any subset of `proposedSessions` plus any accepted `suggestions`; each item's ownership is validated before it is saved.\n\n**Request Body:** `ConfirmScheduleRequest`\n- `goalId` (UUID, required).\n- `sessions` (array, required, non-empty) – Each item:\n  - `taskId` (UUID, required).\n  - `zoneId` (UUID or null) – `null` when confirming a `NO_ZONE` suggestion.\n  - `start` (LocalDateTime, required).\n  - `end` (LocalDateTime, required).\n\n**Response (200):** `ScheduledSessionResult[]` – The newly created sessions with their database ids: `sessionId`, `taskId`, `zoneId`, `start`, `end`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing `goalId`, empty `sessions`, or missing item fields.\n- `GOAL_NOT_FOUND` (404) – Goal not found / not owned.\n- `TASK_NOT_FOUND` (404) – A referenced task is not found / not owned.\n- `ZONE_NOT_FOUND` (404) – A referenced zone is not found / not owned."
+          },
+          "response": [
+            {
+              "name": "Confirmed",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"sessionId\": \"7a0c1a2b-3c4d-4e5f-8a9b-0c1d2e3f4a5b\",\n    \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000001\",\n    \"zoneId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n    \"start\": \"2026-08-04T09:00:00\",\n    \"end\": \"2026-08-04T10:00:00\"\n  },\n  {\n    \"sessionId\": \"7a0c1a2b-3c4d-4e5f-8a9b-0c1d2e3f4a5c\",\n    \"taskId\": \"b1c2d3e4-5678-4abc-9def-000000000002\",\n    \"zoneId\": null,\n    \"start\": \"2026-08-04T20:00:00\",\n    \"end\": \"2026-08-04T21:00:00\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Preview Schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"title\": \"Read chapter 1\",\n    \"estimatedDuration\": 60,\n    \"mandatory\": false,\n    \"estimatedPoints\": 10,\n    \"allowTaskSplitting\": true\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/schedule/preview?horizonDays=14",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "schedule",
+                "preview"
+              ],
+              "query": [
+                {
+                  "key": "horizonDays",
+                  "value": "14"
+                }
+              ]
+            },
+            "description": "**Testing endpoint.** Runs the solver over an ad-hoc list of tasks that do not need to exist in the database, and returns the sessions it would produce. Nothing is persisted.\n\n**Query Parameters:**\n- `horizonDays` (int, optional) – Planning horizon; defaults to the server setting (`EZDO_AI_PLAN_HORIZON_DAYS`, 14).\n\n**Request Body:** `TaskInfoResponse[]` – The tasks to place.\n\n**Response (200):** `SessionResponse[]` – The proposed sessions.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `MALFORMED_REQUEST_BODY` (400) – Body is not a JSON array of tasks.\n- `SCHEDULING_FAILED` (500) – The solver could not produce a schedule."
+          },
+          "response": []
         }
       ]
     },
@@ -2895,15 +3590,85 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Build login page\",\n  \"description\": \"Create a login page with email and password fields\"\n}",
+              "raw": "{\n  \"text\": \"I need to build a login page with email and password fields, plus validation. Also set up the database schema for user accounts.\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Create a task with AI-enriched details. The AI analyzes the title and description to suggest optimal duration, points, category, and other fields.\n\n**Request Body:**\n- `title` (string, required) – Task title (max 255 chars).\n- `description` (string, optional) – Task description (max 2000 chars).\n\n**Response (201):** `TaskInfoResponse`\n- `id` (UUID) – Task ID.\n- `title` (string) – Title (may be refined by AI).\n- `description` (string or null) – Description.\n- `estimatedDuration` (int) – AI-estimated minutes.\n- `status` (string) – `SCHEDULED`.\n- `mandatory` (boolean) – AI-suggested.\n- `estimatedPoints` (int) – AI-estimated points.\n- `allowTaskSplitting` (boolean) – AI-suggested.\n- `goalId` (UUID) – Auto-assigned to Inbox.\n- `dependsOnTaskIds` (UUID[]) – Empty.\n- `category` (CategoryResponse or null) – AI-suggested category.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `AI_UNAVAILABLE` (503) – AI service unavailable."
-          }
+            "description": "Create task proposals from a free-form natural language note. The AI analyzes the text against your categories, preferences, and calendar availability, and returns one or more structured task drafts with AI-estimated durations, points, categories, and suggested scheduling.\n\nNothing is persisted by this endpoint. Each task in the response carries a `draft` that is literally the body to POST to `/api/v1/tasks/with-sessions` to accept that task, so confirming needs no mapping on the client side.\n\nTwo independent scheduling channels:\n- `draft.sessions` — Timing the source itself stated (e.g. \"tomorrow at 3pm\") is passed through untouched.\n- `aiProposedSessions` — The model’s own suggestion grounded in real availability, with a `reason` explaining the choice.\n\n**Request Body:**\n- `text` (string, required) — Free-form natural language note (max 4000 chars). Examples: \"Build login page with validation\", \"Gym Monday and Wednesday 6-8pm, grocery shopping Friday morning\".\n\n**Response (200):** `TaskProposalResponse`\n- `sourceSummary` (string or null) — Always null for typed notes. Present for image uploads to show what was read from the image.\n- `tasks` (array) — Proposed task drafts:\n  - `draft` (TaskWithSessionsRequest) — Body to POST to `/api/v1/tasks/with-sessions`:\n    - `task` (object): `title`, `description`, `estimatedDuration`, `mandatory`, `estimatedPoints`, `allowTaskSplitting`, `goalId`, `categoryId`.\n    - `sessions` (array): Timing from source text — `start` (ISO datetime), `end` (ISO datetime), `zoneId` (UUID or null), `status` = `SCHEDULED`.\n  - `aiProposedSessions` (array) — AI-proposed timing, same structure as `draft.sessions`.\n  - `reason` (string) — Why the AI proposed those times, or what prevented scheduling.\n- `timestamp` (ISO instant) — When the response was generated.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) — Text is blank or exceeds 4000 characters.\n- `AI_UNAVAILABLE` (503) — AI service is unavailable or returned unparseable output."
+          },
+          "response": [
+            {
+              "name": "Task Proposal",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"sourceSummary\": null,\n  \"tasks\": [\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Build login page\",\n          \"description\": \"Create a login page with email and password fields including validation\",\n          \"estimatedDuration\": 60,\n          \"mandatory\": true,\n          \"estimatedPoints\": 30,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": \"cat-uuid-here\"\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:00:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ],\n      \"reason\": \"Your morning Development zone on Jul 30 has room, and this is a high-priority task.\"\n    },\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Set up database schema\",\n          \"description\": \"Design and create the user accounts database schema\",\n          \"estimatedDuration\": 45,\n          \"mandatory\": true,\n          \"estimatedPoints\": 20,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [],\n      \"reason\": \"No suitable time slot was found in the planning horizon due to existing commitments.\"\n    }\n  ],\n  \"timestamp\": \"2026-07-30T08:30:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Image to Tasks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/ai/image-to-tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "ai",
+                "image-to-tasks"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "description": "Image file (PNG, JPEG, WebP, GIF, max 10MB)"
+                },
+                {
+                  "key": "note",
+                  "type": "text",
+                  "value": "Finish these by Friday",
+                  "description": "Optional additional context or instructions"
+                }
+              ]
+            },
+            "description": "Upload an image (photo of a whiteboard, handwritten todo list, screenshot, etc.) and the AI extracts actionable tasks from it.\n\nThe pipeline runs two AI models:\n1. Vision model (Google Gemini) reads the image into a faithful text report.\n2. Planning model (OpenAI-compatible) converts the report into structured task proposals.\n\nNothing is persisted by this endpoint. Each task in the response carries a `draft` that is the body to POST to `/api/v1/tasks/with-sessions` to accept it.\n\n**Multipart Form-Data Fields:**\n- `image` (file, required) — Image file. Supported types: PNG, JPEG, WebP, GIF. Max size: 10MB.\n- `note` (text, optional) — Additional context or instructions (e.g. \"Focus on the top 3 items\", \"Finish by Friday\").\n\n**Response (200):** `TaskProposalResponse`\n- `sourceSummary` (string or null) — The raw text report from the vision model, so the UI can show what was understood.\n- `tasks` (array) — Proposed task drafts (same structure as task-create endpoint).\n- `timestamp` (ISO instant) — When the response was generated.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) — Missing/invalid/expired JWT.\n- `INVALID_OPERATION` (400) — No image provided or image is empty.\n- `UNSUPPORTED_IMAGE_TYPE` (415) — Unsupported image format. Supported: PNG, JPEG, WebP, GIF.\n- `INVALID_OPERATION` (400) — Image exceeds 10MB.\n- `AI_UNAVAILABLE` (503) — AI service unavailable."
+          },
+          "response": [
+            {
+              "name": "Task Proposal (from image)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"sourceSummary\": \"TASK 1: Buy groceries for the week\\nTASK 2: Finish project report\\nTASK 3: Call dentist for appointment at 3pm Friday\",\n  \"tasks\": [\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Buy groceries\",\n          \"description\": \"Buy groceries for the week\",\n          \"estimatedDuration\": 45,\n          \"mandatory\": false,\n          \"estimatedPoints\": 10,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [],\n      \"reason\": \"This is a routine errand; it can fit into any available free slot.\"\n    },\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Finish project report\",\n          \"description\": \"Complete and submit the project report\",\n          \"estimatedDuration\": 120,\n          \"mandatory\": true,\n          \"estimatedPoints\": 50,\n          \"allowTaskSplitting\": true,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": []\n      },\n      \"aiProposedSessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T14:00:00\",\n          \"end\": \"2026-07-30T16:00:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ],\n      \"reason\": \"Your afternoon focus block on Jul 30 has enough room for this 2-hour task.\"\n    },\n    {\n      \"draft\": {\n        \"task\": {\n          \"title\": \"Call dentist\",\n          \"description\": \"Call dentist to schedule an appointment at 3pm Friday\",\n          \"estimatedDuration\": 10,\n          \"mandatory\": false,\n          \"estimatedPoints\": 5,\n          \"allowTaskSplitting\": false,\n          \"goalId\": null,\n          \"categoryId\": null\n        },\n        \"sessions\": [\n          {\n            \"zoneId\": null,\n            \"start\": \"2026-08-01T15:00:00\",\n            \"end\": \"2026-08-01T15:10:00\",\n            \"status\": \"SCHEDULED\"\n          }\n        ]\n      },\n      \"aiProposedSessions\": [],\n      \"reason\": \"The source text explicitly states 'at 3pm Friday', so that time was preserved as-is.\"\n    }\n  ],\n  \"timestamp\": \"2026-07-30T08:30:00Z\"\n}"
+            }
+          ]
         },
         {
           "name": "Get Decomposition Transcript",

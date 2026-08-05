@@ -30,13 +30,46 @@ spring:
         format_sql: true
         highlight_sql: true
 
+  quartz:
+    job-store-type: jdbc  # persist jobs/triggers in the DB instead of memory
+    jdbc:
+      initialize-schema: always     # auto-creates Quartz's tables on startup
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: EzdoScheduler
+            instanceId: AUTO                      # needed even for a single instance, harmless if we scale later
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore   # class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: false                     # true only if we run multiple app instances later
+            misfireThreshold: 60000
+
   ai:
     openai:
       api-key: ${SPRING_OPENAI_API_KEY:}
       base-url: ${SPRING_OPENAI_BASE_URL:https://opencode.ai/zen/v1}
       chat:
-           model: ${SPRING_OPENAI_CHAT_MODEL:deepseek-v4-flash-free}
-           temperature: ${SPRING_OPENAI_CHAT_TEMPERATURE:0.4}
+        model: ${SPRING_OPENAI_CHAT_MODEL:deepseek-v4-flash-free}
+        temperature: ${SPRING_OPENAI_CHAT_TEMPERATURE:0.4}
+    google:
+      genai:
+        api-key: ${SPRING_GENAI_API_KEY:}
+        chat:
+          model: ${SPRING_GENAI_CHAT_MODEL:gemini-3.5-flash-lite}
+          temperature: ${SPRING_GENAI_CHAT_TEMPERATURE:0.4}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
     google:
       genai:
@@ -74,10 +107,26 @@ ezdo:
     rate-limit-window-minutes: 10
   refresh-token:
     expiry-days: 30
+  firebase:
+    credentials-json: ${EZDO_FIREBASE_CREDENTIALS_JSON:}
+    service-account-path: ${EZDO_FIREBASE_SERVICE_ACCOUNT_PATH:classpath:firebase-service-account.json}
+    project-id: ${EZDO_FIREBASE_PROJECT_ID:}
+    allowed-sign-in-providers: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:google.com,apple.com}
   mail:
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
+    plan:
+      max-tasks: ${EZDO_AI_PLAN_MAX_TASKS:25}
+      max-sessions-per-task: ${EZDO_AI_PLAN_MAX_SESSIONS:10}
+      availability-horizon-days: ${EZDO_AI_PLAN_HORIZON_DAYS:14}
+  cors:
+    allowed-origins: ${EZDO_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://localhost:5173}
+
+  cloudinary:
+    cloud-name: ${EZDO_CLOUDINARY_CLOUD_NAME:}
+    api-key: ${EZDO_CLOUDINARY_API_KEY:}
+    api-secret: ${EZDO_CLOUDINARY_API_SECRET:}
 
 timefold:
   solver:

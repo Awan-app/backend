@@ -29,5 +29,7 @@ public record UpdateProfileRequest(
 
     LocalTime sleepTime,
 
-    SchedulingType schedulingType
+    SchedulingType schedulingType,
+
+    Boolean dailySummaryEnabled
 ) {}

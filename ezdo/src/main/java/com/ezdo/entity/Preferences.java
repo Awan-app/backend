@@ -41,4 +41,8 @@ public class Preferences {
     @Enumerated(EnumType.STRING)
     @Column(name = "scheduling_type")
     private SchedulingType schedulingType;
+
+    @Column(name = "daily_summary_enabled")
+    @Builder.Default
+    private Boolean dailySummaryEnabled = true;
 }

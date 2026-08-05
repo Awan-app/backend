@@ -54,7 +54,7 @@ public class GoalService {
                 throw new DuplicateTempIdException(dt.tempId());
             }
             Category category = dt.categoryId() != null
-                ? categoryRepository.findById(dt.categoryId())
+                ? categoryRepository.findByIdAndUserId(dt.categoryId(), userId)
                     .orElseThrow(() -> new CategoryNotFoundException(dt.categoryId()))
                 : null;
             Task task = Task.builder()
@@ -148,7 +148,7 @@ public class GoalService {
             if (newByTempId.containsKey(item.tempId())) {
                 throw new DuplicateTempIdException(item.tempId());
             }
-            Category category = categoryRepository.findById(item.categoryId())
+            Category category = categoryRepository.findByIdAndUserId(item.categoryId(), userId)
                 .orElseThrow(() -> new CategoryNotFoundException(item.categoryId()));
             newByTempId.put(item.tempId(), Task.builder()
                 .goal(goal)

@@ -1,6 +1,8 @@
 package com.ezdo.service;
 
-import com.ezdo.dto.ai.*;
+import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.ai.schedule.*;
+import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.entity.*;
 import com.ezdo.exception.GoalNotFoundException;
 import com.ezdo.exception.TaskNotFoundException;
@@ -11,6 +13,7 @@ import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
+import com.ezdo.scheduler.SessionSchedulerService;
 import com.ezdo.timefold.ScheduleSolution;
 import com.ezdo.timefold.SchedulingPreprocessor;
 import com.ezdo.timefold.SessionChunk;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,6 +43,7 @@ public class GoalSchedulingService {
     private final SessionRepository sessionRepository;
     private final TaskRepository taskRepository;
     private final ZoneRepository zoneRepository;
+    private final SessionSchedulerService sessionSchedulerService;
 
     @Transactional
     public GoalScheduleResponse scheduleGoal(UUID userId, GoalScheduleRequest request) {
@@ -74,6 +79,36 @@ public class GoalSchedulingService {
         return new TaskScheduleResponse(request.taskId(), response.scheduledSessions(), response.unscheduledTasks());
     }
 
+    public List<SessionResponse> previewSchedule(UUID userId, List<TaskInfoResponse> tasks, Integer horizonDays) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        Preferences prefs = user.getPreferences();
+
+        int horizon = horizonDays != null ? horizonDays : 14;
+
+        ScheduleSolution problem = schedulingPreprocessor.preprocessTaskResponses(
+                tasks, userId, null, prefs, horizon);
+        problem.setGoalId(UUID.randomUUID());
+
+        ScheduleSolution solution = timefoldSchedulerService.schedule(problem);
+
+        List<SessionResponse> results = new ArrayList<>();
+        for (SessionChunk chunk : solution.getChunks()) {
+            if (chunk.getStartingGrain() == null) continue;
+
+            results.add(new SessionResponse(
+                    chunk.getId(),
+                    chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()),
+                    chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()).plusMinutes((long) chunk.getDurationInGrains() * 15),
+                    null,
+                    false,
+                    chunk.getStartingGrain().getZoneId(),
+                    chunk.getTaskId()
+            ));
+        }
+        return results;
+    }
+
     private GoalScheduleResponse buildResponse(UUID contextId, ScheduleSolution solution, UUID userId) {
         List<ScheduledSessionResult> scheduledResults = new java.util.ArrayList<>();
         List<UnscheduledTaskResult> unscheduledResults = new java.util.ArrayList<>();
@@ -92,7 +127,6 @@ public class GoalSchedulingService {
                 unscheduledResults.add(new UnscheduledTaskResult(
                         taskId,
                         task != null ? task.getTitle() : "Unknown Task",
-                        "NO_SUITABLE_ZONE",
                         "Timefold could not find a valid time slot for all chunks of this task."
                 ));
             } else {
@@ -112,6 +146,7 @@ public class GoalSchedulingService {
                             .build();
 
                     sessionRepository.save(session);
+                    sessionSchedulerService.scheduleReminder(session, userId);
 
                     scheduledResults.add(new ScheduledSessionResult(
                             session.getId(),

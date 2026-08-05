@@ -24,20 +24,23 @@ public class UserMapper {
                 p.getBufferBetweenSessions(),
                 p.getWakeupTime(),
                 p.getSleepTime(),
-                p.getSchedulingType()
+                p.getSchedulingType(),
+                p.getDailySummaryEnabled()
             );
         }
 
         return new UserProfileResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getBirthDate(),
-                user.getPoints(),
-                user.getStreak(),
-                user.getMaxStreak(),
-                preferencesResponse
+            user.getId(),
+            user.getEmail(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getBirthDate(),
+            user.getPoints(),
+            user.getStreak(),
+            user.getMaxStreak(),
+            user.getProfilePictureUrl(),
+            user.getIsNew(),
+            preferencesResponse
         );
     }
 
@@ -78,6 +81,9 @@ public class UserMapper {
         }
         if (request.schedulingType() != null) {
             p.setSchedulingType(request.schedulingType());
+        }
+        if (request.dailySummaryEnabled() != null) {
+            p.setDailySummaryEnabled(request.dailySummaryEnabled());
         }
     }
 }

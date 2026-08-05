@@ -6,9 +6,11 @@ import com.ezdo.dto.profile.*;
 import com.ezdo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.UUID;
@@ -30,6 +32,20 @@ public class UserController {
         @AuthenticationPrincipal UUID userId
     ) {
         return ResponseEntity.ok(userService.isNew(userId));
+    }
+
+    @PatchMapping(value = "/me/profile/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProfilePictureResponse> updateProfilePicture(
+        @AuthenticationPrincipal UUID userId,
+        @RequestParam("image") MultipartFile image
+    ) {
+        return ResponseEntity.ok(userService.updateProfilePicture(userId, image));
+    }
+
+    @DeleteMapping("/me/profile/picture")
+    public ResponseEntity<Void> removeProfilePicture(@AuthenticationPrincipal UUID userId) {
+        userService.removeProfilePicture(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/me")

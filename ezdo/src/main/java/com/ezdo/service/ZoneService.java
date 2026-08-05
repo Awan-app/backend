@@ -5,19 +5,17 @@ import com.ezdo.dto.ZoneResponse;
 import com.ezdo.entity.Category;
 import com.ezdo.entity.Template;
 import com.ezdo.entity.TemplateOverride;
-import com.ezdo.entity.User;
 import com.ezdo.entity.Zone;
+import com.ezdo.exception.CategoryNotFoundException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateNotFoundException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
-import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.exception.ZoneNotFoundException;
 import com.ezdo.exception.ZoneOverlapException;
 import com.ezdo.mapper.ZoneMapper;
 import com.ezdo.repository.CategoryRepository;
 import com.ezdo.repository.TemplateOverrideRepository;
 import com.ezdo.repository.TemplateRepository;
-import com.ezdo.repository.UserRepository;
 import com.ezdo.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,9 +25,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +42,6 @@ public class ZoneService {
     private final TemplateRepository templateRepository;
     private final CategoryRepository categoryRepository;
     private final TemplateOverrideRepository templateOverrideRepository;
-    private final UserRepository userRepository;
     private final ZoneMapper zoneMapper;
 
     public ZoneResponse addZoneToTemplate(UUID userId, UUID templateId, ZoneRequest request) {
@@ -55,7 +56,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(userId, request.name()))
+            .category(resolveCategory(userId, request.categoryId()))
             .template(template)
             .build();
 
@@ -74,7 +75,7 @@ public class ZoneService {
             .startTime(request.startTime())
             .endTime(request.endTime())
             .color(request.color())
-            .category(resolveCategory(userId, request.name()))
+            .category(resolveCategory(userId, request.categoryId()))
             .templateOverride(override)
             .build();
 
@@ -108,27 +109,51 @@ public class ZoneService {
     }
 
     public List<ZoneResponse> getZonesByDate(UUID userId, LocalDate date) {
-        Optional<TemplateOverride> override =
-            templateOverrideRepository.findByUserIdAndDateOfDayWithZones(userId, date);
+        return getZonesByDateRange(userId, date, date).getOrDefault(date, List.of());
+    }
 
-        if (override.isPresent()) {
-            return override.get().getZones().stream()
-                .map(zoneMapper::toZoneResponse)
-                .sorted(Comparator.comparing(ZoneResponse::startTime))
-                .toList();
+    /**
+     * Resolves zones for every date in a range with a fixed two queries, rather than
+     * the two-per-day (plus a lazy category load per zone) that calling
+     * {@link #getZonesByDate} in a loop costs. Callers scanning a horizon — the AI
+     * schedule context, availability over a range — should use this.
+     *
+     * <p>Resolution per date is unchanged: a per-date override wins outright,
+     * otherwise the template covering that weekday, otherwise nothing.
+     */
+    @Transactional(readOnly = true)
+    public Map<LocalDate, List<ZoneResponse>> getZonesByDateRange(UUID userId,
+                                                                  LocalDate startDate,
+                                                                  LocalDate endDate) {
+        Map<LocalDate, TemplateOverride> overridesByDate = templateOverrideRepository
+            .findByUserIdAndDateRangeWithZones(userId, startDate, endDate).stream()
+            .collect(Collectors.toMap(TemplateOverride::getDateOfDay, o -> o, (first, second) -> first));
+
+        // At most one template may claim a given weekday; the overlap checks on
+        // create/update enforce that, so the first one wins here as it does today.
+        Map<DayOfWeek, Template> templatesByDay = new EnumMap<>(DayOfWeek.class);
+        for (Template template : templateRepository.findByUserIdWithZones(userId)) {
+            for (DayOfWeek day : template.getDaysOfWeek()) {
+                templatesByDay.putIfAbsent(day, template);
+            }
         }
 
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-
-        Optional<Template> template = templateRepository
-            .findByUserIdAndDayOfWeekWithZones(userId, dayOfWeek);
-
-        return template.map(value -> value
-                .getZones().stream()
+        Map<LocalDate, List<ZoneResponse>> result = new LinkedHashMap<>();
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            TemplateOverride override = overridesByDate.get(date);
+            List<Zone> zones;
+            if (override != null) {
+                zones = override.getZones();
+            } else {
+                Template template = templatesByDay.get(date.getDayOfWeek());
+                zones = template != null ? template.getZones() : List.of();
+            }
+            result.put(date, zones.stream()
                 .map(zoneMapper::toZoneResponse)
                 .sorted(Comparator.comparing(ZoneResponse::startTime))
-                .toList())
-            .orElseGet(List::of);
+                .toList());
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)
@@ -152,7 +177,7 @@ public class ZoneService {
         zone.setStartTime(request.startTime());
         zone.setEndTime(request.endTime());
         zone.setColor(request.color());
-        zone.setCategory(resolveCategory(userId, request.name()));
+        zone.setCategory(resolveCategory(userId, request.categoryId()));
         return zoneMapper.toZoneResponse(zone);
     }
 
@@ -161,14 +186,9 @@ public class ZoneService {
             .orElseThrow(() -> new ZoneNotFoundException(zoneId)));
     }
 
-    private Category resolveCategory(UUID userId, String zoneName) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        return categoryRepository.findByNameAndUserId(zoneName, userId)
-            .orElseGet(() -> categoryRepository.save(Category.builder()
-                .name(zoneName)
-                .user(user)
-                .build()));
+    private Category resolveCategory(UUID userId, UUID categoryId) {
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
+            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

@@ -24,6 +24,8 @@ public class ErrorCodes {
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";
     public static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+    public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
+    public static final String TOKEN_INVALID = "TOKEN_INVALID";
 
     // Persistence
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
@@ -40,6 +42,13 @@ public class ErrorCodes {
     public static final String OTP_EXPIRED_OR_NOT_FOUND = "OTP_EXPIRED_OR_NOT_FOUND";
     public static final String OTP_INVALID_CODE = "OTP_INVALID_CODE";
     public static final String OTP_LOCKED = "OTP_LOCKED";
+
+    // Auth - Firebase (Google sign-in)
+    public static final String FIREBASE_NOT_CONFIGURED = "FIREBASE_NOT_CONFIGURED";
+    public static final String FIREBASE_TOKEN_INVALID = "FIREBASE_TOKEN_INVALID";
+    public static final String FIREBASE_PROVIDER_NOT_ALLOWED = "FIREBASE_PROVIDER_NOT_ALLOWED";
+    public static final String FIREBASE_EMAIL_MISSING = "FIREBASE_EMAIL_MISSING";
+    public static final String FIREBASE_EMAIL_NOT_VERIFIED = "FIREBASE_EMAIL_NOT_VERIFIED";
 
     // Auth - Refresh Token
     public static final String REFRESH_TOKEN_INVALID = "REFRESH_TOKEN_INVALID";
@@ -62,10 +71,22 @@ public class ErrorCodes {
     public static final String GOAL_DECOMPOSITION_SESSION_NOT_FOUND = "GOAL_DECOMPOSITION_SESSION_NOT_FOUND";
     public static final String INVALID_DECOMPOSITION = "INVALID_DECOMPOSITION";
     public static final String AI_UNAVAILABLE = "AI_UNAVAILABLE";
+    public static final String UNSUPPORTED_IMAGE_TYPE = "UNSUPPORTED_IMAGE_TYPE";
 
     // Not Found
     public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
     public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";
     public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
     public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
+
+    // Conflict
+    public static final String CATEGORY_NAME_TAKEN = "CATEGORY_NAME_TAKEN";
+
+    // Failed
+    public static final String SCHEDULING_FAILED = "SCHEDULING_FAILED";
+
+    // Profile picture / Cloudinary
+    public static final String PROFILE_PICTURE_EMPTY = "PROFILE_PICTURE_EMPTY";
+    public static final String PROFILE_PICTURE_TOO_LARGE = "PROFILE_PICTURE_TOO_LARGE";
+    public static final String CLOUDINARY_UPLOAD_FAILED = "CLOUDINARY_UPLOAD_FAILED";
 }

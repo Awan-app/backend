@@ -40,6 +40,9 @@ public class User {
     @Builder.Default
     private Integer points = 0;
 
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
+
     @Builder.Default
     @Column(name = "is_new")
     private Boolean isNew = true;
@@ -70,6 +73,11 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TemplateOverride> templateOverrides = new ArrayList<>();
+
+    // --- device tokens (1:N) ---
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeviceToken> deviceTokens = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
