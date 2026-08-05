@@ -53,7 +53,7 @@ public class AvailabilityService {
         // to select: sessions that START within the day, not ones spilling in from
         // the day before.
         Map<LocalDate, List<Session>> sessionsByDate = sessionRepository
-                .findByUserIdAndDateRange(userId, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay())
+                .findByUserIdAndDateRange(userId, startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay(), null)
                 .stream()
                 .collect(Collectors.groupingBy(s -> s.getStart().toLocalDate()));
 

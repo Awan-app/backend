@@ -7,6 +7,7 @@ import com.ezdo.dto.*;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.User;
 import com.ezdo.entity.Zone;
+import com.ezdo.exception.CategoryNotFoundException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
@@ -61,7 +62,7 @@ public class TemplateOverrideService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(resolveCategory(userId, zr.name()))
+                    .category(resolveCategory(userId, zr.categoryId()))
                     .templateOverride(override)
                     .build();
                 override.getZones().add(zone);
@@ -121,7 +122,7 @@ public class TemplateOverrideService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
-                    .category(resolveCategory(userId, item.name()))
+                    .category(resolveCategory(userId, item.categoryId()))
                     .templateOverride(override)
                     .build());
             } else {
@@ -135,7 +136,7 @@ public class TemplateOverrideService {
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
-                existing.setCategory(resolveCategory(userId, item.name()));
+                existing.setCategory(resolveCategory(userId, item.categoryId()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -167,14 +168,9 @@ public class TemplateOverrideService {
         }
     }
 
-    private Category resolveCategory(UUID userId, String zoneName) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        return categoryRepository.findByNameAndUserId(zoneName, userId)
-            .orElseGet(() -> categoryRepository.save(Category.builder()
-                .name(zoneName)
-                .user(user)
-                .build()));
+    private Category resolveCategory(UUID userId, UUID categoryId) {
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
+            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

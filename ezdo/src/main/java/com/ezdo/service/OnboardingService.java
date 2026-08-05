@@ -10,6 +10,7 @@ import com.ezdo.exception.InvalidTimezoneException;
 import com.ezdo.mapper.UserMapper;
 import com.ezdo.repository.PreferencesRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.scheduler.DailySummarySchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class OnboardingService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final DailySummarySchedulerService dailySummarySchedulerService;
 
     @Transactional
     public UserProfileResponse completeOnboarding(UUID userId, OnboardingRequest request) {
@@ -57,8 +59,9 @@ public class OnboardingService {
         preferences.setSleepTime(request.sleepTime());
         preferences.setSchedulingType(request.schedulingType());
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
+        dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(user);
+        return userMapper.toProfileResponse(saved);
     }
 }

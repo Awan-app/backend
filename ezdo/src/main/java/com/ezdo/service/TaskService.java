@@ -6,6 +6,10 @@ import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
 import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
+import com.ezdo.dto.task.AddSessionsRequest;
+import com.ezdo.dto.task.SessionDraftRequest;
+import com.ezdo.dto.task.TasksWithSessionsRequest;
+import com.ezdo.dto.task.TasksWithSessionsResponse;
 import com.ezdo.dto.task.TaskWithSessionsRequest;
 import com.ezdo.dto.task.TaskWithSessionsResponse;
 import com.ezdo.entity.*;
@@ -13,6 +17,7 @@ import com.ezdo.exception.*;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.*;
+import com.ezdo.scheduler.SessionSchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +38,7 @@ public class TaskService {
     private final CategoryRepository categoryRepository;
     private final TaskMapper taskMapper;
     private final SessionMapper sessionMapper;
+    private final SessionSchedulerService sessionSchedulerService;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -114,10 +120,107 @@ public class TaskService {
         }
 
         Task saved = taskRepository.save(task);
+        scheduleReminders(userId, saved.getSessions());
         return new TaskWithSessionsResponse(
             taskMapper.toInfoResponse(saved),
             saved.getSessions().stream().map(sessionMapper::toResponse).toList()
         );
+    }
+
+    @Transactional
+    public TasksWithSessionsResponse createTasksWithSessionsBulk(
+        UUID userId, TasksWithSessionsRequest request
+    ) {
+        User user = findUser(userId);
+        List<Task> tasks = new ArrayList<>();
+
+        for (TaskWithSessionsRequest item : request.tasks()) {
+            TaskCreateRequest taskReq = item.task();
+            Goal goal = (taskReq.goalId() != null)
+                ? goalRepository.findByIdAndUserId(taskReq.goalId(), userId)
+                    .orElseThrow(() -> new GoalNotFoundException(taskReq.goalId()))
+                : goalService.getOrCreateInbox(userId);
+
+            Integer duration = taskReq.estimatedDuration();
+            if (duration == null) {
+                duration = user.getPreferences().getPreferredSessionDuration();
+            }
+
+            Category category = taskReq.categoryId() != null
+                ? categoryRepository.findByIdAndUserId(taskReq.categoryId(), userId)
+                    .orElseThrow(() -> new CategoryNotFoundException(taskReq.categoryId()))
+                : null;
+
+            Task task = Task.builder()
+                .goal(goal)
+                .title(taskReq.title())
+                .description(taskReq.description())
+                .estimatedDuration(duration)
+                .mandatory(Boolean.TRUE.equals(taskReq.mandatory()))
+                .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
+                .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
+                .category(category)
+                .status(TaskStatus.SCHEDULED)
+                .build();
+
+            for (var sessionReq : item.sessions()) {
+                Zone zone = null;
+                if (sessionReq.zoneId() != null) {
+                    zone = zoneRepository.findByIdAndUserId(sessionReq.zoneId(), userId)
+                        .orElseThrow(() -> new ZoneNotFoundException(sessionReq.zoneId()));
+                }
+                validateSessionTimeRange(sessionReq.start(), sessionReq.end());
+                Session session = Session.builder()
+                    .start(sessionReq.start())
+                    .end(sessionReq.end())
+                    .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                    .zone(zone)
+                    .task(task)
+                    .build();
+                task.getSessions().add(session);
+            }
+            tasks.add(task);
+        }
+
+        List<Task> saved = taskRepository.saveAll(tasks);
+        saved.forEach(t -> scheduleReminders(userId, t.getSessions()));
+        return new TasksWithSessionsResponse(
+            saved.stream()
+                .map(t -> new TaskWithSessionsResponse(
+                    taskMapper.toInfoResponse(t),
+                    t.getSessions().stream().map(sessionMapper::toResponse).toList()))
+                .toList()
+        );
+    }
+
+    @Transactional
+    public List<SessionResponse> addSessionsToTask(
+        UUID userId, UUID taskId, AddSessionsRequest request
+    ) {
+        Task task = getOwnedTask(userId, taskId);
+        List<Session> newSessions = new ArrayList<>();
+
+        for (SessionDraftRequest sessionReq : request.sessions()) {
+            Zone zone = null;
+            if (sessionReq.zoneId() != null) {
+                zone = zoneRepository.findByIdAndUserId(sessionReq.zoneId(), userId)
+                    .orElseThrow(() -> new ZoneNotFoundException(sessionReq.zoneId()));
+            }
+            validateSessionTimeRange(sessionReq.start(), sessionReq.end());
+            Session session = Session.builder()
+                .start(sessionReq.start())
+                .end(sessionReq.end())
+                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                .zone(zone)
+                .task(task)
+                .build();
+            newSessions.add(session);
+            task.getSessions().add(session);
+        }
+
+        taskRepository.save(task);
+        scheduleReminders(userId, newSessions);
+        return newSessions.stream().map(sessionMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
@@ -178,6 +281,7 @@ public class TaskService {
                 dependent.getDependsOn().remove(task);
             }
         }
+        task.getSessions().forEach(s -> sessionSchedulerService.cancelReminder(s.getId()));
         taskRepository.delete(task);
     }
 
@@ -272,6 +376,12 @@ public class TaskService {
         }
 
         return result;
+    }
+
+    private void scheduleReminders(UUID userId, java.util.Collection<Session> sessions) {
+        sessions.stream()
+                .filter(s -> s.getStatus() == SessionStatus.SCHEDULED)
+                .forEach(s -> sessionSchedulerService.scheduleReminder(s, userId));
     }
 
     private void validateSessionTimeRange(LocalDateTime start, LocalDateTime end) {

@@ -6,7 +6,13 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "categories")
+@Table(
+    name = "categories",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_categories_user_name",
+        columnNames = {"user_id", "name"}
+    )
+)
 @Getter
 @Setter
 @NoArgsConstructor

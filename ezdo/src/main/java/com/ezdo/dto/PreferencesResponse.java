@@ -10,5 +10,6 @@ public record PreferencesResponse(
     Integer bufferBetweenSessions,
     LocalTime wakeupTime,
     LocalTime sleepTime,
-    SchedulingType schedulingType
+    SchedulingType schedulingType,
+    Boolean dailySummaryEnabled
 ) {}

@@ -9,6 +9,7 @@ import com.ezdo.exception.ZoneNotFoundException;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.ZoneRepository;
+import com.ezdo.scheduler.SessionSchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ public class AISchedulingService {
     private final SessionRepository sessionRepository;
     private final TaskRepository taskRepository;
     private final ZoneRepository zoneRepository;
+    private final SessionSchedulerService sessionSchedulerService;
 
     /**
      * Asks the AI to schedule all tasks in the goal and returns the complete
@@ -101,6 +103,7 @@ public class AISchedulingService {
                     .build();
 
             sessionRepository.save(session);
+            sessionSchedulerService.scheduleReminder(session, userId);
 
             saved.add(new ScheduledSessionResult(
                     session.getId(),

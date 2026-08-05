@@ -5,18 +5,18 @@ import com.ezdo.dto.UserProfileResponse;
 import com.ezdo.dto.profile.*;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
-import com.ezdo.exception.InsufficientPointsException;
-import com.ezdo.exception.InvalidSleepScheduleException;
-import com.ezdo.exception.InvalidTimezoneException;
-import com.ezdo.exception.UserNotFoundException;
+import com.ezdo.exception.*;
 import com.ezdo.mapper.UserMapper;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.scheduler.DailySummarySchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +26,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CloudinaryService cloudinaryService;
+    private final DailySummarySchedulerService dailySummarySchedulerService;
+
+    private static final long MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/png", "image/webp");
 
     @Transactional(readOnly = true)
     public UserProfileResponse getProfile(UUID userId) {
@@ -67,7 +72,45 @@ public class UserService {
 
         userMapper.updateProfileFromRequest(request, user);
 
-        return userMapper.toProfileResponse(userRepository.save(user));
+        User saved = userRepository.save(user);
+        dailySummarySchedulerService.syncDailySummary(saved);
+
+        return userMapper.toProfileResponse(saved);
+    }
+
+    public ProfilePictureResponse updateProfilePicture(UUID userId, MultipartFile file) {
+        validateProfilePicture(file);
+
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
+        String url = cloudinaryService.uploadProfilePicture(userId, file);
+        userRepository.updateProfilePictureUrl(userId, url);
+
+        return new ProfilePictureResponse(url);
+    }
+
+    /** Idempotent: removing a picture the user does not have is a no-op, not an error. */
+    public void removeProfilePicture(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
+        cloudinaryService.deleteProfilePicture(userId);
+        userRepository.updateProfilePictureUrl(userId, null);
+    }
+
+    private void validateProfilePicture(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new ProfilePictureEmptyException();
+        }
+        if (file.getSize() > MAX_PROFILE_PICTURE_SIZE) {
+            throw new ProfilePictureTooLargeException(file.getSize(), MAX_PROFILE_PICTURE_SIZE);
+        }
+        if (!ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
+            throw new UnsupportedImageTypeException(file.getContentType(), String.join(", ", ALLOWED_IMAGE_TYPES));
+        }
     }
 
     private boolean hasAnyPreferenceField(UpdateProfileRequest request) {
@@ -76,7 +119,8 @@ public class UserService {
             || request.bufferBetweenSessions() != null
             || request.wakeupTime() != null
             || request.sleepTime() != null
-            || request.schedulingType() != null;
+            || request.schedulingType() != null
+            || request.dailySummaryEnabled() != null;
     }
 
     @Transactional
@@ -166,9 +210,10 @@ public class UserService {
 
         preferences.setTimezone(request.timezone());
 
-        userRepository.save(preferences.getUser());
+        User saved = userRepository.save(preferences.getUser());
+        dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(preferences.getUser());
+        return userMapper.toProfileResponse(saved);
     }
 
     @Transactional
@@ -183,9 +228,10 @@ public class UserService {
         preferences.setBufferBetweenSessions(
             request.bufferBetweenSessions());
 
-        userRepository.save(preferences.getUser());
+        User saved = userRepository.save(preferences.getUser());
+        dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(preferences.getUser());
+        return userMapper.toProfileResponse(saved);
     }
 
     @Transactional
