@@ -94,6 +94,8 @@ ezdo:
   refresh-token:
     expiry-days: 30
   firebase:
+    credentials-json: ${EZDO_FIREBASE_CREDENTIALS_JSON:}
+    service-account-path: ${EZDO_FIREBASE_SERVICE_ACCOUNT_PATH:classpath:firebase-service-account.json}
     project-id: ${EZDO_FIREBASE_PROJECT_ID:}
     allowed-sign-in-providers: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:google.com,apple.com}
   mail:
@@ -111,9 +113,6 @@ ezdo:
     cloud-name: ${EZDO_CLOUDINARY_CLOUD_NAME:}
     api-key: ${EZDO_CLOUDINARY_API_KEY:}
     api-secret: ${EZDO_CLOUDINARY_API_SECRET:}
-
-  firebase:
-    service-account-path: ${EZDO_FIREBASE_SERVICE_ACCOUNT_PATH:classpath:firebase-service-account.json}
 
 timefold:
   solver:
