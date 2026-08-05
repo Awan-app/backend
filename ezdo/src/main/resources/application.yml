@@ -33,10 +33,24 @@ spring:
   ai:
     openai:
       api-key: ${SPRING_OPENAI_API_KEY:}
-      base-url: ${SPRING_OPENAI_BASE_URL:https://api.groq.com/openai/v1}
+      base-url: ${SPRING_OPENAI_BASE_URL:https://opencode.ai/zen/v1}
       chat:
-        model: ${SPRING_OPENAI_CHAT_MODEL:llama-3.3-70b-versatile}
-        temperature: ${SPRING_OPENAI_CHAT_TEMPERATURE:0.4}
+           model: ${SPRING_OPENAI_CHAT_MODEL:deepseek-v4-flash-free}
+           temperature: ${SPRING_OPENAI_CHAT_TEMPERATURE:0.4}
+
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+
+        embedding:
+          text:
+            model: text-embedding-004
+
+      vectorstore:
+        qdrant:
+          host: localhost
+          port: 6334
+          collection-name: ezdo-memory
 
 logging:
   level:

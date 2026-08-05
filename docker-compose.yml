@@ -55,6 +55,11 @@ services:
       EZDO_MAIL_FROM: ${EZDO_MAIL_FROM:-noreply@awan.com}
       EZDO_AI_MAX_TURNS: ${EZDO_AI_MAX_TURNS:-20}
 
+#
+#      SPRING_AI_VECTORSTORE_QDRANT_HOST: qdrant
+#      SPRING_AI_VECTORSTORE_QDRANT_PORT: 6334
+#      SPRING_AI_VECTORSTORE_QDRANT_COLLECTION_NAME: ezdo-memory
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: mailpit
@@ -63,5 +68,16 @@ services:
       - "8025:8025"
     restart: unless-stopped
 
+  qdrant:
+   image: qdrant/qdrant:latest
+   container_name: qdrant
+   restart: unless-stopped
+   ports:
+     - "6333:6333"
+     - "6334:6334"
+   volumes:
+     - qdrant_data:/qdrant/storage
+
 volumes:
   mysql_data:
+  qdrant_data:
