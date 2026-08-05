@@ -210,10 +210,9 @@ public class UserService {
 
         preferences.setTimezone(request.timezone());
 
-        User saved = userRepository.save(preferences.getUser());
-        dailySummarySchedulerService.syncDailySummary(saved);
+        userRepository.save(preferences.getUser());
 
-        return userMapper.toProfileResponse(saved);
+        return userMapper.toProfileResponse(preferences.getUser());
     }
 
     @Transactional
@@ -249,9 +248,10 @@ public class UserService {
         preferences.setWakeupTime(request.wakeupTime());
         preferences.setSleepTime(request.sleepTime());
 
-        userRepository.save(preferences.getUser());
+        User saved = userRepository.save(preferences.getUser());
+        dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(preferences.getUser());
+        return userMapper.toProfileResponse(saved);
     }
 
     @Transactional

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.DateTimeException;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -41,7 +42,8 @@ public class DailySummarySchedulerService {
     public void scheduleAllDailySummaries() {
         try {
             deleteOldPollingJob();
-            Set<UUID> eligibleUserIds = userRepository.findAllEligibleForDailySummary().stream()
+            List<User> eligibleUsers = userRepository.findAllEligibleForDailySummary();
+            Set<UUID> eligibleUserIds = eligibleUsers.stream()
                     .map(User::getId)
                     .collect(Collectors.toSet());
 
@@ -53,7 +55,7 @@ public class DailySummarySchedulerService {
                 }
             }
 
-            userRepository.findAllEligibleForDailySummary().forEach(this::scheduleDailySummary);
+            eligibleUsers.forEach(this::scheduleDailySummary);
         } catch (SchedulerException e) {
             log.error("Failed to initialize daily summary schedules", e);
         }
