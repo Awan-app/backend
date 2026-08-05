@@ -13,14 +13,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -163,7 +161,7 @@ public class McpToolService {
     ) {
         UUID userId = currentUserId();
         log.info("[MCP] getTodaySchedule called for user {} date {}", userId, date);
-        return sessionService.getByDate(userId, LocalDate.parse(date));
+        return sessionService.getByDate(userId, LocalDate.parse(date), null);
     }
 
     @McpTool(
@@ -183,7 +181,7 @@ public class McpToolService {
     ) {
         UUID userId = currentUserId();
         log.info("[MCP] getScheduleRange called for user {} from {} to {}", userId, startDate, endDate);
-        return sessionService.getByDateRange(userId, LocalDate.parse(startDate), LocalDate.parse(endDate));
+        return sessionService.getByDateRange(userId, LocalDate.parse(startDate), LocalDate.parse(endDate), null);
     }
 
     // ═══════════════════════════════════════════════════════════════════════
