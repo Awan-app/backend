@@ -1,6 +1,7 @@
 package com.ezdo.scheduler;
 
 import com.ezdo.entity.Session;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.entity.User;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.service.FcmNotificationService;
@@ -45,6 +46,11 @@ public class SessionReminderJob extends QuartzJobBean {
             // Fresh Lookup Pattern: Avoids stale data if the user/AI updated the task recently
             Session session = sessionRepository.findById(sessionUuid)
                     .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionUuid));
+
+            if (session.getStatus() != SessionStatus.SCHEDULED) {
+                log.info("Skipping reminder for session {}: status is {}", sessionUuid, session.getStatus());
+                return;
+            }
 
             // Safely navigate relationships (Ensure your repository uses JOIN FETCH if lazy-loading throws an exception)
             User user = session.getTask().getGoal().getUser();

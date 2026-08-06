@@ -142,6 +142,10 @@ public class SessionService {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
+        if (session.getStatus() == SessionStatus.SCHEDULED) {
+            return sessionMapper.toResponse(session);
+        }
+
         validateTransition(session.getStatus(), SessionStatus.SCHEDULED);
         session.setStatus(SessionStatus.SCHEDULED);
         sessionSchedulerService.scheduleReminder(session, userId);
