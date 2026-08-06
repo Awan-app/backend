@@ -18,7 +18,13 @@ import java.util.UUID;
  * created by a User, consisting of its own Zones.
  */
 @Entity
-@Table(name = "template_overrides")
+@Table(
+    name = "template_overrides",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_template_overrides_user_date",
+        columnNames = {"user_id", "date_of_day"}
+    )
+)
 @Getter
 @Setter
 @NoArgsConstructor

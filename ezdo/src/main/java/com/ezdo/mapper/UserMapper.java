@@ -30,7 +30,8 @@ public class UserMapper {
                 p.getBufferBetweenSessions(),
                 p.getWakeupTime(),
                 p.getSleepTime(),
-                p.getSchedulingType()
+                p.getSchedulingType(),
+                p.getDailySummaryEnabled()
             );
         }
 
@@ -89,6 +90,9 @@ public class UserMapper {
         }
         if (request.schedulingType() != null) {
             p.setSchedulingType(request.schedulingType());
+        }
+        if (request.dailySummaryEnabled() != null) {
+            p.setDailySummaryEnabled(request.dailySummaryEnabled());
         }
     }
 }

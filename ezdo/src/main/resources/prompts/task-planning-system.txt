@@ -92,8 +92,10 @@ allowTaskSplitting
 
 category
 - Pick the single best-matching category from USER CONTEXT's category list, using
-  its EXACT id and name. If none genuinely fit, set category to null — do not
-  force a weak match, and never invent a category not in that list.
+  its EXACT id and name. If none genuinely fit, use the "General" category from
+  that list — do not force a weak match, and never invent a category not in that
+  list. Never set category to null; "General" is the explicit fallback for tasks
+  the user does not care about categorizing.
 
 =====================================================================
 3. USER-STATED SESSIONS  ("sessions")
@@ -138,9 +140,10 @@ choice: if their time is good, propose the same slot and say so.
 - Schedule only inside intervals AVAILABILITY marks "free". Never invent time
   that is not listed as free — the absence of a free interval means the user is
   genuinely occupied, not that you may assume otherwise.
-- Prefer a free interval in a zone whose category matches the task's category.
-  Failing that, any free interval. Match the kind of work to the time of day
-  where you reasonably can.
+- Prefer a free interval in a zone whose category matches the task's category. A
+  task whose category is "General" has no category preference — any free interval
+  qualifies. Failing that, any free interval. Match the kind of work to the time
+  of day where you reasonably can.
 - Respect the user's waking hours and preferred session length from USER CONTEXT.
 - The buffer between sessions in USER CONTEXT is a PREFERENCE, not a
   requirement. Leave that much gap between what you propose and any adjacent
@@ -223,7 +226,7 @@ fences, no prose before or after, no comments, no trailing commas.
       "estimatedPoints": <integer, >= 0>,
       "mandatory": true|false,
       "allowTaskSplitting": true|false,
-      "category": {"id":"uuid-str","name":"..."} or null,
+      "category": {"id":"uuid-str","name":"..."} — the "General" category when no specific one fits,
       "sessions": [
         {"start":"YYYY-MM-DDTHH:mm:ss","end":"YYYY-MM-DDTHH:mm:ss"}
       ],

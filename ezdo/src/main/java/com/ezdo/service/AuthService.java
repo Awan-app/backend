@@ -22,6 +22,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
+    private final CategorySeedService categorySeedService;
     private final UserProvisioningService userProvisioningService;
 
     public OtpResponse requestOtp(OtpRequest request) {
@@ -36,10 +37,10 @@ public class AuthService {
         otpService.verifyOtp(email, request.code());
 
         // Find or create user
-        boolean isNewUser;
         User user = userRepository.findByEmail(email).orElse(null);
+        boolean isNewUser = user == null;
 
-        if (user == null) {
+        if (isNewUser) {
             user = userProvisioningService.register(email);
         }
 
@@ -49,6 +50,10 @@ public class AuthService {
         }
 
         user = userRepository.save(user);
+
+        if (isNewUser) {
+            categorySeedService.seedDefaults(user);
+        }
 
         return issueTokens(user, request.deviceId());
     }

@@ -30,6 +30,28 @@ spring:
         format_sql: true
         highlight_sql: true
 
+  quartz:
+    job-store-type: jdbc  # persist jobs/triggers in the DB instead of memory
+    jdbc:
+      initialize-schema: always     # auto-creates Quartz's tables on startup
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: EzdoScheduler
+            instanceId: AUTO                      # needed even for a single instance, harmless if we scale later
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore   # class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: false                     # true only if we run multiple app instances later
+            misfireThreshold: 60000
+
   ai:
     openai:
       api-key: ${SPRING_OPENAI_API_KEY:}
@@ -43,11 +65,26 @@ spring:
         chat:
           model: ${SPRING_GENAI_CHAT_MODEL:gemini-3.5-flash-lite}
           temperature: ${SPRING_GENAI_CHAT_TEMPERATURE:0.4}
+        embedding:
+          api-key: ${SPRING_GENAI_API_KEY:}
+          text:
+            model: text-embedding-004
+#    vectorstore:
+#      qdrant:
+#        host: localhost
+#        port: 6334
+#        collection-name: ezdo-memory
 
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        max-page-size: 100
 
 logging:
   level:
@@ -72,6 +109,8 @@ ezdo:
   refresh-token:
     expiry-days: 30
   firebase:
+    credentials-json: ${EZDO_FIREBASE_CREDENTIALS_JSON:}
+    service-account-path: ${EZDO_FIREBASE_SERVICE_ACCOUNT_PATH:classpath:firebase-service-account.json}
     project-id: ${EZDO_FIREBASE_PROJECT_ID:}
     allowed-sign-in-providers: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:google.com,apple.com}
   mail:

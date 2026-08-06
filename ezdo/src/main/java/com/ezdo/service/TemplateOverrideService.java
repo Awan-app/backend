@@ -7,7 +7,9 @@ import com.ezdo.dto.*;
 import com.ezdo.entity.TemplateOverride;
 import com.ezdo.entity.User;
 import com.ezdo.entity.Zone;
+import com.ezdo.exception.CategoryNotFoundException;
 import com.ezdo.exception.InvalidZoneTimeRangeException;
+import com.ezdo.exception.TemplateOverrideDateTakenException;
 import com.ezdo.exception.TemplateOverrideNotFoundException;
 import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.exception.ZoneNotFoundException;
@@ -42,6 +44,10 @@ public class TemplateOverrideService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
+        if (templateOverrideRepository.existsByUserIdAndDateOfDay(userId, templateOverrideRequest.dateOfDay())) {
+            throw new TemplateOverrideDateTakenException(templateOverrideRequest.dateOfDay());
+        }
+
         TemplateOverride override = TemplateOverride.builder().
                 name(templateOverrideRequest.name())
                 .dateOfDay(templateOverrideRequest.dateOfDay())
@@ -61,7 +67,7 @@ public class TemplateOverrideService {
                     .startTime(zr.startTime())
                     .endTime(zr.endTime())
                     .color(zr.color())
-                    .category(resolveCategory(userId, zr.name()))
+                    .category(resolveCategory(userId, zr.categoryId()))
                     .templateOverride(override)
                     .build();
                 override.getZones().add(zone);
@@ -87,7 +93,12 @@ public class TemplateOverrideService {
 
     public TemplateOverrideResponse updateTemplate(UUID userId, UUID overrideId, TemplateOverrideRequest request) {
         TemplateOverride override = templateOverrideRepository.findByIdAndUserId(overrideId, userId)
-                .orElseThrow(()-> new TemplateOverrideNotFoundException(overrideId));
+                .orElseThrow(() -> new TemplateOverrideNotFoundException(overrideId));
+
+        if (templateOverrideRepository.existsByUserIdAndDateOfDayAndIdNot(
+                userId, request.dateOfDay(), overrideId)) {
+            throw new TemplateOverrideDateTakenException(request.dateOfDay());
+        }
 
         override.setName(request.name());
         override.setDateOfDay(request.dateOfDay());
@@ -121,7 +132,7 @@ public class TemplateOverrideService {
                     .startTime(item.startTime())
                     .endTime(item.endTime())
                     .color(item.color())
-                    .category(resolveCategory(userId, item.name()))
+                    .category(resolveCategory(userId, item.categoryId()))
                     .templateOverride(override)
                     .build());
             } else {
@@ -135,7 +146,7 @@ public class TemplateOverrideService {
                 existing.setStartTime(item.startTime());
                 existing.setEndTime(item.endTime());
                 existing.setColor(item.color());
-                existing.setCategory(resolveCategory(userId, item.name()));
+                existing.setCategory(resolveCategory(userId, item.categoryId()));
                 toSave.add(existing);
                 keepIds.add(item.id());
             }
@@ -147,7 +158,7 @@ public class TemplateOverrideService {
             .toList();
         if (!toDelete.isEmpty()) {
             sessionRepository.nullifyZoneId(
-                toDelete.stream().map(Zone::getId).toList());
+                userId, toDelete.stream().map(Zone::getId).toList());
         }
         zoneRepository.deleteAll(toDelete);
 
@@ -167,14 +178,9 @@ public class TemplateOverrideService {
         }
     }
 
-    private Category resolveCategory(UUID userId, String zoneName) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        return categoryRepository.findByNameAndUserId(zoneName, userId)
-            .orElseGet(() -> categoryRepository.save(Category.builder()
-                .name(zoneName)
-                .user(user)
-                .build()));
+    private Category resolveCategory(UUID userId, UUID categoryId) {
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
+            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 
     private void validateTimeRange(LocalTime start, LocalTime end) {

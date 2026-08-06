@@ -13,6 +13,8 @@ import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.scheduler.SessionSchedulerService;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final SessionMapper sessionMapper;
     private final UserRepository userRepository;
+    private final SessionSchedulerService sessionSchedulerService;
     private final GamificationService gamificationService;
 
     @Transactional(readOnly = true)
@@ -62,9 +65,7 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, List<SessionResponse>> getByDateRange(UUID userId, LocalDate startDate, LocalDate endDate, SessionStatus status) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         List<SessionResponse> sessions = sessionRepository.findByUserIdAndDateRange(userId, start, end, status).stream()
@@ -96,9 +97,7 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getMissedRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime now = resolveNow(userId);
         return sessionRepository.findMissed(userId, now,
                 startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay()).stream()
@@ -118,6 +117,7 @@ public class SessionService {
             validateTransition(session.getStatus(), request.status());
             session.setStatus(request.status());
         }
+        syncReminder(userId, session);
         return sessionMapper.toResponse(session);
     }
 
@@ -127,6 +127,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), status);
         session.setStatus(status);
+        syncReminder(userId, session);
         return sessionMapper.toResponse(session);
     }
 
@@ -136,6 +137,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.COMPLETED);
         session.setStatus(SessionStatus.COMPLETED);
+        sessionSchedulerService.cancelReminder(session.getId());
 
         // Rewards fire once per session, ever. Since a session can be un-completed
         // and completed again, this stamp is what stops the toggle from farming.
@@ -151,8 +153,13 @@ public class SessionService {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
+        if (session.getStatus() == SessionStatus.SCHEDULED) {
+            return sessionMapper.toResponse(session);
+        }
+
         validateTransition(session.getStatus(), SessionStatus.SCHEDULED);
         session.setStatus(SessionStatus.SCHEDULED);
+        sessionSchedulerService.scheduleReminder(session, userId);
         return sessionMapper.toResponse(session);
     }
 
@@ -162,6 +169,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.CANCELLED);
         session.setStatus(SessionStatus.CANCELLED);
+        sessionSchedulerService.cancelReminder(session.getId());
         return sessionMapper.toResponse(session);
     }
 
@@ -182,7 +190,21 @@ public class SessionService {
     public void delete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
+        sessionSchedulerService.cancelReminder(session.getId());
         sessionRepository.delete(session);
+    }
+
+    /**
+     * Keeps the reminder job aligned with the session's current state: scheduled
+     * sessions get a reminder, anything else (completed/cancelled) has its
+     * reminder removed.
+     */
+    private void syncReminder(UUID userId, Session session) {
+        if (session.getStatus() == SessionStatus.SCHEDULED) {
+            sessionSchedulerService.scheduleReminder(session, userId);
+        } else {
+            sessionSchedulerService.cancelReminder(session.getId());
+        }
     }
 
     private void validateTimeRange(LocalDateTime start, LocalDateTime end) {

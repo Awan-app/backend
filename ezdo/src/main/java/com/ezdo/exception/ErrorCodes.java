@@ -59,6 +59,7 @@ public class ErrorCodes {
     public static final String ZONE_OVERLAP = "ZONE_OVERLAP";
     public static final String TEMPLATE_NOT_FOUND = "TEMPLATE_NOT_FOUND";
     public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATE_OVERRIDE_NOT_FOUND";
+    public static final String TEMPLATE_OVERRIDE_DATE_TAKEN = "TEMPLATE_OVERRIDE_DATE_TAKEN";
     public static final String INVALID_ZONE_TIME_RANGE = "INVALID_ZONE_TIME_RANGE";
     public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
     public static final String DAY_NOT_FOUND = "DAY_NOT_FOUND";
@@ -78,6 +79,9 @@ public class ErrorCodes {
     public static final String GOAL_NOT_FOUND = "GOAL_NOT_FOUND";
     public static final String TASK_NOT_FOUND = "TASK_NOT_FOUND";
     public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
+
+    // Conflict
+    public static final String CATEGORY_NAME_TAKEN = "CATEGORY_NAME_TAKEN";
 
     // Failed
     public static final String SCHEDULING_FAILED = "SCHEDULING_FAILED";

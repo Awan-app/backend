@@ -32,5 +32,11 @@
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
+  },
+  "overrides": {
+    "undici": "^8.10.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@hono/node-server": "^2.1.0",
+    "hono": "^4.12.34"
   }
 }

@@ -17,6 +17,8 @@ import com.ezdo.exception.*;
 import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.*;
+import com.ezdo.scheduler.SessionSchedulerService;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import java.util.*;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final SessionRepository sessionRepository;
     private final GoalRepository goalRepository;
     private final GoalService goalService;
     private final UserRepository userRepository;
@@ -37,7 +40,7 @@ public class TaskService {
     private final CategoryRepository categoryRepository;
     private final TaskMapper taskMapper;
     private final SessionMapper sessionMapper;
-    private final SessionRepository sessionRepository;
+    private final SessionSchedulerService sessionSchedulerService;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -119,6 +122,7 @@ public class TaskService {
         }
 
         Task saved = taskRepository.save(task);
+        scheduleReminders(userId, saved.getSessions());
         return new TaskWithSessionsResponse(
             taskMapper.toInfoResponse(saved),
             saved.getSessions().stream().map(sessionMapper::toResponse).toList()
@@ -181,6 +185,7 @@ public class TaskService {
         }
 
         List<Task> saved = taskRepository.saveAll(tasks);
+        saved.forEach(t -> scheduleReminders(userId, t.getSessions()));
         return new TasksWithSessionsResponse(
             saved.stream()
                 .map(t -> new TaskWithSessionsResponse(
@@ -215,8 +220,9 @@ public class TaskService {
             task.getSessions().add(session);
         }
 
-        sessionRepository.saveAll(newSessions);
-        return newSessions.stream().map(sessionMapper::toResponse).toList();
+        List<Session> saved = sessionRepository.saveAll(newSessions);
+        scheduleReminders(userId, saved);
+        return saved.stream().map(sessionMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
@@ -277,6 +283,7 @@ public class TaskService {
                 dependent.getDependsOn().remove(task);
             }
         }
+        task.getSessions().forEach(s -> sessionSchedulerService.cancelReminder(s.getId()));
         taskRepository.delete(task);
     }
 
@@ -339,9 +346,7 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, List<TaskWithSessionsResponse>> getTasksByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);
@@ -371,6 +376,12 @@ public class TaskService {
         }
 
         return result;
+    }
+
+    private void scheduleReminders(UUID userId, java.util.Collection<Session> sessions) {
+        sessions.stream()
+                .filter(s -> s.getStatus() == SessionStatus.SCHEDULED)
+                .forEach(s -> sessionSchedulerService.scheduleReminder(s, userId));
     }
 
     private void validateSessionTimeRange(LocalDateTime start, LocalDateTime end) {

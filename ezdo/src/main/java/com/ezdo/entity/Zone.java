@@ -41,7 +41,7 @@ public class Zone {
     private String color;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     // --- consists_of (N side) — nullable: set only when the Zone belongs to a Template

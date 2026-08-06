@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Exchanges a verified Firebase ID token for our own session.
@@ -40,6 +41,7 @@ public class FirebaseAuthService {
     private final UserRepository userRepository;
     private final UserProvisioningService userProvisioningService;
     private final AuthService authService;
+    private final CategorySeedService categorySeedService;
 
     @Value("${ezdo.firebase.allowed-sign-in-providers}")
     private List<String> allowedSignInProviders;
@@ -72,8 +74,10 @@ public class FirebaseAuthService {
                     ErrorCodes.FIREBASE_EMAIL_NOT_VERIFIED);
         }
 
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> userProvisioningService.register(email));
+        Optional<User> existing = userRepository.findByEmail(email);
+        boolean isNewUser = existing.isEmpty();
+
+        User user = existing.orElseGet(() -> userProvisioningService.register(email));
 
         if (user.getEmailVerifiedAt() == null) {
             user.setEmailVerifiedAt(Instant.now());
@@ -87,6 +91,10 @@ public class FirebaseAuthService {
         }
 
         user = userRepository.save(user);
+
+        if (isNewUser) {
+            categorySeedService.seedDefaults(user);
+        }
 
         return authService.issueTokens(user, request.deviceId());
     }

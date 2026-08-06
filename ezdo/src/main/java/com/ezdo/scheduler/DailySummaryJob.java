@@ -1,4 +1,4 @@
-package com.ezdo.service;
+package com.ezdo.scheduler;
 
 import com.ezdo.dto.email.DeadlineSummary;
 import com.ezdo.dto.email.GoalSummary;
@@ -12,52 +12,67 @@ import com.ezdo.entity.User;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
+import com.ezdo.service.EmailService;
+import com.ezdo.service.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DailySummaryScheduler {
+@DisallowConcurrentExecution
+public class DailySummaryJob implements Job {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
     private final GoalRepository goalRepository;
     private final EmailService emailService;
+    private final FcmNotificationService fcmNotificationService;
 
-    private static final LocalTime DEFAULT_WAKEUP = LocalTime.of(7, 0);
+    @Setter
+    private String userId;
 
-    // @Scheduled(cron = "0 */15 * * * *")
+    @Override
     @Transactional(readOnly = true)
-    public void dispatchWindow() {
-        List<User> users = userRepository.findAllEligibleForDailySummary();
+    public void execute(JobExecutionContext context) throws JobExecutionException {
+        if (userId == null || userId.isBlank()) {
+            log.error("DailySummaryJob executed without a valid userId in JobDataMap.");
+            return;
+        }
 
-        for (User user : users) {
+        UUID userUuid = UUID.fromString(userId);
+        User user = userRepository.findById(userUuid)
+                .orElseThrow(() -> new JobExecutionException("User not found: " + userUuid));
+
+        if (user.getPreferences() == null || !Boolean.TRUE.equals(user.getPreferences().getDailySummaryEnabled())) {
+            log.info("Skipping daily summary for user {} because daily summaries are disabled", userUuid);
+            return;
+        }
+
+        try {
             ZoneId zone = resolveZone(user);
             ZonedDateTime nowLocal = ZonedDateTime.now(zone);
-            LocalTime wakeup = resolveWakeupTime(user);
-
-            if (!isWithinWindow(nowLocal.toLocalTime(), wakeup)) {
-                continue;
-            }
-            try {
-                sendFor(user, nowLocal.toLocalDate());
-            } catch (Exception e) {
-                log.error("Failed to send daily summary to user {}: {}", user.getId(), e.getMessage(), e);
-            }
+            sendFor(user, nowLocal.toLocalDate());
+        } catch (Exception e) {
+            log.error("Failed to send daily summary to user {}: {}", user.getId(), e.getMessage(), e);
+            throw new JobExecutionException(e);
         }
     }
 
@@ -112,18 +127,16 @@ public class DailySummaryScheduler {
                 deadlineSummaries,
                 totalFocusMinutes);
 
+        // Send email
         emailService.sendDailySummaryEmail(user.getEmail(), email);
-    }
+        log.info("Sent daily summary email to user {}", user.getId());
 
-    private boolean isWithinWindow(LocalTime now, LocalTime wakeup) {
-        int nowBucket = (now.getHour() * 60 + now.getMinute()) / 15;
-        int wakeupBucket = (wakeup.getHour() * 60 + wakeup.getMinute()) / 15;
-        return nowBucket == wakeupBucket;
-    }
-
-    private LocalTime resolveWakeupTime(User user) {
-        LocalTime w = user.getPreferences().getWakeupTime();
-        return w != null ? w : DEFAULT_WAKEUP;
+        // Send push notification to all user devices
+        fcmNotificationService.sendDailySummaryToUser(
+                user.getId(),
+                user.getFirstName(),
+                sessions.size()
+        );
     }
 
     private ZoneId resolveZone(User user) {

@@ -2319,7 +2319,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"TUESDAY\",\n    \"WEDNESDAY\",\n    \"THURSDAY\",\n    \"FRIDAY\"\n  ],\n  \"zones\": [\n    {\n      \"name\": \"Morning Focus\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"11:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"Afternoon Work\",\n      \"startTime\": \"13:00:00\",\n      \"endTime\": \"17:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
+              "raw": "{\n  \"name\": \"Work Week\",\n  \"daysOfWeek\": [\n    \"MONDAY\",\n    \"TUESDAY\",\n    \"WEDNESDAY\",\n    \"THURSDAY\",\n    \"FRIDAY\"\n  ],\n  \"zones\": [\n    {\n      \"name\": \"Morning Focus\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"11:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"Afternoon Work\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"13:00:00\",\n      \"endTime\": \"17:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2336,7 +2336,7 @@
                 "templates"
               ]
             },
-            "description": "Create a new weekly template with optional zones.\n\n**Request Body:**\n- `name` (string, required) – Template name.\n- `daysOfWeek` (Set of DayOfWeek, optional) – Days this template applies to. Values: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. Each day can only belong to one template.\n- `zones` (array, optional) – Max 50 zones. Each item:\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color code (e.g., `#4CAF50`).\n\n**Response (200):** `TemplateResponse`\n- `id` (UUID) – Template ID.\n- `name` (string) – Template name.\n- `daysOfWeek` (Set of DayOfWeek) – Active days.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/ invalid fields.\n- `DAY_ALREADY_ASSIGNED` (409) – One or more days are already used by another template.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
+            "description": "Create a new weekly template with optional zones.\n\n**Request Body:**\n- `name` (string, required) – Template name.\n- `daysOfWeek` (Set of DayOfWeek, optional) – Days this template applies to. Values: `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY`. Each day can only belong to one template.\n- `zones` (array, optional) – Max 50 zones. Each item:\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color code (e.g., `#4CAF50`).\n\n**Response (200):** `TemplateResponse`\n- `id` (UUID) – Template ID.\n- `name` (string) – Template name.\n- `daysOfWeek` (Set of DayOfWeek) – Active days.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/ invalid fields.\n- `DAY_ALREADY_ASSIGNED` (409) – One or more days are already used by another template.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
           },
           "response": [
             {
@@ -2474,7 +2474,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Evening Review\",\n  \"startTime\": \"18:00:00\",\n  \"endTime\": \"19:00:00\",\n  \"color\": \"#FF9800\"\n}",
+              "raw": "{\n  \"name\": \"Evening Review\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startTime\": \"18:00:00\",\n  \"endTime\": \"19:00:00\",\n  \"color\": \"#FF9800\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2493,7 +2493,7 @@
                 "zones"
               ]
             },
-            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) – Zone ID.\n- `name` (string) – Zone name.\n- `startTime` (LocalTime) – Start time.\n- `endTime` (LocalTime) – End time.\n- `color` (string or null) – Hex color.\n- `templateId` (UUID or null) – Parent template ID.\n- `templateOverrideId` (UUID or null) – Parent override ID (null for template zones).\n- `category` (CategoryResponse or null) – Assigned category (auto-created from zone name).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this template."
+            "description": "Add a new zone to an existing template.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n- `id` (UUID) – Zone ID.\n- `name` (string) – Zone name.\n- `startTime` (LocalTime) – Start time.\n- `endTime` (LocalTime) – End time.\n- `color` (string or null) – Hex color.\n- `templateId` (UUID or null) – Parent template ID.\n- `templateOverrideId` (UUID or null) – Parent override ID (null for template zones).\n- `category` (CategoryResponse) – Assigned category (provided by `categoryId`).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this template."
           },
           "response": [
             {
@@ -2561,14 +2561,14 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Focus\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"New Afternoon Slot\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"16:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
+              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Focus\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"09:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#4CAF50\"\n    },\n    {\n      \"name\": \"New Afternoon Slot\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"16:00:00\",\n      \"color\": \"#2196F3\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Replace all zones for a template in bulk. Provide the full desired set of zones — zones not included in the request are deleted.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones for this template. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. If omitted, creates a new zone.\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color code.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this template."
+            "description": "Replace all zones for a template in bulk. Provide the full desired set of zones — zones not included in the request are deleted.\n\n**Path Parameters:**\n- `templateId` (UUID, required) – Template identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones for this template. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. If omitted, creates a new zone.\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color code.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_NOT_FOUND` (404) – Template not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this template."
           }
         }
       ]
@@ -2590,7 +2590,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-25\",\n  \"zones\": [\n    {\n      \"name\": \"Leisure Morning\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"Family Time\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"18:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
+              "raw": "{\n  \"name\": \"Holiday Schedule\",\n  \"dateOfDay\": \"2026-12-25\",\n  \"zones\": [\n    {\n      \"name\": \"Leisure Morning\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"12:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"Family Time\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"14:00:00\",\n      \"endTime\": \"18:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2607,7 +2607,7 @@
                 "template-overrides"
               ]
             },
-            "description": "Create a one-off override for a specific date with optional zones.\n\n**Request Body:**\n- `name` (string, optional) – Override name.\n- `dateOfDay` (LocalDate, required) – The date this override applies to. Format: `YYYY-MM-DD`.\n- `zones` (array, optional) – Zones for this override. Each item:\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** `TemplateOverrideResponse`\n- `id` (UUID) – Override ID.\n- `name` (string) – Override name.\n- `dateOfDay` (LocalDate) – The target date.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
+            "description": "Create a one-off override for a specific date with optional zones.\n\n**Request Body:**\n- `name` (string, optional) – Override name.\n- `dateOfDay` (LocalDate, required) – The date this override applies to. Format: `YYYY-MM-DD`.\n- `zones` (array, optional) – Zones for this override. Each item:\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Start time. Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`. Format: `HH:mm:ss`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** `TemplateOverrideResponse`\n- `id` (UUID) – Override ID.\n- `name` (string) – Override name.\n- `dateOfDay` (LocalDate) – The target date.\n- `zones` (array) – List of `ZoneResponse` objects.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`."
           },
           "response": [
             {
@@ -2745,7 +2745,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Extra Slot\",\n  \"startTime\": \"20:00:00\",\n  \"endTime\": \"21:00:00\",\n  \"color\": \"#00BCD4\"\n}",
+              "raw": "{\n  \"name\": \"Extra Slot\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startTime\": \"20:00:00\",\n  \"endTime\": \"21:00:00\",\n  \"color\": \"#00BCD4\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2764,7 +2764,7 @@
                 "zones"
               ]
             },
-            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this override."
+            "description": "Add a new zone to an existing override.\n\n**Path Parameters:**\n- `overrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in this override."
           }
         },
         {
@@ -2818,14 +2818,14 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Slot\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"13:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"New Evening Slot\",\n      \"startTime\": \"19:00:00\",\n      \"endTime\": \"21:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
+              "raw": "{\n  \"zones\": [\n    {\n      \"id\": \"existing-zone-uuid\",\n      \"name\": \"Updated Morning Slot\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"10:00:00\",\n      \"endTime\": \"13:00:00\",\n      \"color\": \"#E91E63\"\n    },\n    {\n      \"name\": \"New Evening Slot\",\n      \"categoryId\": \"{{categoryId}}\",\n      \"startTime\": \"19:00:00\",\n      \"endTime\": \"21:00:00\",\n      \"color\": \"#9C27B0\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Replace all zones for a template override in bulk. Provide the full desired set — zones not included are deleted.\n\n**Path Parameters:**\n- `templateOverrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. Omit to create.\n  - `name` (string, required) – Zone name.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this override."
+            "description": "Replace all zones for a template override in bulk. Provide the full desired set — zones not included are deleted.\n\n**Path Parameters:**\n- `templateOverrideId` (UUID, required) – Override identifier.\n\n**Request Body:**\n- `zones` (array, required) – The complete list of zones. Each item:\n  - `id` (UUID, optional) – If provided, updates an existing zone. Omit to create.\n  - `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n  - `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n  - `endTime` (LocalTime, required) – Must be after `startTime`.\n  - `color` (string, optional) – Hex color.\n\n**Response (200):** Array of `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `TEMPLATE_OVERRIDE_NOT_FOUND` (404) – Override not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time ranges must not overlap.\n- `ZONE_NOT_FOUND` (404) – A zone ID in the request was not found in this override."
           }
         }
       ]
@@ -2945,7 +2945,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Focus Time\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"color\": \"#673AB7\"\n}",
+              "raw": "{\n  \"name\": \"Updated Focus Time\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"color\": \"#673AB7\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2963,7 +2963,7 @@
                 "{{zoneId}}"
               ]
             },
-            "description": "Update a zone's name, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) – Zone not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in the same template or override."
+            "description": "Update a zone's name, category, time range, and color.\n\n**Path Parameters:**\n- `zoneId` (UUID, required) – Zone identifier.\n\n**Request Body:**\n- `name` (string, required) – Zone name.\n- `categoryId` (UUID, required) – Category id for this zone.\n- `startTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `endTime` (LocalTime, required) – Must be after `startTime`.\n- `color` (string, optional) – Hex color.\n\n**Response (200):** `ZoneResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `ZONE_NOT_FOUND` (404) – Zone not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid fields.\n- `INVALID_ZONE_TIME_RANGE` (400) – `endTime` must be after `startTime`.\n- `ZONE_OVERLAP` (409) – Zone time range overlaps with an existing zone in the same template or override."
           }
         },
         {
@@ -3160,7 +3160,7 @@
     },
     {
       "name": "Categories",
-      "description": "Category management for zones and tasks. Categories are auto-created when zones are created, but can also be managed independently.\n\nEach category is user-scoped — you only see your own categories.",
+      "description": "Per-user categories. Every new account is seeded with 8 starter categories (General, Work, Personal, Health, Learning, Finance, Home, Social) on first sign-in, and the user can add more at any time.\n\nZones, templates, and overrides reference a category by its `categoryId` (UUID), which must belong to the authenticated user. Fetch the available categories via **List Categories** and supply the id in zone payloads.",
       "item": [
         {
           "name": "Create Category",
@@ -3171,8 +3171,22 @@
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/v1/categories",
               "host": [
@@ -3183,16 +3197,7 @@
                 "categories"
               ]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Work\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "description": "Create a new category.\n\n**Request Body:**\n- `name` (string, required) – Category name.\n\n**Response (201):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `VALIDATION_ERROR` (422) – Missing/invalid name."
+            "description": "Create a new category owned by the authenticated user.\n\n**Body:**\n- `name` (string, required) – Category name. Must be unique within the user's own categories (case-insensitive).\n\n**Response (201):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (400) – Blank name.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NAME_TAKEN` (409) – The user already has a category with that name."
           }
         },
         {
@@ -3253,8 +3258,22 @@
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gym Time\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/v1/categories/{{categoryId}}",
               "host": [
@@ -3266,16 +3285,7 @@
                 "{{categoryId}}"
               ]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "description": "Update a category name.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) – Category identifier.\n\n**Request Body:**\n- `name` (string, required) – New category name.\n\n**Response (200):** `CategoryResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) – Category not found / not owned.\n- `VALIDATION_ERROR` (422) – Missing/invalid name."
+            "description": "Rename one of the authenticated user's categories.\n\n**Path Parameters:**\n- `categoryId` (UUID, required) – Category identifier.\n\n**Body:**\n- `name` (string, required) – New category name.\n\n**Response (200):** `CategoryResponse`\n- `id` (UUID) – Category ID.\n- `name` (string) – Category name.\n\n**Possible Errors:**\n- `VALIDATION_ERROR` (400) – Blank name.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT.\n- `CATEGORY_NOT_FOUND` (404) – Category not found or does not belong to user.\n- `CATEGORY_NAME_TAKEN` (409) – The user already has another category with that name."
           }
         }
       ]

@@ -62,6 +62,9 @@ services:
       EZDO_FIREBASE_PROJECT_ID: ${EZDO_FIREBASE_PROJECT_ID:-}
       # Firebase sign_in_provider values allowed to mint a session, comma-separated.
       EZDO_FIREBASE_ALLOWED_PROVIDERS: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:-google.com,apple.com}
+
+      EZDO_FIREBASE_CREDENTIALS_JSON: ${EZDO_FIREBASE_CREDENTIALS_JSON:-}
+      EZDO_FIREBASE_SERVICE_ACCOUNT_PATH: ${EZDO_FIREBASE_SERVICE_ACCOUNT_PATH:-}
       # Browser origins allowed to call the API, comma-separated. Set this to your web app's
       # real origin in production — the default only covers local dev servers.
       EZDO_CORS_ALLOWED_ORIGINS: ${EZDO_CORS_ALLOWED_ORIGINS:-http://localhost:4200}
@@ -76,6 +79,11 @@ services:
       EZDO_CLOUDINARY_API_KEY: ${EZDO_CLOUDINARY_API_KEY}
       EZDO_CLOUDINARY_API_SECRET: ${EZDO_CLOUDINARY_API_SECRET}
 
+#
+#      SPRING_AI_VECTORSTORE_QDRANT_HOST: qdrant
+#      SPRING_AI_VECTORSTORE_QDRANT_PORT: 6334
+#      SPRING_AI_VECTORSTORE_QDRANT_COLLECTION_NAME: ezdo-memory
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: mailpit
@@ -84,5 +92,16 @@ services:
       - "8025:8025"
     restart: unless-stopped
 
+#  qdrant:
+#   image: qdrant/qdrant:latest
+#   container_name: qdrant
+#   restart: unless-stopped
+#   ports:
+#     - "6333:6333"
+#     - "6334:6334"
+#   volumes:
+#     - qdrant_data:/qdrant/storage
+
 volumes:
   mysql_data:
+#  qdrant_data:
