@@ -2,7 +2,6 @@ package com.ezdo.service;
 
 import com.ezdo.entity.Streak;
 import com.ezdo.entity.User;
-import com.ezdo.repository.StreakRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,25 +12,12 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class StreakService {
 
-    private final StreakRepository streakRepository;
     private final UserClockService userClockService;
-
-    @Transactional
-    public Streak getOrCreate(User user) {
-        Streak streak = user.getStreak();
-        if (streak != null) {
-            return streak;
-        }
-
-        streak = Streak.builder().user(user).build();
-        user.setStreak(streak);
-        return streakRepository.save(streak);
-    }
 
     @Transactional
     public Streak recordQualifyingActivity(User user) {
         LocalDate today = userClockService.today(user);
-        Streak streak = getOrCreate(user);
+        Streak streak = user.getStreak();
         LocalDate last = streak.getLastActivityDate();
 
         if (today.equals(last)) {

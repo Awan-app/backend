@@ -13,9 +13,9 @@ public record UserProgressResponse(
 
     public static UserProgressResponse of(Wallet wallet, Streak streak, LocalDate today) {
         return new UserProgressResponse(
-            wallet != null ? wallet.getPoints() : 0L,
-            streak != null ? streak.effectiveStreak(today) : 0,
-            streak != null ? streak.getMaxStreak() : 0
+            wallet.getPoints(),
+            streak.effectiveStreak(today),
+            streak.getMaxStreak()
         );
     }
 }

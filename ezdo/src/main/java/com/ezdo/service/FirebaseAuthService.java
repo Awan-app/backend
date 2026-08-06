@@ -38,6 +38,7 @@ public class FirebaseAuthService {
 
     private final FirebaseTokenVerifier verifier;
     private final UserRepository userRepository;
+    private final UserProvisioningService userProvisioningService;
     private final AuthService authService;
 
     @Value("${ezdo.firebase.allowed-sign-in-providers}")
@@ -71,12 +72,8 @@ public class FirebaseAuthService {
                     ErrorCodes.FIREBASE_EMAIL_NOT_VERIFIED);
         }
 
-        User user = userRepository.findByEmail(email).orElseGet(() -> {
-            User created = new User();
-            created.setEmail(email);
-            created.setIsNew(true);
-            return created;
-        });
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> userProvisioningService.register(email));
 
         if (user.getEmailVerifiedAt() == null) {
             user.setEmailVerifiedAt(Instant.now());

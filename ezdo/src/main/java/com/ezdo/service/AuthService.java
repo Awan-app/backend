@@ -22,6 +22,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
+    private final UserProvisioningService userProvisioningService;
 
     public OtpResponse requestOtp(OtpRequest request) {
         return otpService.requestOtp(EmailUtil.normalize(request.email()));
@@ -39,9 +40,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null) {
-            user = new User();
-            user.setEmail(email);
-            user.setIsNew(true);
+            user = userProvisioningService.register(email);
         }
 
         // Set email verified if not already
