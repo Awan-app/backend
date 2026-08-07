@@ -2,6 +2,8 @@ package com.ezdo.service;
 
 import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.gamification.SessionCompleteResponse;
+import com.ezdo.dto.gamification.SessionCompletionReward;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
@@ -113,25 +115,22 @@ public class SessionService {
 
         session.setStart(request.start());
         session.setEnd(request.end());
-        if (request.status() != null) {
-            validateTransition(session.getStatus(), request.status());
-            session.setStatus(request.status());
-        }
+        // request.status() is intentionally ignored — editing times never mutates a
+        // session's status. Status can only be changed via complete/cancel/uncomplete.
         syncReminder(userId, session);
         return sessionMapper.toResponse(session);
     }
 
+    @Deprecated(forRemoval = true)
     public SessionResponse updateStatus(UUID userId, UUID sessionId, SessionStatus status) {
-        Session session =  sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(() -> new SessionNotFoundException(sessionId));
-
-        validateTransition(session.getStatus(), status);
-        session.setStatus(status);
-        syncReminder(userId, session);
-        return sessionMapper.toResponse(session);
+        return switch (status) {
+            case COMPLETED -> complete(userId, sessionId).session();
+            case SCHEDULED -> uncomplete(userId, sessionId);
+            case CANCELLED -> cancel(userId, sessionId);
+        };
     }
 
-    public SessionResponse complete(UUID userId, UUID sessionId) {
+    public SessionCompleteResponse complete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
@@ -141,12 +140,15 @@ public class SessionService {
 
         // Rewards fire once per session, ever. Since a session can be un-completed
         // and completed again, this stamp is what stops the toggle from farming.
+        SessionCompletionReward reward;
         if (session.getFirstCompletedAt() == null) {
             session.setFirstCompletedAt(Instant.now());
-            gamificationService.onSessionCompleted(findUser(userId), session);
+            reward = gamificationService.onSessionCompleted(findUser(userId), session);
+        } else {
+            reward = gamificationService.currentResult(findUser(userId));
         }
 
-        return sessionMapper.toResponse(session);
+        return new SessionCompleteResponse(sessionMapper.toResponse(session), reward);
     }
 
     public SessionResponse uncomplete(UUID userId, UUID sessionId) {

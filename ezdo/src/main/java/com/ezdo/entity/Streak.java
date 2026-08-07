@@ -4,18 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
-/**
- * Consecutive days on which the user performed a qualifying activity.
- *
- * <p>Deliberately knows nothing about what counts as qualifying — it only stores
- * activity dates, so new triggers can be added without touching this model.
- *
- * <p>There is no reset job. A lapsed streak is derived on read via
- * {@link #effectiveStreak(LocalDate)}; the stored value self-heals on the next
- * recorded activity, which restarts the count at 1.
- */
 @Entity
 @Table(name = "streaks")
 @Getter
@@ -45,14 +37,21 @@ public class Streak {
     @Column(name = "max_streak")
     private int maxStreak = 0;
 
-    /** In the user's own timezone, not UTC. */
     @Column(name = "last_activity_date")
     private LocalDate lastActivityDate;
 
-    /**
-     * The streak as it should be shown right now: the stored count while the last
-     * activity was today or yesterday, otherwise 0 because a full day was missed.
-     */
+    @Builder.Default
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "streak_change_dates",
+            joinColumns = @JoinColumn(name = "streak_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uk_streak_change_date",
+                    columnNames = {"streak_id", "change_date"})
+    )
+    @Column(name = "change_date", nullable = false)
+    private Set<LocalDate> streakChangeDates = new LinkedHashSet<>();
+
     public int effectiveStreak(LocalDate today) {
         if (lastActivityDate == null || lastActivityDate.isBefore(today.minusDays(1))) {
             return 0;

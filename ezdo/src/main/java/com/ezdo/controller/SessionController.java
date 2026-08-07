@@ -2,6 +2,7 @@ package com.ezdo.controller;
 
 import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.gamification.SessionCompleteResponse;
 import com.ezdo.entity.SessionStatus;
 import com.ezdo.service.SessionService;
 import jakarta.validation.Valid;
@@ -77,17 +78,21 @@ public class SessionController {
         return ResponseEntity.ok(sessionService.update(userId, sessionId, request));
     }
 
+    @Deprecated(forRemoval = true)
     @PatchMapping("/{sessionId}/status")
     public ResponseEntity<SessionResponse> updateStatus(
         @AuthenticationPrincipal UUID userId,
         @PathVariable UUID sessionId,
         @RequestParam SessionStatus status
     ) {
-        return ResponseEntity.ok(sessionService.updateStatus(userId, sessionId, status));
+        return ResponseEntity.ok()
+            .header("Deprecation", "true")
+            .header("Link", "</api/v1/sessions/{sessionId}/complete>; rel=\"successor-version\"")
+            .body(sessionService.updateStatus(userId, sessionId, status));
     }
 
     @PostMapping("/{sessionId}/complete")
-    public ResponseEntity<SessionResponse> complete(
+    public ResponseEntity<SessionCompleteResponse> complete(
         @AuthenticationPrincipal UUID userId,
         @PathVariable UUID sessionId
     ) {

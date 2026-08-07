@@ -3,6 +3,7 @@ package com.ezdo.service;
 import com.ezdo.dto.CategoryResponse;
 import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.gamification.SessionCompleteResponse;
 import com.ezdo.dto.goal.*;
 import com.ezdo.entity.GoalStatus;
 import com.ezdo.entity.Preferences;
@@ -415,8 +416,10 @@ public class McpToolService {
     // ═══════════════════════════════════════════════════════════════════════
 
     @McpTool(
-            name = "updateSessionStatus",
-            description = "Update the status of a session. Valid statuses: SCHEDULED, IN_PROGRESS, COMPLETED, SKIPPED. " +
+            name = "completeSession",
+            description = "Mark a session as completed. The user earns the task's points and their streak is updated " +
+                    "(this happens once per session, ever — re-completing awards nothing). " +
+                    "The response includes the points and streak reward deltas. " +
                     "Use when the user says 'mark my session as done' or 'I finished that task'.",
             annotations = @McpTool.McpAnnotations(
                     readOnlyHint = false,
@@ -424,17 +427,49 @@ public class McpToolService {
                     idempotentHint = true
             )
     )
-    public SessionResponse updateSessionStatus(
-            @McpToolParam(description = "The session's UUID", required = true) String sessionId,
-            @McpToolParam(description = "New status: SCHEDULED, IN_PROGRESS, COMPLETED, or SKIPPED", required = true) String status
+    public SessionCompleteResponse completeSession(
+            @McpToolParam(description = "The session's UUID", required = true) String sessionId
     ) {
         UUID userId = currentUserId();
-        log.info("[MCP] updateSessionStatus called for user {} session {} status {}", userId, sessionId, status);
-        return sessionService.updateStatus(
-                userId,
-                UUID.fromString(sessionId),
-                com.ezdo.entity.SessionStatus.valueOf(status)
-        );
+        log.info("[MCP] completeSession called for user {} session {}", userId, sessionId);
+        return sessionService.complete(userId, UUID.fromString(sessionId));
+    }
+
+    @McpTool(
+            name = "uncompleteSession",
+            description = "Revert a completed session back to scheduled (undo completion). " +
+                    "No points or streak are revoked. " +
+                    "Use when the user says 'undo completion' or 'I didn't actually finish that task'.",
+            annotations = @McpTool.McpAnnotations(
+                    readOnlyHint = false,
+                    destructiveHint = false,
+                    idempotentHint = true
+            )
+    )
+    public SessionResponse uncompleteSession(
+            @McpToolParam(description = "The session's UUID", required = true) String sessionId
+    ) {
+        UUID userId = currentUserId();
+        log.info("[MCP] uncompleteSession called for user {} session {}", userId, sessionId);
+        return sessionService.uncomplete(userId, UUID.fromString(sessionId));
+    }
+
+    @McpTool(
+            name = "cancelSession",
+            description = "Cancel a session — it will not be executed or completed. " +
+                    "Use when the user says 'cancel my session' or 'remove this from my schedule'.",
+            annotations = @McpTool.McpAnnotations(
+                    readOnlyHint = false,
+                    destructiveHint = false,
+                    idempotentHint = true
+            )
+    )
+    public SessionResponse cancelSession(
+            @McpToolParam(description = "The session's UUID", required = true) String sessionId
+    ) {
+        UUID userId = currentUserId();
+        log.info("[MCP] cancelSession called for user {} session {}", userId, sessionId);
+        return sessionService.cancel(userId, UUID.fromString(sessionId));
     }
 
     @McpTool(

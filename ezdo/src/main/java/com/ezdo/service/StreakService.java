@@ -35,6 +35,7 @@ public class StreakService {
             streak.setMaxStreak(streak.getCurrentStreak());
         }
         streak.setLastActivityDate(today);
+        streak.getStreakChangeDates().add(today);
 
         return streak;
     }
