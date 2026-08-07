@@ -25,7 +25,33 @@ public class SecurityConfig {
     private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    @org.springframework.core.annotation.Order(1)
+    public SecurityFilterChain mcpSecurityFilterChain(
+            HttpSecurity http,
+            McpJwtAuthenticationConverter mcpJwtAuthenticationConverter
+    ) throws Exception {
+        http
+            .securityMatcher("/mcp/**")
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .jwtAuthenticationConverter(mcpJwtAuthenticationConverter)
+                )
+            );
+
+        return http.build();
+    }
+
+    @Bean
+    @org.springframework.core.annotation.Order(2)
+    public SecurityFilterChain defaultSecurityFilterChain(
+            HttpSecurity http, 
+            CorsConfigurationSource corsConfigurationSource
+    ) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
@@ -46,10 +72,10 @@ public class SecurityConfig {
                     "/api/v1/auth/refresh",
                     "/api/v1/time",
                     "/actuator/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
-                        "/mcp/**"
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**",
+                    "/.well-known/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
