@@ -1,5 +1,6 @@
 package com.ezdo.service;
 
+import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Streak;
 import com.ezdo.entity.User;
 import com.ezdo.entity.Wallet;
@@ -12,6 +13,9 @@ public class UserProvisioningService {
         User user = new User();
         user.setEmail(email);
         user.setIsNew(true);
+
+        Preferences preferences = Preferences.builder().user(user).build();
+        user.setPreferences(preferences);
 
         Wallet wallet = Wallet.builder().user(user).build();
         user.setWallet(wallet);

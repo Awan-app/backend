@@ -62,14 +62,6 @@ public class UserService {
                 request.wakeupTime(), request.sleepTime());
         }
 
-        if (hasAnyPreferenceField(request)) {
-            if (user.getPreferences() == null) {
-                Preferences preferences = new Preferences();
-                preferences.setUser(user);
-                user.setPreferences(preferences);
-            }
-        }
-
         userMapper.updateProfileFromRequest(request, user);
 
         User saved = userRepository.save(user);
@@ -111,16 +103,6 @@ public class UserService {
         if (!ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
             throw new UnsupportedImageTypeException(file.getContentType(), String.join(", ", ALLOWED_IMAGE_TYPES));
         }
-    }
-
-    private boolean hasAnyPreferenceField(UpdateProfileRequest request) {
-        return request.timezone() != null
-            || request.preferredSessionDuration() != null
-            || request.bufferBetweenSessions() != null
-            || request.wakeupTime() != null
-            || request.sleepTime() != null
-            || request.schedulingType() != null
-            || request.dailySummaryEnabled() != null;
     }
 
     @Transactional

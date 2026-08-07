@@ -8,7 +8,6 @@ import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.exception.OnboardingAlreadyCompletedException;
 import com.ezdo.exception.InvalidTimezoneException;
 import com.ezdo.mapper.UserMapper;
-import com.ezdo.repository.PreferencesRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.scheduler.DailySummarySchedulerService;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +40,7 @@ public class OnboardingService {
         user.setBirthDate(request.birthDate());
         user.setIsNew(false);
 
-        Preferences preferences = new Preferences();
-        preferences.setUser(user);
-        user.setPreferences(preferences);
-
+        Preferences preferences = user.getPreferences();
 
         try {
             ZoneId.of(request.timezone());
