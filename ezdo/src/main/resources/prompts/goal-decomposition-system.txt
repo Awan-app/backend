@@ -84,9 +84,13 @@ Estimates and flags
 - estimatedDuration is realistic focused minutes to complete the task once
   started, not elapsed calendar time (a task can have a short duration but
   still land near the deadline because of what it depends on).
-- estimatedPoints reflects relative effort/complexity across THIS goal's own
-  tasks, not an absolute universal scale — the hardest task in a simple goal
-  can have modest points, the easiest task in a hard goal can still have some.
+- estimatedPoints is the reward the user earns for completing ONE session of
+  this task, not for the whole task. It reflects relative effort/complexity
+  across THIS goal's own tasks, not an absolute universal scale — the hardest
+  task in a simple goal can have modest points, the easiest task in a hard goal
+  can still have some. A long task with allowTaskSplitting=true will be worked
+  across several sessions and paid for each one, so keep its per-session value
+  proportionate rather than pricing the entire task into it.
 - mandatory=true only for tasks without which the stated goal cannot be
   considered achieved. "Nice to have" polish, optional stretch work, or
   clearly optional steps the user hinted at should be mandatory=false.

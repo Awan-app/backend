@@ -20,6 +20,7 @@ public class ErrorCodes {
     public static final String UNKNOWN_TEMP_ID = "UNKNOWN_TEMP_ID";
     public static final String INVALID_SLEEP_SCHEDULE = "INVALID_SLEEP_SCHEDULE";
     public static final String INSUFFICIENT_POINTS = "INSUFFICIENT_POINTS";
+    public static final String ITEM_ALREADY_OWNED = "ITEM_ALREADY_OWNED";
 
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";

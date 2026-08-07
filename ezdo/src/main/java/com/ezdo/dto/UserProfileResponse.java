@@ -9,9 +9,9 @@ public record UserProfileResponse(
     String firstName,
     String lastName,
     LocalDate birthDate,
-    Integer points,
-    Integer streak,
-    Integer maxStreak,
+    long points,
+    int streak,
+    int maxStreak,
     String profilePictureUrl,
     boolean isNew,
     PreferencesResponse preferences

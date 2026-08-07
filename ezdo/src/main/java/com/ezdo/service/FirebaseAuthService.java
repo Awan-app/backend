@@ -39,6 +39,7 @@ public class FirebaseAuthService {
 
     private final FirebaseTokenVerifier verifier;
     private final UserRepository userRepository;
+    private final UserProvisioningService userProvisioningService;
     private final AuthService authService;
     private final CategorySeedService categorySeedService;
 
@@ -76,12 +77,7 @@ public class FirebaseAuthService {
         Optional<User> existing = userRepository.findByEmail(email);
         boolean isNewUser = existing.isEmpty();
 
-        User user = existing.orElseGet(() -> {
-            User created = new User();
-            created.setEmail(email);
-            created.setIsNew(true);
-            return created;
-        });
+        User user = existing.orElseGet(() -> userProvisioningService.register(email));
 
         if (user.getEmailVerifiedAt() == null) {
             user.setEmailVerifiedAt(Instant.now());

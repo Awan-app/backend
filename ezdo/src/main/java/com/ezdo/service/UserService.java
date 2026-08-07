@@ -62,14 +62,6 @@ public class UserService {
                 request.wakeupTime(), request.sleepTime());
         }
 
-        if (hasAnyPreferenceField(request)) {
-            if (user.getPreferences() == null) {
-                Preferences preferences = new Preferences();
-                preferences.setUser(user);
-                user.setPreferences(preferences);
-            }
-        }
-
         userMapper.updateProfileFromRequest(request, user);
 
         User saved = userRepository.save(user);
@@ -113,16 +105,6 @@ public class UserService {
         }
     }
 
-    private boolean hasAnyPreferenceField(UpdateProfileRequest request) {
-        return request.timezone() != null
-            || request.preferredSessionDuration() != null
-            || request.bufferBetweenSessions() != null
-            || request.wakeupTime() != null
-            || request.sleepTime() != null
-            || request.schedulingType() != null
-            || request.dailySummaryEnabled() != null;
-    }
-
     @Transactional
     public UserProfileResponse updateName(UUID userId, UpdateNameRequest request) {
         User user = findUser(userId);
@@ -144,64 +126,6 @@ public class UserService {
         userRepository.save(user);
 
         return userMapper.toProfileResponse(user);
-    }
-
-    @Transactional
-    public UserProgressResponse incrementStreak(UUID userId) {
-        User user = findUser(userId);
-
-        user.setStreak(user.getStreak() + 1);
-
-        if (user.getStreak() > user.getMaxStreak()) {
-            user.setMaxStreak(user.getStreak());
-        }
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
-    public UserProgressResponse resetStreak(UUID userId) {
-        User user = findUser(userId);
-
-        user.setStreak(0);
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
-    public UserProgressResponse awardPoints(UUID userId, AwardPointsRequest request) {
-        User user = findUser(userId);
-
-        // TODO: Add points validation rules...
-        user.setPoints(user.getPoints() + request.points());
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
-    }
-
-    @Transactional
-    public UserProgressResponse deductPoints(UUID userId, DeductPointsRequest request) {
-        User user = findUser(userId);
-
-        // TODO: Add points validation rules...
-        if (request.points() > user.getPoints()) {
-            throw new InsufficientPointsException(user.getPoints(), request.points());
-        }
-
-        user.setPoints(user.getPoints() - request.points());
-
-        userRepository.save(user);
-
-        return new UserProgressResponse(
-            user.getPoints(), user.getStreak(), user.getMaxStreak());
     }
 
     @Transactional

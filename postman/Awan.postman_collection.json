@@ -759,14 +759,109 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Gamification",
+      "item": [
+        {
+          "name": "Get Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/gamification/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "gamification",
+                "progress"
+              ]
+            },
+            "description": "Get the authenticated user's gamification progress (points + streak).\n\n**Response (200):** `UserProgressResponse`\n- `points` (int) – Total wallet points.\n- `streak` (int) – Current effective streak (0 if the user lapsed a day).\n- `maxStreak` (int) – Highest streak ever reached.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"points\": 150,\n  \"streak\": 6,\n  \"maxStreak\": 12\n}"
+            }
+          ]
         },
         {
-          "name": "Gamification",
+          "name": "Get Activity Dates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/gamification/activity-dates?startDate=2026-07-20&endDate=2026-07-22",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "gamification",
+                "activity-dates"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-07-20",
+                  "description": "Inclusive start date, YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-07-22",
+                  "description": "Inclusive end date, YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "List the dates on which the user performed a qualifying activity (streak-relevant days), within a date range.\n\n**Query Parameters:**\n- `startDate` (LocalDate, required) – Inclusive start. Format: `YYYY-MM-DD`.\n- `endDate` (LocalDate, required) – Inclusive end. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `LocalDate` (activity dates, ascending).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `INVALID_OPERATION` (400) – `startDate` is after `endDate`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  \"2026-07-20\",\n  \"2026-07-21\",\n  \"2026-07-22\"\n]"
+            }
+          ]
+        },
+        {
+          "name": "Store",
           "item": [
             {
-              "name": "Increment Streak",
+              "name": "Get All Items",
               "request": {
-                "method": "PATCH",
+                "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
@@ -774,29 +869,25 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/streak/increment",
+                  "raw": "{{baseUrl}}/v1/store/items",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "streak",
-                    "increment"
+                    "store",
+                    "items"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "FRAME",
+                      "description": "Optional filter: FRAME, SKIN, THEME, or ICON"
+                    }
                   ]
                 },
-                "description": "Increment the user's current streak by 1. If current streak exceeds max streak, max streak is updated.\n\n**Request Body:** None (empty).\n\n**Response (200):** `UserProgressResponse`\n- `points` (int) – Total points.\n- `streak` (int) – Updated current streak.\n- `maxStreak` (int) – Highest streak ever.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+                "description": "List all store items, optionally filtered by type.\n\n**Query Parameters:**\n- `type` (enum, optional) – One of: `FRAME`, `SKIN`, `THEME`, `ICON`. Omit for all.\n\n**Response (200):** Array of `ItemResponse`\n- `id` (UUID), `name`, `description`, `image`, `info`, `price` (int), `version`, `type` (enum).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
               },
               "response": [
                 {
@@ -809,14 +900,14 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"points\": 150,\n  \"streak\": 6,\n  \"maxStreak\": 12\n}"
+                  "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  }\n]"
                 }
               ]
             },
             {
-              "name": "Reset Streak",
+              "name": "Get Inventory",
               "request": {
-                "method": "PATCH",
+                "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
@@ -824,35 +915,38 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/streak/reset",
+                  "raw": "{{baseUrl}}/v1/store/inventory",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "streak",
-                    "reset"
+                    "store",
+                    "inventory"
                   ]
                 },
-                "description": "Reset the user's current streak to 0. Max streak is preserved.\n\n**Request Body:** None (empty).\n\n**Response (200):** `UserProgressResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
-              }
+                "description": "List the authenticated user's owned items.\n\n**Response (200):** Array of `UserItemResponse`\n- `id` (UUID) – Ownership record ID.\n- `item` (`ItemResponse`) – The owned item details.\n- `boughtAt` (ISO datetime) – When it was purchased.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440011\",\n    \"item\": {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n      \"name\": \"Aurora Frame\",\n      \"description\": \"A glowing animated frame for your avatar\",\n      \"image\": \"https://cdn.example.com/frames/aurora.png\",\n      \"info\": \"Rarity: epic\",\n      \"price\": 200,\n      \"version\": \"1.0\",\n      \"type\": \"FRAME\"\n    },\n    \"boughtAt\": \"2026-07-22T10:00:00Z\"\n  }\n]"
+                }
+              ]
             },
             {
-              "name": "Award Points",
+              "name": "Buy Item",
               "request": {
-                "method": "PATCH",
+                "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
@@ -860,66 +954,35 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"points\": 50\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/points/award",
+                  "raw": "{{baseUrl}}/v1/store/items/{{itemId}}/buy",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "points",
-                    "award"
+                    "store",
+                    "items",
+                    "{{itemId}}",
+                    "buy"
                   ]
                 },
-                "description": "Award points to the user (adds to total).\n\n**Request Body:**\n- `points` (int, required) – Must be positive (> 0).\n\n**Response (200):** `UserProgressResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Points must be positive."
-              }
-            },
-            {
-              "name": "Deduct Points",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{accessToken}}",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"points\": 10\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
+                "description": "Purchase an item with wallet points. The price is deducted from the wallet and the item is added to the user's inventory.\n\n**Path Parameters:**\n- `itemId` (UUID, required) – Item to buy.\n\n**Request Body:** None (empty).\n\n**Response (200):** `UserItemResponse` — The newly created ownership record.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `ITEM_NOT_FOUND` (404) – Item does not exist.\n- `ITEM_ALREADY_OWNED` (409) – User already owns this item.\n- `INSUFFICIENT_POINTS` (400) – Wallet balance is below the item price."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
                     }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/points/deduct",
-                  "host": [
-                    "{{baseUrl}}"
                   ],
-                  "path": [
-                    "v1",
-                    "users",
-                    "me",
-                    "points",
-                    "deduct"
-                  ]
-                },
-                "description": "Deduct points from the user (subtracts from total).\n\n**Request Body:**\n- `points` (int, required) – Must be positive (> 0).\n\n**Response (200):** `UserProgressResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Points must be positive.\n- `INSUFFICIENT_POINTS` (400) – User doesn't have enough points."
-              }
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440011\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"boughtAt\": \"2026-07-22T10:00:00Z\"\n}"
+                }
+              ]
             }
           ]
         }
@@ -2132,8 +2195,22 @@
                 "complete"
               ]
             },
-            "description": "Mark a `SCHEDULED` session as completed.\n\n**Transition:** `SCHEDULED → COMPLETED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: COMPLETED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be completed from its current status (e.g. already cancelled)."
-          }
+            "description": "Mark a `SCHEDULED` session as completed and award the gamification reward.\n\n**Transition:** `SCHEDULED → COMPLETED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** `SessionCompleteResponse`\n- `session` (`SessionResponse`) – The completed session with `status: COMPLETED`.\n- `reward` (`SessionCompletionReward`) – Points and streak deltas produced by this completion:\n  - `points.awarded` (bool) – True only on the first-ever completion of this session and only if the task has `estimatedPoints > 0`.\n  - `points.amount`, `points.oldValue`, `points.newValue` – Points credited and wallet balance before/after.\n  - `streak.updated` (bool) – True if the effective streak changed.\n  - `streak.oldValue`, `streak.newValue`, `streak.maxStreakBroken`, `streak.maxStreakOld`, `streak.maxStreakNew`.\n\nRe-completing the same session awards nothing (`points.awarded: false`, `streak.updated: false`).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be completed from its current status (e.g. already cancelled)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"session\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-22T09:00:00\",\n    \"end\": \"2026-07-22T10:00:00\",\n    \"status\": \"COMPLETED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  \"reward\": {\n    \"points\": {\"awarded\": true, \"amount\": 25, \"oldValue\": 150, \"newValue\": 175},\n    \"streak\": {\"updated\": true, \"oldValue\": 5, \"newValue\": 6, \"maxStreakBroken\": true, \"maxStreakOld\": 6, \"maxStreakNew\": 7}\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Uncomplete Session",
@@ -3159,6 +3236,302 @@
       ]
     },
     {
+      "name": "Device Tokens",
+      "item": [
+        {
+          "name": "Register Device Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens"
+              ]
+            },
+            "description": "Register or update a device token for push notifications. Upsert keyed by `deviceId`.\n\n**Request Body:**\n- `deviceId` (string, required) – Unique device identifier.\n- `fcmToken` (string, required) – FCM registration token.\n- `deviceType` (string, optional) – One of: `ANDROID`, `IOS`, `WEB`.\n\n**Response (200):** `DeviceTokenResponse`\n- `id` (UUID), `deviceId`, `deviceType`, `createdAt`, `updatedAt`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – `deviceId` or `fcmToken` is blank.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": \"device-123\",\n  \"fcmToken\": \"fcm-registration-token-here\",\n  \"deviceType\": \"ANDROID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440020\",\n  \"deviceId\": \"device-123\",\n  \"deviceType\": \"ANDROID\",\n  \"createdAt\": \"2026-07-22T10:00:00Z\",\n  \"updatedAt\": \"2026-07-22T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Devices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens"
+              ]
+            },
+            "description": "List all registered devices (push tokens) for the authenticated user.\n\n**Response (200):** Array of `DeviceTokenResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440020\",\n    \"deviceId\": \"device-123\",\n    \"deviceType\": \"ANDROID\",\n    \"createdAt\": \"2026-07-22T10:00:00Z\",\n    \"updatedAt\": \"2026-07-22T10:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Remove Device Token",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens/{{deviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens",
+                "{{deviceId}}"
+              ]
+            },
+            "description": "Remove a single device token by its device ID.\n\n**Path Parameters:**\n- `deviceId` (string, required) – The device identifier.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Remove All Device Tokens",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens"
+              ]
+            },
+            "description": "Remove all device tokens for the authenticated user (sign out everywhere).\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "API Keys",
+      "item": [
+        {
+          "name": "Create API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api-keys"
+              ]
+            },
+            "description": "Generate a new long-lived API key for MCP client authentication.\n\n**Request Body:**\n- `name` (string, required, max 100) – A label to identify the key.\n\n**Response (200):** `ApiKeyResponse` — the full `keyValue` is returned ONLY once; it cannot be retrieved again later.\n- `id` (UUID), `name`, `keyValue`, `createdAt`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – `name` is blank or too long.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Claude Desktop\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440030\",\n  \"name\": \"Claude Desktop\",\n  \"keyValue\": \"ezdo_5f6a8c1d2e3f4a5b6c7d8e9f\",\n  \"createdAt\": \"2026-07-22T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List API Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api-keys"
+              ]
+            },
+            "description": "List all active API keys for the authenticated user. The full key value is never returned – only a display prefix.\n\n**Response (200):** Array of `ApiKeySummaryResponse`\n- `id` (UUID), `name`, `keyPrefix` (first chars + \"...\"), `createdAt`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440030\",\n    \"name\": \"Claude Desktop\",\n    \"keyPrefix\": \"ezdo_5f6a8c1d...\",\n    \"createdAt\": \"2026-07-22T10:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Revoke API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api-keys/{{keyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api-keys",
+                "{{keyId}}"
+              ]
+            },
+            "description": "Revoke (soft-delete) an API key. Any MCP client using it immediately stops authenticating.\n\n**Path Parameters:**\n- `keyId` (UUID, required) – The key to revoke.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `ILLEGAL_ARGUMENT` (400) – Key not found or not owned by user."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Categories",
       "description": "Per-user categories. Every new account is seeded with 8 starter categories (General, Work, Personal, Health, Learning, Finance, Home, Social) on first sign-in, and the user can add more at any time.\n\nZones, templates, and overrides reference a category by its `categoryId` (UUID), which must belong to the authenticated user. Fetch the available categories via **List Categories** and supply the id in zone payloads.",
       "item": [
@@ -3795,6 +4168,18 @@
     },
     {
       "key": "templateOverrideId",
+      "value": ""
+    },
+    {
+      "key": "itemId",
+      "value": ""
+    },
+    {
+      "key": "deviceId",
+      "value": ""
+    },
+    {
+      "key": "keyId",
       "value": ""
     }
   ]

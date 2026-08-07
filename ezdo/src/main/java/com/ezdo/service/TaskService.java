@@ -114,7 +114,9 @@ public class TaskService {
             Session session = Session.builder()
                 .start(sessionReq.start())
                 .end(sessionReq.end())
-                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                // Sessions are always created SCHEDULED; a client-supplied status is
+                // ignored — lifecycle changes go through complete/cancel/uncomplete.
+                .status(SessionStatus.SCHEDULED)
                 .zone(zone)
                 .task(task)
                 .build();
@@ -175,7 +177,9 @@ public class TaskService {
                 Session session = Session.builder()
                     .start(sessionReq.start())
                     .end(sessionReq.end())
-                    .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                    // Sessions are always created SCHEDULED; a client-supplied status is
+                    // ignored — lifecycle changes go through complete/cancel/uncomplete.
+                    .status(SessionStatus.SCHEDULED)
                     .zone(zone)
                     .task(task)
                     .build();
@@ -212,7 +216,9 @@ public class TaskService {
             Session session = Session.builder()
                 .start(sessionReq.start())
                 .end(sessionReq.end())
-                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                // Sessions are always created SCHEDULED; a client-supplied status is
+                // ignored — lifecycle changes go through complete/cancel/uncomplete.
+                .status(SessionStatus.SCHEDULED)
                 .zone(zone)
                 .task(task)
                 .build();
