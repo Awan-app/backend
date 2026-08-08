@@ -2,6 +2,11 @@ server:
   port: 8080
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:}
   application:
     name: ezdo
   mail:
@@ -87,6 +92,13 @@ logging:
             bind: TRACE
 
 ezdo:
+  keycloak:
+    issuer-uri: ${KEYCLOAK_ISSUER_URI:}
+    admin-url: ${KEYCLOAK_ADMIN_URL:}
+    realm: ${KEYCLOAK_REALM:awan}
+    admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
+    admin-username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
   jwt:
     secret: ${EZDO_JWT_SECRET:default-dev-secret-change-in-production-32chars!}
     access-token-expiry-seconds: 86400

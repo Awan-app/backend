@@ -97,6 +97,13 @@
             <version>2.3.0</version>
         </dependency>
 
+        <!-- Keycloak Admin Client (sync users to Keycloak on registration) -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>26.0.7</version>
+        </dependency>
+
         <!-- Firebase Admin SDK for FCM -->
         <dependency>
             <groupId>com.google.firebase</groupId>
