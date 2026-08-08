@@ -1,8 +1,10 @@
 package com.ezdo.mapper;
 
+import com.ezdo.dto.store.EquippedItemResponse;
 import com.ezdo.dto.store.ItemResponse;
 import com.ezdo.dto.store.UserItemResponse;
 import com.ezdo.entity.Item;
+import com.ezdo.entity.UserEquippedItem;
 import com.ezdo.entity.UserItem;
 import org.springframework.stereotype.Component;
 
@@ -34,5 +36,16 @@ public class StoreMapper {
                 .item(toItemResponse(userItem.getItem()))
                 .boughtAt(userItem.getBoughtAt())
                 .build();
+    }
+
+    public EquippedItemResponse toEquippedItemResponse(UserEquippedItem equipped) {
+        if (equipped == null) {
+            return null;
+        }
+        return new EquippedItemResponse(
+                equipped.getItemType(),
+                toItemResponse(equipped.getItem()),
+                equipped.getEquippedAt()
+        );
     }
 }

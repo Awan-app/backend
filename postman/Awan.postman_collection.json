@@ -983,6 +983,126 @@
                   "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440011\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"boughtAt\": \"2026-07-22T10:00:00Z\"\n}"
                 }
               ]
+            },
+            {
+              "name": "Get Equipped",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/equipped",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "equipped"
+                  ]
+                },
+                "description": "List the authenticated user's currently equipped items (one slot per type).\n\n**Response (200):** Array of `EquippedItemResponse`\n- `type` (ItemType) – The equipped slot's type: `FRAME`, `SKIN`, `THEME`, `ICON`.\n- `item` (`ItemResponse`) – The equipped item details.\n- `equippedAt` (ISO datetime) – When it was equipped.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"type\": \"FRAME\",\n    \"item\": {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n      \"name\": \"Gold Frame\",\n      \"description\": \"A shiny gold frame for your profile.\",\n      \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n      \"info\": null,\n      \"price\": 100,\n      \"version\": \"1.0\",\n      \"type\": \"FRAME\"\n    },\n    \"equippedAt\": \"2026-07-22T12:00:00Z\"\n  }\n]"
+                }
+              ]
+            },
+            {
+              "name": "Equip Item",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/items/{{itemId}}/equip",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "items",
+                    "{{itemId}}",
+                    "equip"
+                  ]
+                },
+                "description": "Equip an owned item. One slot exists per `ItemType` (`FRAME`, `SKIN`, `THEME`, `ICON`), so equipping an item replaces the previously equipped item of the same type. Equipping the same item again is a no-op.\n\n**Path Parameters:**\n- `itemId` (UUID, required) – The owned item to equip.\n\n**Request Body:** None (empty).\n\n**Response (200):** `EquippedItemResponse` — the equipped slot.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `ITEM_NOT_FOUND` (404) – Item does not exist.\n- `ITEM_NOT_OWNED` (409) – User does not own this item."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"type\": \"FRAME\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Gold Frame\",\n    \"description\": \"A shiny gold frame for your profile.\",\n    \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n    \"info\": null,\n    \"price\": 100,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"equippedAt\": \"2026-07-22T12:00:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Unequip Item",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/equipped/{{itemType}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "equipped",
+                    "{{itemType}}"
+                  ]
+                },
+                "description": "Clear the equipped slot of a type. Idempotent – calling it for an empty slot succeeds.\n\n**Path Parameters:**\n- `itemType` (enum, required) – One of: `FRAME`, `SKIN`, `THEME`, `ICON`.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "No Content",
+                  "status": "No Content",
+                  "code": 204,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": ""
+                }
+              ]
             }
           ]
         }
@@ -4181,6 +4301,10 @@
     {
       "key": "keyId",
       "value": ""
+    },
+    {
+      "key": "itemType",
+      "value": "FRAME"
     }
   ]
 }

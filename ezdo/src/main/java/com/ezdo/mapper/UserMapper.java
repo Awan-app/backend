@@ -4,11 +4,14 @@ import com.ezdo.dto.PreferencesResponse;
 import com.ezdo.dto.UpdateProfileRequest;
 import com.ezdo.dto.UserProfileResponse;
 import com.ezdo.dto.profile.UserProgressResponse;
+import com.ezdo.dto.store.EquippedItemResponse;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.User;
 import com.ezdo.service.UserClockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -16,7 +19,7 @@ public class UserMapper {
 
     private final UserClockService userClockService;
 
-    public UserProfileResponse toProfileResponse(User user) {
+    public UserProfileResponse toProfileResponse(User user, List<EquippedItemResponse> equippedItems) {
         if (user == null) {
             return null;
         }
@@ -49,7 +52,8 @@ public class UserMapper {
             progress.maxStreak(),
             user.getProfilePictureUrl(),
             user.getIsNew(),
-            preferencesResponse
+            preferencesResponse,
+            equippedItems
         );
     }
 
