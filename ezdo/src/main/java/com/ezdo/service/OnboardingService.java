@@ -24,6 +24,7 @@ public class OnboardingService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final StoreService storeService;
     private final DailySummarySchedulerService dailySummarySchedulerService;
 
     @Transactional
@@ -58,6 +59,6 @@ public class OnboardingService {
         User saved = userRepository.save(user);
         dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(saved);
+        return userMapper.toProfileResponse(saved, storeService.getEquipped(saved.getId()));
     }
 }

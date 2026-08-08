@@ -12,8 +12,10 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,6 +78,27 @@ public class GlobalExceptionHandler {
             HttpStatus.BAD_REQUEST.value(),
             ErrorCodes.MALFORMED_REQUEST_BODY,
             Map.of()
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("parameter", e.getName());
+        info.put("rejectedValue", e.getValue());
+
+        Class<?> required = e.getRequiredType();
+        if (required != null && required.isEnum()) {
+            info.put("allowedValues", Arrays.stream(required.getEnumConstants())
+                .map(Object::toString)
+                .toList());
+        }
+
+        return buildErrorResponse(
+            "Invalid value for '" + e.getName() + "'",
+            HttpStatus.BAD_REQUEST.value(),
+            ErrorCodes.TYPE_MISMATCH,
+            info
         );
     }
 

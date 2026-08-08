@@ -21,6 +21,8 @@ public class ErrorCodes {
     public static final String INVALID_SLEEP_SCHEDULE = "INVALID_SLEEP_SCHEDULE";
     public static final String INSUFFICIENT_POINTS = "INSUFFICIENT_POINTS";
     public static final String ITEM_ALREADY_OWNED = "ITEM_ALREADY_OWNED";
+    public static final String ITEM_NOT_OWNED = "ITEM_NOT_OWNED";
+    public static final String DAILY_GIFT_ALREADY_CLAIMED = "DAILY_GIFT_ALREADY_CLAIMED";
 
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";

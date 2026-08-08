@@ -856,6 +856,115 @@
           ]
         },
         {
+          "name": "Daily Wheel",
+          "item": [
+            {
+              "name": "Get Wheel Config",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/gamification/wheel/config",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "gamification",
+                    "wheel",
+                    "config"
+                  ]
+                },
+                "description": "Get the daily wheel layout plus the user's claim status for today. Call this when\nthe daily-gift screen opens, to draw the wheel and decide whether the spin button is enabled.\n\n**Response (200):** `WheelConfigResponse`\n- `segments` (array of `WheelSegmentResponse`) – The wheel layout, in wheel order. The order is\n  stable across calls, so segment *i* is always the same wedge.\n  - `segmentId` (string) – Stable id of the wedge (e.g. `SEG_4`). Match the spin result against this.\n  - `coins` (int) – Coins this wedge pays. `0` for the item wedge.\n  - `payoutType` (enum) – `COINS` or `ITEM`.\n- `claimedToday` (boolean) – `true` if the user already spun today. Disable the spin button.\n- `lastClaim` (`WheelClaimResponse`, nullable) – The most recent claim, or `null` if the user has\n  never spun. Useful for showing \"you won X yesterday\".\n  - `segmentId`, `coinsAwarded`, `itemId`, `itemName`, `claimDate`, `claimedAt`.\n\nSegment weights are deliberately **not** exposed — the odds are server-side only.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"segments\": [\n    {\n      \"segmentId\": \"SEG_1\",\n      \"coins\": 1,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_2\",\n      \"coins\": 5,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_3\",\n      \"coins\": 10,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_4\",\n      \"coins\": 20,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_5\",\n      \"coins\": 50,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_6\",\n      \"coins\": 100,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_ITEM\",\n      \"coins\": 0,\n      \"payoutType\": \"ITEM\"\n    }\n  ],\n  \"claimedToday\": true,\n  \"lastClaim\": {\n    \"segmentId\": \"SEG_4\",\n    \"coinsAwarded\": 20,\n    \"itemId\": null,\n    \"itemName\": null,\n    \"claimDate\": \"2026-07-22\",\n    \"claimedAt\": \"2026-07-22T09:14:03.221Z\"\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Spin Wheel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/gamification/wheel/spin",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "gamification",
+                    "wheel",
+                    "spin"
+                  ]
+                },
+                "description": "Spin the daily wheel. Once per calendar day, in the user's own timezone.\n\n**The server decides the outcome.** The client sends no body and picks nothing — it animates the\nwheel so it lands on the `segmentId` the response returns. Never award coins or items client-side.\n\n**Response (200):** `WheelSpinResponse`\n- `segmentId` (string) – Which wedge to land the animation on. Always one of the `segmentId`s from\n  `GET /wheel/config`.\n- `payoutType` (enum) – `COINS` or `ITEM`. **Branch on this, not on the segment's configured type.**\n- `coinsAwarded` (int) – Coins credited. `0` when `payoutType` is `ITEM`.\n- `newBalance` (long) – Wallet balance after the spin. Use it directly; no need to re-fetch progress.\n- `item` (`ItemResponse`, nullable) – The won item when `payoutType` is `ITEM`, otherwise `null`.\n\n**Item wedge:** the item is picked at random from the items the user does **not** already own, and it\nis added to the inventory for free (it does not cost points). If the user already owns every item,\nthe spin resolves to a coin wedge instead — the response will say `SEG_4` / `COINS`, never\n`SEG_ITEM` with a null item.\n\n**Possible Errors:**\n- `DAILY_GIFT_ALREADY_CLAIMED` (409) – Already spun today. `info.claimDate` is the day in question.\n  Nothing is credited on a rejected spin.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+              },
+              "response": [
+                {
+                  "name": "Success - Coins",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"segmentId\": \"SEG_2\",\n  \"payoutType\": \"COINS\",\n  \"coinsAwarded\": 5,\n  \"newBalance\": 180,\n  \"item\": null\n}"
+                },
+                {
+                  "name": "Success - Item",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"segmentId\": \"SEG_ITEM\",\n  \"payoutType\": \"ITEM\",\n  \"coinsAwarded\": 0,\n  \"newBalance\": 175,\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  }\n}"
+                },
+                {
+                  "name": "Already Claimed",
+                  "status": "Conflict",
+                  "code": 409,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Daily gift already claimed for this day.\",\n  \"statusCode\": 409,\n  \"errorCode\": \"DAILY_GIFT_ALREADY_CLAIMED\",\n  \"info\": {\n    \"claimDate\": \"2026-07-22\"\n  },\n  \"timestamp\": \"2026-07-22T09:20:11.4821\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Store",
           "item": [
             {
@@ -981,6 +1090,126 @@
                     }
                   ],
                   "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440011\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"boughtAt\": \"2026-07-22T10:00:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Equipped",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/equipped",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "equipped"
+                  ]
+                },
+                "description": "List the authenticated user's currently equipped items (one slot per type).\n\n**Response (200):** Array of `EquippedItemResponse`\n- `type` (ItemType) – The equipped slot's type: `FRAME`, `SKIN`, `THEME`, `ICON`.\n- `item` (`ItemResponse`) – The equipped item details.\n- `equippedAt` (ISO datetime) – When it was equipped.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"type\": \"FRAME\",\n    \"item\": {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n      \"name\": \"Gold Frame\",\n      \"description\": \"A shiny gold frame for your profile.\",\n      \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n      \"info\": null,\n      \"price\": 100,\n      \"version\": \"1.0\",\n      \"type\": \"FRAME\"\n    },\n    \"equippedAt\": \"2026-07-22T12:00:00Z\"\n  }\n]"
+                }
+              ]
+            },
+            {
+              "name": "Equip Item",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/items/{{itemId}}/equip",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "items",
+                    "{{itemId}}",
+                    "equip"
+                  ]
+                },
+                "description": "Equip an owned item. One slot exists per `ItemType` (`FRAME`, `SKIN`, `THEME`, `ICON`), so equipping an item replaces the previously equipped item of the same type. Equipping the same item again is a no-op.\n\n**Path Parameters:**\n- `itemId` (UUID, required) – The owned item to equip.\n\n**Request Body:** None (empty).\n\n**Response (200):** `EquippedItemResponse` — the equipped slot.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `ITEM_NOT_FOUND` (404) – Item does not exist.\n- `ITEM_NOT_OWNED` (409) – User does not own this item."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"type\": \"FRAME\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Gold Frame\",\n    \"description\": \"A shiny gold frame for your profile.\",\n    \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n    \"info\": null,\n    \"price\": 100,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"equippedAt\": \"2026-07-22T12:00:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Unequip Item",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/equipped/{{itemType}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "equipped",
+                    "{{itemType}}"
+                  ]
+                },
+                "description": "Clear the equipped slot of a type. Idempotent – calling it for an empty slot succeeds.\n\n**Path Parameters:**\n- `itemType` (enum, required) – One of: `FRAME`, `SKIN`, `THEME`, `ICON`.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "No Content",
+                  "status": "No Content",
+                  "code": 204,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": ""
                 }
               ]
             }
@@ -4181,6 +4410,10 @@
     {
       "key": "keyId",
       "value": ""
+    },
+    {
+      "key": "itemType",
+      "value": "FRAME"
     }
   ]
 }

@@ -1,6 +1,9 @@
 package com.ezdo.dto;
 
+import com.ezdo.dto.store.EquippedItemResponse;
+
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public record UserProfileResponse(
@@ -14,6 +17,7 @@ public record UserProfileResponse(
     int maxStreak,
     String profilePictureUrl,
     boolean isNew,
-    PreferencesResponse preferences
+    PreferencesResponse preferences,
+    List<EquippedItemResponse> equippedItems
 ) {
 }

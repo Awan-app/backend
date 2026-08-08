@@ -1,5 +1,6 @@
 package com.ezdo.controller;
 
+import com.ezdo.dto.store.EquippedItemResponse;
 import com.ezdo.dto.store.ItemResponse;
 import com.ezdo.dto.store.UserItemResponse;
 import com.ezdo.entity.ItemType;
@@ -39,5 +40,29 @@ public class StoreController {
             @PathVariable UUID itemId
     ) {
         return ResponseEntity.ok(storeService.buyItem(userId, itemId));
+    }
+
+    @GetMapping("/equipped")
+    public ResponseEntity<List<EquippedItemResponse>> getEquipped(
+            @AuthenticationPrincipal UUID userId
+    ) {
+        return ResponseEntity.ok(storeService.getEquipped(userId));
+    }
+
+    @PostMapping("/items/{itemId}/equip")
+    public ResponseEntity<EquippedItemResponse> equip(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable UUID itemId
+    ) {
+        return ResponseEntity.ok(storeService.equip(userId, itemId));
+    }
+
+    @DeleteMapping("/equipped/{type}")
+    public ResponseEntity<Void> unequip(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable ItemType type
+    ) {
+        storeService.unequip(userId, type);
+        return ResponseEntity.noContent().build();
     }
 }

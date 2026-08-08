@@ -26,6 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final StoreService storeService;
     private final CloudinaryService cloudinaryService;
     private final DailySummarySchedulerService dailySummarySchedulerService;
 
@@ -36,7 +37,7 @@ public class UserService {
     public UserProfileResponse getProfile(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        return userMapper.toProfileResponse(user);
+        return profile(user);
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +68,7 @@ public class UserService {
         User saved = userRepository.save(user);
         dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(saved);
+        return profile(saved);
     }
 
     public ProfilePictureResponse updateProfilePicture(UUID userId, MultipartFile file) {
@@ -114,7 +115,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return userMapper.toProfileResponse(user);
+        return profile(user);
     }
 
     @Transactional
@@ -125,7 +126,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return userMapper.toProfileResponse(user);
+        return profile(user);
     }
 
     @Transactional
@@ -136,7 +137,7 @@ public class UserService {
 
         userRepository.save(preferences.getUser());
 
-        return userMapper.toProfileResponse(preferences.getUser());
+        return profile(preferences.getUser());
     }
 
     @Transactional
@@ -154,7 +155,7 @@ public class UserService {
         User saved = userRepository.save(preferences.getUser());
         dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(saved);
+        return profile(saved);
     }
 
     @Transactional
@@ -175,7 +176,7 @@ public class UserService {
         User saved = userRepository.save(preferences.getUser());
         dailySummarySchedulerService.syncDailySummary(saved);
 
-        return userMapper.toProfileResponse(saved);
+        return profile(saved);
     }
 
     @Transactional
@@ -189,12 +190,16 @@ public class UserService {
 
         userRepository.save(preferences.getUser());
 
-        return userMapper.toProfileResponse(preferences.getUser());
+        return profile(preferences.getUser());
     }
 
     private User findUser(UUID userId) {
         return userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
+    }
+
+    private UserProfileResponse profile(User user) {
+        return userMapper.toProfileResponse(user, storeService.getEquipped(user.getId()));
     }
 
     private Preferences findPreferences(UUID userId) {

@@ -79,6 +79,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeviceToken> deviceTokens = new ArrayList<>();
 
+    // --- equipped items (1:N) — mapped for delete-cascade only; all reads and
+    // writes go through UserEquippedItemRepository, never through this list ---
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<UserEquippedItem> equippedItems = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
