@@ -321,7 +321,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": [\n    {\n      \"type\": \"FRAME\",\n      \"item\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n        \"name\": \"Gold Frame\",\n        \"description\": \"A shiny gold frame for your profile.\",\n        \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n        \"info\": null,\n        \"price\": 100,\n        \"version\": \"1.0\",\n        \"type\": \"FRAME\"\n      },\n      \"equippedAt\": \"2026-07-22T12:00:00Z\"\n    }\n  ]\n}"
                 }
               ]
             },
@@ -535,7 +535,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"firstName\": \"Omar\",\n  \"lastName\": \"Sami\"\n}..."
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Omar\",\n  \"lastName\": \"Sami\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
                 }
               ]
             },
@@ -573,7 +573,25 @@
                   ]
                 },
                 "description": "Update the user's birth date.\n\n**Request Body:**\n- `birthDate` (LocalDate, required) – Must be in the past. Format: `YYYY-MM-DD`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Missing date or date in the future."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2005-01-01\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Profile (Partial)",
@@ -588,7 +606,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"timezone\": \"America/New_York\",\n  \"preferredSessionDuration\": 45,\n  \"bufferBetweenSessions\": 5,\n  \"wakeupTime\": \"07:00:00\",\n  \"sleepTime\": \"23:00:00\",\n  \"schedulingType\": \"BALANCED\"\n}",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"timezone\": \"America/New_York\",\n  \"preferredSessionDuration\": 45,\n  \"bufferBetweenSessions\": 5,\n  \"wakeupTime\": \"07:00:00\",\n  \"sleepTime\": \"23:00:00\",\n  \"schedulingType\": \"BALANCED\",\n  \"birthDate\": \"2002-06-16\",\n  \"dailySummaryEnabled\": true\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -607,7 +625,25 @@
                   ]
                 },
                 "description": "Partially update profile fields. Only provided fields are updated.\n\n**Request Body (all optional):**\n- `firstName` (string) – Max 50 chars.\n- `lastName` (string) – Max 50 chars.\n- `birthDate` (LocalDate) – Must be in the past.\n- `timezone` (string) – IANA timezone regex: `^[A-Za-z]+(?:/[A-Za-z_]+)+$`.\n- `preferredSessionDuration` (int) – Minutes (≥ 0).\n- `bufferBetweenSessions` (int) – Minutes (≥ 0).\n- `wakeupTime` (LocalTime) – Format: `HH:mm:ss`.\n- `sleepTime` (LocalTime) – Must differ from `wakeupTime`. Format: `HH:mm:ss`.\n- `schedulingType` (enum) – `BALANCED`, `EASIEST_FIRST`, `HARDEST_FIRST`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"America/New_York\",\n    \"preferredSessionDuration\": 45,\n    \"bufferBetweenSessions\": 5,\n    \"wakeupTime\": \"07:00:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             }
           ]
         },
@@ -648,7 +684,25 @@
                   ]
                 },
                 "description": "Update the user's preferred IANA timezone.\n\n**Request Body:**\n- `timezone` (string, required) – IANA timezone (e.g., `Africa/Cairo`, `America/New_York`, `Asia/Tokyo`).\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `INVALID_TIMEZONE` (400) – Invalid IANA timezone string."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"America/Chicago\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Session Settings",
@@ -684,7 +738,25 @@
                   ]
                 },
                 "description": "Update preferred session duration and buffer time.\n\n**Request Body:**\n- `preferredSessionDuration` (int, required) – Minutes per session (≥ 10).\n- `bufferBetweenSessions` (int, required) – Break minutes between sessions (≥ 0).\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 60,\n    \"bufferBetweenSessions\": 15,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Sleep Schedule",
@@ -720,7 +792,25 @@
                   ]
                 },
                 "description": "Update wake-up and sleep times.\n\n**Request Body:**\n- `wakeupTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `sleepTime` (LocalTime, required) – Must be after `wakeupTime`. Format: `HH:mm:ss`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `INVALID_SLEEP_SCHEDULE` (400) – Wake up must be before sleep time."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Scheduling Type",
@@ -756,7 +846,25 @@
                   ]
                 },
                 "description": "Update the scheduling algorithm type.\n\n**Request Body:**\n- `schedulingType` (enum, optional) – Default: `BALANCED`. Options:\n  - `BALANCED` – Balance difficulty.\n  - `EASIEST_FIRST` – Do easy tasks first.\n  - `HARDEST_FIRST` – Do hard tasks first.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             }
           ]
         }
