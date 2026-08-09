@@ -83,7 +83,7 @@ public class ImageTaskExtractionService {
             return new TaskProposalResponse(strip(report), List.of(), Instant.now());
         }
 
-        log.info("Image from user {} held actionable tasks: {}", userId, report);
+        // log.info("Image from user {} held actionable tasks: {}", userId, report);
 
         return new TaskProposalResponse(
             strip(report),

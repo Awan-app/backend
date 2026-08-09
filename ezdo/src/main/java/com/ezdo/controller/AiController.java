@@ -10,10 +10,12 @@ import com.ezdo.service.ai.decompose.GoalDecompositionService;
 import com.ezdo.service.ai.image.ImageTaskExtractionService;
 import com.ezdo.service.ai.plan.TaskPlanningService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ai")
 @RequiredArgsConstructor
+@Validated
 public class AiController {
 
     private final GoalDecompositionService decompositionService;
@@ -57,7 +60,8 @@ public class AiController {
     public TaskProposalResponse extract(
         @AuthenticationPrincipal UUID userId,
         @RequestPart("image") MultipartFile image,
-        @RequestPart(value = "note", required = false) String note
+        @RequestPart(value = "note", required = false)
+        @Size(max = 2000, message = "Note must be at most 2000 characters") String note
     ) {
         return imageTaskExtractionService.extract(userId, image, note);
     }

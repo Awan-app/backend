@@ -2,9 +2,12 @@ package com.ezdo.service;
 
 import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.gamification.SessionCompleteResponse;
+import com.ezdo.dto.gamification.CompletionReward;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
+import com.ezdo.entity.User;
 import com.ezdo.exception.InvalidOperationException;
 import com.ezdo.exception.InvalidSessionTimeRangeException;
 import com.ezdo.exception.SessionNotFoundException;
@@ -13,10 +16,12 @@ import com.ezdo.mapper.SessionMapper;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.scheduler.SessionSchedulerService;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -35,6 +40,7 @@ public class SessionService {
     private final SessionMapper sessionMapper;
     private final UserRepository userRepository;
     private final SessionSchedulerService sessionSchedulerService;
+    private final GamificationService gamificationService;
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getByTask(UUID taskId, UUID userId, SessionStatus status) {
@@ -61,9 +67,7 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, List<SessionResponse>> getByDateRange(UUID userId, LocalDate startDate, LocalDate endDate, SessionStatus status) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         List<SessionResponse> sessions = sessionRepository.findByUserIdAndDateRange(userId, start, end, status).stream()
@@ -95,9 +99,7 @@ public class SessionService {
 
     @Transactional(readOnly = true)
     public List<SessionResponse> getMissedRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime now = resolveNow(userId);
         return sessionRepository.findMissed(userId, now,
                 startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay()).stream()
@@ -113,40 +115,53 @@ public class SessionService {
 
         session.setStart(request.start());
         session.setEnd(request.end());
-        if (request.status() != null) {
-            validateTransition(session.getStatus(), request.status());
-            session.setStatus(request.status());
-        }
+        // request.status() is intentionally ignored — editing times never mutates a
+        // session's status. Status can only be changed via complete/cancel/uncomplete.
         syncReminder(userId, session);
         return sessionMapper.toResponse(session);
     }
 
+    @Deprecated(forRemoval = true)
     public SessionResponse updateStatus(UUID userId, UUID sessionId, SessionStatus status) {
-        Session session =  sessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(() -> new SessionNotFoundException(sessionId));
-
-        validateTransition(session.getStatus(), status);
-        session.setStatus(status);
-        syncReminder(userId, session);
-        return sessionMapper.toResponse(session);
+        return switch (status) {
+            case COMPLETED -> complete(userId, sessionId).session();
+            case SCHEDULED -> uncomplete(userId, sessionId);
+            case CANCELLED -> cancel(userId, sessionId);
+        };
     }
 
-    public SessionResponse complete(UUID userId, UUID sessionId) {
+    public SessionCompleteResponse complete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
         validateTransition(session.getStatus(), SessionStatus.COMPLETED);
         session.setStatus(SessionStatus.COMPLETED);
         sessionSchedulerService.cancelReminder(session.getId());
-        return sessionMapper.toResponse(session);
+
+        // Rewards fire once per session, ever. Since a session can be un-completed
+        // and completed again, this stamp is what stops the toggle from farming.
+        CompletionReward reward;
+        if (session.getFirstCompletedAt() == null) {
+            session.setFirstCompletedAt(Instant.now());
+            reward = gamificationService.onSessionCompleted(findUser(userId), session);
+        } else {
+            reward = gamificationService.currentResult(findUser(userId));
+        }
+
+        return new SessionCompleteResponse(sessionMapper.toResponse(session), reward);
     }
 
     public SessionResponse uncomplete(UUID userId, UUID sessionId) {
         Session session = sessionRepository.findByIdAndUserId(sessionId, userId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
 
+        if (session.getStatus() == SessionStatus.SCHEDULED) {
+            return sessionMapper.toResponse(session);
+        }
+
         validateTransition(session.getStatus(), SessionStatus.SCHEDULED);
         session.setStatus(SessionStatus.SCHEDULED);
+        session.getTask().reopen();
         sessionSchedulerService.scheduleReminder(session, userId);
         return sessionMapper.toResponse(session);
     }
@@ -201,9 +216,13 @@ public class SessionService {
         }
     }
 
+    private User findUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
     private LocalDateTime resolveNow(UUID userId) {
-        Preferences prefs = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId)).getPreferences();
+        Preferences prefs = findUser(userId).getPreferences();
         ZoneId zone = (prefs != null && prefs.getTimezone() != null)
                 ? ZoneId.of(prefs.getTimezone())
                 : ZoneId.of("UTC");

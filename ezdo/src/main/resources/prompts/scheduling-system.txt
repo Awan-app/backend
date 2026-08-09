@@ -59,7 +59,7 @@ skipped), try each of the following in order — stop as soon as one succeeds:
         1. locked == false                (hard filter: skip locked == true)
         2. mandatory == false  preferred over mandatory == true
         3. Fewer points        preferred over more points
-        4. COMPLETED or SKIPPED preferred over SCHEDULED or IN_PROGRESS
+        4. COMPLETED preferred over SCHEDULED
         5. Smallest overlap duration preferred
 
   (c) FAIL

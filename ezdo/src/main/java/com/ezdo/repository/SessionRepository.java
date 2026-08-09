@@ -57,12 +57,26 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
                                           @Param("endDate") LocalDateTime endDate,
                                           @Param("status") SessionStatus status);
 
+    @Query("""
+        SELECT s FROM Session s
+        JOIN s.task t
+        JOIN t.goal g
+        WHERE g.user.id = :userId
+          AND s.start >= :startDate
+          AND s.start < :endDate
+          AND s.status <> 'CANCELLED'
+        ORDER BY s.start ASC
+    """)
+    List<Session> findOccupyingByUserIdAndDateRange(@Param("userId") UUID userId,
+                                                    @Param("startDate") LocalDateTime startDate,
+                                                    @Param("endDate") LocalDateTime endDate);
+
     /**
-     * Same range as {@link #findByUserIdAndDateRange}, but the task is fetch-joined.
-     * The plain query joins {@code s.task} only to filter by owner, which leaves the
-     * association a lazy proxy — fine for reading its id, but any caller that needs
-     * the task's title or flags (the AI schedule context does) would N+1 or blow up
-     * outside a transaction.
+     * Same range as {@link #findOccupyingByUserIdAndDateRange}, but the task is
+     * fetch-joined. The plain query joins {@code s.task} only to filter by owner,
+     * which leaves the association a lazy proxy — fine for reading its id, but any
+     * caller that needs the task's title or flags (the AI schedule context does)
+     * would N+1 or blow up outside a transaction.
      */
     @Query("""
         SELECT s FROM Session s
@@ -72,30 +86,27 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
         WHERE g.user.id = :userId
           AND s.start >= :startDate
           AND s.start < :endDate
+          AND s.status <> 'CANCELLED'
         ORDER BY s.start ASC
     """)
     List<Session> findByUserIdAndDateRangeWithTask(@Param("userId") UUID userId,
                                                    @Param("startDate") LocalDateTime startDate,
                                                    @Param("endDate") LocalDateTime endDate);
 
+    /** Feeds the solver's booked intervals — cancelled time is free time. */
     @Query("""
         SELECT s FROM Session s
         JOIN s.task t
         JOIN t.goal g
         WHERE g.user.id = :userId
         AND s.start >= :fromTime AND s.end <= :toTime
+        AND s.status <> 'CANCELLED'
     """)
     List<Session> findByUserIdAndTimeRange(
         @Param("userId") UUID userId,
         @Param("fromTime") LocalDateTime fromTime,
         @Param("toTime") LocalDateTime toTime
     );
-
-    @Query("SELECT s FROM Session s WHERE s.task.goal.user.id = :userId " +
-            "AND s.start >= :dayStart AND s.start < :dayEnd")
-    List<Session> findByUserIdAndDate(@Param("userId") UUID userId,
-                                      @Param("dayStart") LocalDateTime dayStart,
-                                      @Param("dayEnd") LocalDateTime dayEnd);
 
     /**
      * Still-{@code SCHEDULED} sessions whose window has already ended (missed),
@@ -116,7 +127,17 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
                              @Param("now") LocalDateTime now,
                              @Param("startDate") LocalDateTime startDate,
                              @Param("endDate") LocalDateTime endDate);
-    @Modifying
-    @Query("UPDATE Session s SET s.zone = null WHERE s.zone.id IN :zoneIds")
-    void nullifyZoneId(@Param("zoneIds") List<UUID> zoneIds);
+
+    @Modifying(flushAutomatically = true)
+    @Query("""
+        UPDATE Session s SET s.zone = null
+        WHERE s.zone.id IN :zoneIds
+          AND s.id IN (
+              SELECT s2.id FROM Session s2
+              JOIN s2.task t
+              JOIN t.goal g
+              WHERE g.user.id = :userId
+          )
+    """)
+    int nullifyZoneId(@Param("userId") UUID userId, @Param("zoneIds") List<UUID> zoneIds);
 }

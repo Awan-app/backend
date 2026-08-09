@@ -1,93 +1,191 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:with="cBrand='#6366f1',
+               cBrandAlt='#8b5cf6',
+               cBrandSoft='#a78bfa',
+               cOnBrand='#ffffff',
+               cOnBrandMuted='#ddd6fe',
+               cCanvas='#f4f6f9',
+               cSurface='#ffffff',
+               cInk='#1e293b',
+               cBody='#334155',
+               cMuted='#64748b',
+               cFaint='#94a3b8',
+               cLine='#f1f5f9',
+               cTrack='#e2e8f0',
+               cRule='#e2e8f0',
+               cFocusBg='#f0fdf4',
+               cFocusFg='#166534',
+               cWarnBg='#fef3c7',
+               cWarnFg='#d97706',
+               cUrgentBg='#fee2e2',
+               cUrgentFg='#dc2626',
+               cLateBg='#fef2f2',
+               cLateFg='#b91c1c',
+               fontStack='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif'">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>Your plan for today</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f6f9; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9;">
-        <tr>
-            <td align="center" style="padding:24px 16px;">
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
+<body th:style="|margin:0; padding:0; width:100%; background-color:${cCanvas}; font-family:${fontStack}|">
 
-                    <!-- Header -->
-                    <tr>
-                        <td style="background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:16px 16px 0 0; padding:32px 32px 24px; text-align:center;">
-                            <h1 style="margin:0; color:#fff; font-size:24px; font-weight:700;">Good morning, <span th:text="${email.firstName}">there</span>!</h1>
-                            <p style="margin:8px 0 0; color:rgba(255,255,255,0.85); font-size:14px;" th:text="${#temporals.format(email.date, 'EEEE, MMMM d, yyyy')}">Monday, January 1, 2026</p>
-                        </td>
-                    </tr>
+<div th:style="|display:none; font-size:0; line-height:0; max-height:0; max-width:0; opacity:0; overflow:hidden|"
+     th:text="${hasSessions
+                 ? email.sessions.size() + ' sessions today · ' + email.totalFocusMinutes + ' minutes of focus'
+                 : 'No sessions scheduled today.'}">preheader</div>
 
-                    <!-- Today's Sessions -->
-                    <tr th:if="${hasSessions}">
-                        <td style="background:#fff; padding:24px 32px;">
-                            <h2 style="margin:0 0 16px; font-size:16px; font-weight:600; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px;">Today's Schedule</h2>
-                            <div th:each="s : ${email.sessions}" style="display:flex; align-items:center; padding:12px 0; border-bottom:1px solid #f1f5f9;">
-                                <div style="flex-shrink:0; width:80px; text-align:right; padding-right:16px;">
-                                    <span style="font-size:13px; font-weight:600; color:#6366f1;" th:text="${s.startTime()}">09:00</span>
-                                    <span style="font-size:11px; color:#94a3b8; display:block;">– <span th:text="${s.endTime()}">10:00</span></span>
-                                </div>
-                                <div style="flex-grow:1; padding-left:16px; border-left:2px solid #e2e8f0;">
-                                    <span style="font-size:15px; font-weight:500; color:#1e293b;" th:text="${s.title()}">Task Title</span>
-                                </div>
-                            </div>
-                            <div style="margin-top:16px; padding:12px 16px; background:#f0fdf4; border-radius:8px; text-align:center;">
-                                <span style="font-size:13px; color:#166534;">Total focus time: <strong th:text="${#numbers.formatInteger(email.totalFocusMinutes, 0)}">120</strong> minutes</span>
-                            </div>
-                        </td>
-                    </tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       th:bgcolor="${cCanvas}" th:style="|background-color:${cCanvas}; border-collapse:collapse|">
+    <tr>
+        <td align="center" style="padding:24px 16px;">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+                   style="max-width:600px; width:100%; border-collapse:collapse;">
 
-                    <!-- No Sessions -->
-                    <tr th:unless="${hasSessions}">
-                        <td style="background:#fff; padding:24px 32px; text-align:center;">
-                            <div style="font-size:40px; margin-bottom:8px;">☀️</div>
-                            <h2 style="margin:0 0 4px; font-size:18px; font-weight:600; color:#1e293b;">Your day is clear</h2>
-                            <p style="margin:0; font-size:14px; color:#64748b;">Enjoy your free time or catch up on something.</p>
-                        </td>
-                    </tr>
+                <tr>
+                    <td align="center" th:bgcolor="${cBrand}"
+                        th:style="|background-color:${cBrand}; background-image:linear-gradient(135deg,${cBrand},${cBrandAlt}); border-radius:16px 16px 0 0; padding:32px 32px 24px; text-align:center|">
+                        <img th:if="${logoCid != null}" th:src="'cid:' + ${logoCid}" alt="EZDO"
+                             width="96" height="24" style="display:block; margin:0 auto 16px; border:0; outline:none; text-decoration:none;">
+                        <h1 th:style="|margin:0; color:${cOnBrand}; font-size:24px; font-weight:700; font-family:${fontStack}|">
+                            Good morning, <span th:text="${email.firstName}">there</span>!
+                        </h1>
+                        <p th:style="|margin:8px 0 0; color:${cOnBrandMuted}; font-size:14px; font-family:${fontStack}|"
+                           th:text="${#temporals.format(email.date, 'EEEE, MMMM d, yyyy')}">Monday, January 1, 2026</p>
+                    </td>
+                </tr>
 
-                    <!-- Active Goals -->
-                    <tr th:if="${hasGoals}">
-                        <td style="background:#fff; padding:24px 32px; border-top:1px solid #f1f5f9;">
-                            <h2 style="margin:0 0 16px; font-size:16px; font-weight:600; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px;">Active Goals</h2>
-                            <div th:each="g : ${email.activeGoals}" style="margin-bottom:12px;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                                    <span style="font-size:14px; font-weight:500; color:#334155;" th:text="${g.title()}">Goal Title</span>
-                                    <span style="font-size:13px; font-weight:600; color:#6366f1;" th:text="${g.progressPercentage() + '%'}">75%</span>
-                                </div>
-                                <div style="height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden;">
-                                    <div style="height:100%; background:linear-gradient(90deg,#6366f1,#a78bfa); border-radius:4px; transition:width 0.3s;" th:style="'width:' + ${g.progressPercentage()} + '%'"></div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
+                <tr th:if="${hasSessions}">
+                    <td th:bgcolor="${cSurface}" th:style="|background-color:${cSurface}; padding:24px 32px|">
+                        <h2 th:style="|margin:0 0 16px; font-size:16px; font-weight:600; color:${cInk}; text-transform:uppercase; letter-spacing:0.5px; font-family:${fontStack}|">
+                            Today's Schedule</h2>
 
-                    <!-- Upcoming Deadlines -->
-                    <tr th:if="${hasDeadlines}">
-                        <td style="background:#fff; padding:24px 32px; border-top:1px solid #f1f5f9;">
-                            <h2 style="margin:0 0 16px; font-size:16px; font-weight:600; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px;">Upcoming Deadlines</h2>
-                            <div th:each="d : ${email.upcomingDeadlines}" style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f1f5f9;">
-                                <span style="font-size:14px; font-weight:500; color:#334155;" th:text="${d.title()}">Goal Title</span>
-                                <span th:if="${d.daysRemaining() > 0}" style="flex-shrink:0; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:#fef3c7; color:#d97706;" th:text="${d.daysRemaining() + ' days left'}">5 days left</span>
-                                <span th:if="${d.daysRemaining() == 0}" style="flex-shrink:0; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:#fee2e2; color:#dc2626;">Due today</span>
-                                <span th:if="${d.daysRemaining() < 0}" style="flex-shrink:0; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; background:#fef2f2; color:#b91c1c;" th:text="${-d.daysRemaining() + ' days overdue'}">2 days overdue</span>
-                            </div>
-                        </td>
-                    </tr>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="border-collapse:collapse;">
+                            <tr th:each="s : ${email.sessions}">
+                                <td width="80" align="right" valign="top"
+                                    th:style="|width:80px; padding:12px 16px 12px 0; border-bottom:1px solid ${cLine}; font-family:${fontStack}|">
+                                    <span th:style="|font-size:13px; font-weight:600; color:${cBrand}|"
+                                          th:text="${#temporals.format(s.startTime(), 'HH:mm')}">09:00</span>
+                                    <span th:style="|font-size:11px; color:${cFaint}; display:block|">–
+                                        <span th:text="${#temporals.format(s.endTime(), 'HH:mm')}">10:00</span></span>
+                                </td>
+                                <td valign="top"
+                                    th:style="|padding:12px 0 12px 16px; border-left:2px solid ${cRule}; border-bottom:1px solid ${cLine}; font-size:15px; font-weight:500; color:${cInk}; font-family:${fontStack}|"
+                                    th:text="${s.title()}">Task Title</td>
+                            </tr>
+                        </table>
 
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background:#fff; border-radius:0 0 16px 16px; padding:24px 32px; border-top:1px solid #f1f5f9; text-align:center;">
-                            <p style="margin:0; font-size:12px; color:#94a3b8;">Have a productive day! — EZDO</p>
-                        </td>
-                    </tr>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="border-collapse:collapse; margin-top:16px;">
+                            <tr>
+                                <td align="center" th:bgcolor="${cFocusBg}"
+                                    th:style="|background-color:${cFocusBg}; border-radius:8px; padding:12px 16px; font-size:13px; color:${cFocusFg}; font-family:${fontStack}|">
+                                    Total focus time:
+                                    <strong th:text="${#numbers.formatInteger(email.totalFocusMinutes, 0)}">120</strong> minutes
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
 
-                    <!-- Spacer -->
-                    <tr><td style="height:16px;"></td></tr>
+                <tr th:unless="${hasSessions}">
+                    <td align="center" th:bgcolor="${cSurface}"
+                        th:style="|background-color:${cSurface}; padding:24px 32px; text-align:center; font-family:${fontStack}|">
+                        <div style="font-size:40px; line-height:48px; margin-bottom:8px;">&#9728;&#65039;</div>
+                        <h2 th:style="|margin:0 0 4px; font-size:18px; font-weight:600; color:${cInk}|">Your day is clear</h2>
+                        <p th:style="|margin:0; font-size:14px; color:${cMuted}|">Enjoy your free time or catch up on something.</p>
+                    </td>
+                </tr>
 
-                </table>
-            </td>
-        </tr>
-    </table>
+                <tr th:if="${hasGoals}">
+                    <td th:bgcolor="${cSurface}"
+                        th:style="|background-color:${cSurface}; padding:24px 32px; border-top:1px solid ${cLine}|">
+                        <h2 th:style="|margin:0 0 16px; font-size:16px; font-weight:600; color:${cInk}; text-transform:uppercase; letter-spacing:0.5px; font-family:${fontStack}|">
+                            Active Goals</h2>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="border-collapse:collapse;">
+                            <tr th:each="g : ${email.activeGoals}" th:with="pct=${g.progressPercentage()}">
+                                <td style="padding:0 0 12px;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                                           style="border-collapse:collapse;">
+                                        <tr>
+                                            <td align="left"
+                                                th:style="|padding:0 0 4px; font-size:14px; font-weight:500; color:${cBody}; font-family:${fontStack}|"
+                                                th:text="${g.title()}">Goal Title</td>
+                                            <td align="right"
+                                                th:style="|padding:0 0 4px; font-size:13px; font-weight:600; color:${cBrand}; font-family:${fontStack}|"
+                                                th:text="${pct} + '%'">75%</td>
+                                        </tr>
+                                    </table>
+
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                                           th:bgcolor="${cTrack}"
+                                           th:style="|background-color:${cTrack}; border-radius:4px; border-collapse:collapse|">
+                                        <tr>
+                                            <td th:if="${pct > 0}" th:attr="width=${pct} + '%'"
+                                                th:bgcolor="${cBrand}"
+                                                th:style="|width:${pct}%; background-color:${cBrand}; background-image:linear-gradient(90deg,${cBrand},${cBrandSoft}); border-radius:4px; height:8px; font-size:0; line-height:8px|">&nbsp;</td>
+                                            <td th:if="${pct < 100}"
+                                                style="height:8px; font-size:0; line-height:8px;">&nbsp;</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr th:if="${hasDeadlines}">
+                    <td th:bgcolor="${cSurface}"
+                        th:style="|background-color:${cSurface}; padding:24px 32px; border-top:1px solid ${cLine}|">
+                        <h2 th:style="|margin:0 0 16px; font-size:16px; font-weight:600; color:${cInk}; text-transform:uppercase; letter-spacing:0.5px; font-family:${fontStack}|">
+                            Upcoming Deadlines</h2>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="border-collapse:collapse;">
+                            <tr th:each="d : ${email.upcomingDeadlines}"
+                                th:with="days=${d.daysRemaining()},
+                                         badgeBg=${d.daysRemaining() < 0 ? cLateBg : (d.daysRemaining() == 0 ? cUrgentBg : cWarnBg)},
+                                         badgeFg=${d.daysRemaining() < 0 ? cLateFg : (d.daysRemaining() == 0 ? cUrgentFg : cWarnFg)}">
+                                <td align="left" valign="middle"
+                                    th:style="|padding:10px 12px 10px 0; border-bottom:1px solid ${cLine}; font-size:14px; font-weight:500; color:${cBody}; font-family:${fontStack}|"
+                                    th:text="${d.title()}">Goal Title</td>
+                                <td align="right" valign="middle"
+                                    th:style="|padding:10px 0; border-bottom:1px solid ${cLine}|">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="right"
+                                           style="border-collapse:collapse;">
+                                        <tr>
+                                            <td th:bgcolor="${badgeBg}"
+                                                th:style="|background-color:${badgeBg}; color:${badgeFg}; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; font-family:${fontStack}|"
+                                                th:text="${days < 0
+                                                            ? (days == -1 ? '1 day overdue' : -days + ' days overdue')
+                                                            : (days == 0 ? 'Due today'
+                                                            : (days == 1 ? '1 day left' : days + ' days left'))}">5 days left</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td align="center" th:bgcolor="${cSurface}"
+                        th:style="|background-color:${cSurface}; border-radius:0 0 16px 16px; padding:24px 32px; border-top:1px solid ${cLine}; text-align:center|">
+                        <p th:style="|margin:0; font-size:12px; color:${cFaint}; font-family:${fontStack}|">
+                            Have a productive day! &#8212; EZDO</p>
+                    </td>
+                </tr>
+
+                <tr><td style="height:16px; font-size:0; line-height:16px;">&nbsp;</td></tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

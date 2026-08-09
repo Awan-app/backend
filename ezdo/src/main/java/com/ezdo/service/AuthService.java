@@ -24,6 +24,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final CategorySeedService categorySeedService;
     private final KeycloakUserSyncService keycloakUserSyncService;
+    private final UserProvisioningService userProvisioningService;
 
     public OtpResponse requestOtp(OtpRequest request) {
         return otpService.requestOtp(EmailUtil.normalize(request.email()));
@@ -41,9 +42,7 @@ public class AuthService {
         boolean isNewUser = user == null;
 
         if (isNewUser) {
-            user = new User();
-            user.setEmail(email);
-            user.setIsNew(true);
+            user = userProvisioningService.register(email);
         }
 
         // Set email verified if not already

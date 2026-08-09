@@ -70,10 +70,14 @@ estimatedDuration
   duration should agree with that span.
 
 estimatedPoints
-- Relative effort/complexity of this task compared to the OTHER tasks in this
-  same source — a quick errand is low, a task requiring research, coordination,
-  or sustained creative/technical work is higher. When the source describes only
-  one task, judge it on its own terms.
+- The reward the user earns for completing ONE session of this task, not for
+  the whole task. Relative effort/complexity of this task compared to the OTHER
+  tasks in this same source — a quick errand is low, a task requiring research,
+  coordination, or sustained creative/technical work is higher. When the source
+  describes only one task, judge it on its own terms.
+- A long task with allowTaskSplitting=true will be worked across several
+  sessions and paid for each one, so keep its per-session value proportionate
+  rather than pricing the entire task into it.
 
 mandatory
 - true unless the entry itself signals this is optional, a stretch goal, or
@@ -164,7 +168,7 @@ using this order:
      preference — a locked item is immovable.
   2. Prefer overlapping "optional" over "mandatory".
   3. Prefer fewer points over more points.
-  4. Prefer COMPLETED or SKIPPED over SCHEDULED or IN_PROGRESS.
+  4. Prefer COMPLETED over SCHEDULED.
   5. Prefer a short, partial overlap over a long or total one.
 Whenever you overlap anything, name it in the reason and say why it was the
 cheapest choice.

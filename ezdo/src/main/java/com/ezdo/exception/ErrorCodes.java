@@ -20,6 +20,9 @@ public class ErrorCodes {
     public static final String UNKNOWN_TEMP_ID = "UNKNOWN_TEMP_ID";
     public static final String INVALID_SLEEP_SCHEDULE = "INVALID_SLEEP_SCHEDULE";
     public static final String INSUFFICIENT_POINTS = "INSUFFICIENT_POINTS";
+    public static final String ITEM_ALREADY_OWNED = "ITEM_ALREADY_OWNED";
+    public static final String ITEM_NOT_OWNED = "ITEM_NOT_OWNED";
+    public static final String DAILY_GIFT_ALREADY_CLAIMED = "DAILY_GIFT_ALREADY_CLAIMED";
 
     // Security
     public static final String ACCESS_DENIED = "ACCESS_DENIED";
@@ -59,6 +62,7 @@ public class ErrorCodes {
     public static final String ZONE_OVERLAP = "ZONE_OVERLAP";
     public static final String TEMPLATE_NOT_FOUND = "TEMPLATE_NOT_FOUND";
     public static final String TEMPLATE_OVERRIDE_NOT_FOUND = "TEMPLATE_OVERRIDE_NOT_FOUND";
+    public static final String TEMPLATE_OVERRIDE_DATE_TAKEN = "TEMPLATE_OVERRIDE_DATE_TAKEN";
     public static final String INVALID_ZONE_TIME_RANGE = "INVALID_ZONE_TIME_RANGE";
     public static final String ZONE_NOT_FOUND = "ZONE_NOT_FOUND";
     public static final String DAY_NOT_FOUND = "DAY_NOT_FOUND";

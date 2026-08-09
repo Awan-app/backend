@@ -97,13 +97,14 @@ public class GoalSchedulingService {
             if (chunk.getStartingGrain() == null) continue;
 
             results.add(new SessionResponse(
-                    chunk.getId(),
-                    chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()),
-                    chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()).plusMinutes((long) chunk.getDurationInGrains() * 15),
-                    null,
-                    false,
-                    chunk.getStartingGrain().getZoneId(),
-                    chunk.getTaskId()
+                chunk.getId(),
+                chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()),
+                chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()).plusMinutes((long) chunk.getDurationInGrains() * 15),
+                null,
+                false,
+                null,
+                chunk.getStartingGrain().getZoneId(),
+                chunk.getTaskId()
             ));
         }
         return results;
@@ -137,6 +138,8 @@ public class GoalSchedulingService {
                     UUID zoneId = chunk.getStartingGrain().getZoneId();
                     Zone zone = zoneRepository.findByIdAndUserId(zoneId, userId)
                             .orElseThrow(() -> new ZoneNotFoundException(zoneId));
+
+                    task.reopen();
 
                     Session session = Session.builder()
                             .start(chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()))

@@ -1,6 +1,10 @@
 package com.ezdo.service;
 
 import com.ezdo.dto.SessionResponse;
+import com.ezdo.dto.gamification.PointsDelta;
+import com.ezdo.dto.gamification.CompletionReward;
+import com.ezdo.dto.gamification.StreakDelta;
+import com.ezdo.dto.task.TaskCompleteResponse;
 import com.ezdo.dto.goal.TaskCreateRequest;
 import com.ezdo.dto.goal.TaskInfoResponse;
 import com.ezdo.dto.goal.TaskUpdateRequest;
@@ -18,10 +22,12 @@ import com.ezdo.mapper.SessionMapper;
 import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.*;
 import com.ezdo.scheduler.SessionSchedulerService;
+import com.ezdo.util.DateRangeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,6 +37,7 @@ import java.util.*;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final SessionRepository sessionRepository;
     private final GoalRepository goalRepository;
     private final GoalService goalService;
     private final UserRepository userRepository;
@@ -39,6 +46,7 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final SessionMapper sessionMapper;
     private final SessionSchedulerService sessionSchedulerService;
+    private final GamificationService gamificationService;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -66,7 +74,6 @@ public class TaskService {
             .estimatedPoints(request.estimatedPoints() != null ? request.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(request.allowTaskSplitting()))
             .category(category)
-            .status(TaskStatus.SCHEDULED)
             .build();
 
         return taskMapper.toInfoResponse(taskRepository.save(task));
@@ -99,7 +106,6 @@ public class TaskService {
             .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
             .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
             .category(category)
-            .status(TaskStatus.SCHEDULED)
             .build();
 
         for (var sessionReq : request.sessions()) {
@@ -112,7 +118,9 @@ public class TaskService {
             Session session = Session.builder()
                 .start(sessionReq.start())
                 .end(sessionReq.end())
-                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                // Sessions are always created SCHEDULED; a client-supplied status is
+                // ignored — lifecycle changes go through complete/cancel/uncomplete.
+                .status(SessionStatus.SCHEDULED)
                 .zone(zone)
                 .task(task)
                 .build();
@@ -160,7 +168,6 @@ public class TaskService {
                 .estimatedPoints(taskReq.estimatedPoints() != null ? taskReq.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(taskReq.allowTaskSplitting()))
                 .category(category)
-                .status(TaskStatus.SCHEDULED)
                 .build();
 
             for (var sessionReq : item.sessions()) {
@@ -173,7 +180,9 @@ public class TaskService {
                 Session session = Session.builder()
                     .start(sessionReq.start())
                     .end(sessionReq.end())
-                    .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                    // Sessions are always created SCHEDULED; a client-supplied status is
+                    // ignored — lifecycle changes go through complete/cancel/uncomplete.
+                    .status(SessionStatus.SCHEDULED)
                     .zone(zone)
                     .task(task)
                     .build();
@@ -198,6 +207,7 @@ public class TaskService {
         UUID userId, UUID taskId, AddSessionsRequest request
     ) {
         Task task = getOwnedTask(userId, taskId);
+        task.reopen();
         List<Session> newSessions = new ArrayList<>();
 
         for (SessionDraftRequest sessionReq : request.sessions()) {
@@ -210,7 +220,9 @@ public class TaskService {
             Session session = Session.builder()
                 .start(sessionReq.start())
                 .end(sessionReq.end())
-                .status(sessionReq.status() != null ? sessionReq.status() : SessionStatus.SCHEDULED)
+                // Sessions are always created SCHEDULED; a client-supplied status is
+                // ignored — lifecycle changes go through complete/cancel/uncomplete.
+                .status(SessionStatus.SCHEDULED)
                 .zone(zone)
                 .task(task)
                 .build();
@@ -218,9 +230,9 @@ public class TaskService {
             task.getSessions().add(session);
         }
 
-        taskRepository.save(task);
-        scheduleReminders(userId, newSessions);
-        return newSessions.stream().map(sessionMapper::toResponse).toList();
+        List<Session> saved = sessionRepository.saveAll(newSessions);
+        scheduleReminders(userId, saved);
+        return saved.stream().map(sessionMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
@@ -233,6 +245,67 @@ public class TaskService {
     @Transactional(readOnly = true)
     public TaskInfoResponse getTask(UUID userId, UUID taskId) {
         return taskMapper.toInfoResponse(getOwnedTask(userId, taskId));
+    }
+
+    @Transactional
+    public TaskCompleteResponse completeTask(UUID userId, UUID taskId) {
+        Task task = getOwnedTask(userId, taskId);
+        User user = findUser(userId);
+
+        if (task.isCompleted()) {
+            return new TaskCompleteResponse(
+                taskMapper.toInfoResponse(task), List.of(),
+                gamificationService.currentResult(user));
+        }
+
+        CompletionReward before = gamificationService.currentResult(user);
+
+        List<Session> justCompleted = new ArrayList<>();
+        for (Session session : task.getSessions()) {
+            if (session.getStatus() != SessionStatus.SCHEDULED) continue;
+
+            session.setStatus(SessionStatus.COMPLETED);
+            sessionSchedulerService.cancelReminder(session.getId());
+
+            if (session.getFirstCompletedAt() == null) {
+                session.setFirstCompletedAt(Instant.now());
+                gamificationService.onSessionCompleted(user, session);
+            }
+            justCompleted.add(session);
+        }
+
+        task.setCompletedAt(Instant.now());
+
+        CompletionReward after = gamificationService.currentResult(user);
+        return new TaskCompleteResponse(
+            taskMapper.toInfoResponse(task),
+            justCompleted.stream()
+                .sorted(Comparator.comparing(Session::getStart))
+                .map(sessionMapper::toResponse)
+                .toList(),
+            aggregate(before, after)
+        );
+    }
+
+    @Transactional
+    public TaskInfoResponse uncompleteTask(UUID userId, UUID taskId) {
+        Task task = getOwnedTask(userId, taskId);
+        task.reopen();
+        return taskMapper.toInfoResponse(task);
+    }
+
+    private CompletionReward aggregate(CompletionReward before, CompletionReward after) {
+        long oldPoints = before.points().newValue();
+        long newPoints = after.points().newValue();
+        int oldStreak = before.streak().newValue();
+        int newStreak = after.streak().newValue();
+        int oldMax = before.streak().maxStreakNew();
+        int newMax = after.streak().maxStreakNew();
+
+        return new CompletionReward(
+            new PointsDelta(newPoints > oldPoints, newPoints - oldPoints, oldPoints, newPoints),
+            new StreakDelta(oldStreak != newStreak, oldStreak, newStreak, newMax > oldMax, oldMax, newMax)
+        );
     }
 
     @Transactional
@@ -344,9 +417,7 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, List<TaskWithSessionsResponse>> getTasksByDateRange(UUID userId, LocalDate startDate, LocalDate endDate) {
-        if (endDate.isBefore(startDate)) {
-            throw new InvalidOperationException("endDate must not be before startDate");
-        }
+        DateRangeValidator.validate(startDate, endDate);
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.plusDays(1).atStartOfDay();
         List<Task> tasks = taskRepository.findByUserIdAndDateRange(userId, start, end);

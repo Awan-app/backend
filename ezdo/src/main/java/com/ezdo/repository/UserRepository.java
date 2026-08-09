@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("UPDATE User u SET u.profilePictureUrl = :url WHERE u.id = :userId")
     void updateProfilePictureUrl(@Param("userId") UUID userId, @Param("url") String url);
 
-    @Query("SELECT u FROM User u WHERE u.preferences.wakeupTime IS NOT NULL " +
-            "AND u.preferences.dailySummaryEnabled = true")
+    @Query("SELECT u FROM User u JOIN FETCH u.preferences p " +
+            "WHERE p.wakeupTime IS NOT NULL AND p.dailySummaryEnabled = true")
     List<User> findAllEligibleForDailySummary();
 }

@@ -321,7 +321,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\"\n  }\n}"
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": [\n    {\n      \"type\": \"FRAME\",\n      \"item\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n        \"name\": \"Gold Frame\",\n        \"description\": \"A shiny gold frame for your profile.\",\n        \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n        \"info\": null,\n        \"price\": 100,\n        \"version\": \"1.0\",\n        \"type\": \"FRAME\"\n      },\n      \"equippedAt\": \"2026-07-22T12:00:00Z\"\n    }\n  ]\n}"
                 }
               ]
             },
@@ -535,7 +535,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"firstName\": \"Omar\",\n  \"lastName\": \"Sami\"\n}..."
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Omar\",\n  \"lastName\": \"Sami\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
                 }
               ]
             },
@@ -573,7 +573,25 @@
                   ]
                 },
                 "description": "Update the user's birth date.\n\n**Request Body:**\n- `birthDate` (LocalDate, required) – Must be in the past. Format: `YYYY-MM-DD`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Missing date or date in the future."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2005-01-01\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Profile (Partial)",
@@ -588,7 +606,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"timezone\": \"America/New_York\",\n  \"preferredSessionDuration\": 45,\n  \"bufferBetweenSessions\": 5,\n  \"wakeupTime\": \"07:00:00\",\n  \"sleepTime\": \"23:00:00\",\n  \"schedulingType\": \"BALANCED\"\n}",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"timezone\": \"America/New_York\",\n  \"preferredSessionDuration\": 45,\n  \"bufferBetweenSessions\": 5,\n  \"wakeupTime\": \"07:00:00\",\n  \"sleepTime\": \"23:00:00\",\n  \"schedulingType\": \"BALANCED\",\n  \"birthDate\": \"2002-06-16\",\n  \"dailySummaryEnabled\": true\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -607,7 +625,25 @@
                   ]
                 },
                 "description": "Partially update profile fields. Only provided fields are updated.\n\n**Request Body (all optional):**\n- `firstName` (string) – Max 50 chars.\n- `lastName` (string) – Max 50 chars.\n- `birthDate` (LocalDate) – Must be in the past.\n- `timezone` (string) – IANA timezone regex: `^[A-Za-z]+(?:/[A-Za-z_]+)+$`.\n- `preferredSessionDuration` (int) – Minutes (≥ 0).\n- `bufferBetweenSessions` (int) – Minutes (≥ 0).\n- `wakeupTime` (LocalTime) – Format: `HH:mm:ss`.\n- `sleepTime` (LocalTime) – Must differ from `wakeupTime`. Format: `HH:mm:ss`.\n- `schedulingType` (enum) – `BALANCED`, `EASIEST_FIRST`, `HARDEST_FIRST`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"America/New_York\",\n    \"preferredSessionDuration\": 45,\n    \"bufferBetweenSessions\": 5,\n    \"wakeupTime\": \"07:00:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             }
           ]
         },
@@ -648,7 +684,25 @@
                   ]
                 },
                 "description": "Update the user's preferred IANA timezone.\n\n**Request Body:**\n- `timezone` (string, required) – IANA timezone (e.g., `Africa/Cairo`, `America/New_York`, `Asia/Tokyo`).\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `INVALID_TIMEZONE` (400) – Invalid IANA timezone string."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"America/Chicago\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Session Settings",
@@ -684,7 +738,25 @@
                   ]
                 },
                 "description": "Update preferred session duration and buffer time.\n\n**Request Body:**\n- `preferredSessionDuration` (int, required) – Minutes per session (≥ 10).\n- `bufferBetweenSessions` (int, required) – Break minutes between sessions (≥ 0).\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 60,\n    \"bufferBetweenSessions\": 15,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Sleep Schedule",
@@ -720,7 +792,25 @@
                   ]
                 },
                 "description": "Update wake-up and sleep times.\n\n**Request Body:**\n- `wakeupTime` (LocalTime, required) – Format: `HH:mm:ss`.\n- `sleepTime` (LocalTime, required) – Must be after `wakeupTime`. Format: `HH:mm:ss`.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `INVALID_SLEEP_SCHEDULE` (400) – Wake up must be before sleep time."
-              }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
             },
             {
               "name": "Update Scheduling Type",
@@ -756,17 +846,130 @@
                   ]
                 },
                 "description": "Update the scheduling algorithm type.\n\n**Request Body:**\n- `schedulingType` (enum, optional) – Default: `BALANCED`. Options:\n  - `BALANCED` – Balance difficulty.\n  - `EASIEST_FIRST` – Do easy tasks first.\n  - `HARDEST_FIRST` – Do hard tasks first.\n\n**Response (200):** `UserProfileResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"Abdelrahman\",\n  \"lastName\": \"Emad\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"Africa/Cairo\",\n    \"preferredSessionDuration\": 30,\n    \"bufferBetweenSessions\": 10,\n    \"wakeupTime\": \"07:30:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gamification",
+      "item": [
+        {
+          "name": "Get Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
               }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/gamification/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "gamification",
+                "progress"
+              ]
+            },
+            "description": "Get the authenticated user's gamification progress (points + streak).\n\n**Response (200):** `UserProgressResponse`\n- `points` (int) – Total wallet points.\n- `streak` (int) – Current effective streak (0 if the user lapsed a day).\n- `maxStreak` (int) – Highest streak ever reached.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"points\": 150,\n  \"streak\": 6,\n  \"maxStreak\": 12\n}"
             }
           ]
         },
         {
-          "name": "Gamification",
+          "name": "Get Activity Dates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/gamification/activity-dates?startDate=2026-07-20&endDate=2026-07-22",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "gamification",
+                "activity-dates"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-07-20",
+                  "description": "Inclusive start date, YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-07-22",
+                  "description": "Inclusive end date, YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "List the dates on which the user performed a qualifying activity (streak-relevant days), within a date range.\n\n**Query Parameters:**\n- `startDate` (LocalDate, required) – Inclusive start. Format: `YYYY-MM-DD`.\n- `endDate` (LocalDate, required) – Inclusive end. Format: `YYYY-MM-DD`.\n\n**Response (200):** Array of `LocalDate` (activity dates, ascending).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `INVALID_OPERATION` (400) – `startDate` is after `endDate`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  \"2026-07-20\",\n  \"2026-07-21\",\n  \"2026-07-22\"\n]"
+            }
+          ]
+        },
+        {
+          "name": "Daily Wheel",
           "item": [
             {
-              "name": "Increment Streak",
+              "name": "Get Wheel Config",
               "request": {
-                "method": "PATCH",
+                "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
@@ -774,29 +977,19 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/streak/increment",
+                  "raw": "{{baseUrl}}/v1/gamification/wheel/config",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "streak",
-                    "increment"
+                    "gamification",
+                    "wheel",
+                    "config"
                   ]
                 },
-                "description": "Increment the user's current streak by 1. If current streak exceeds max streak, max streak is updated.\n\n**Request Body:** None (empty).\n\n**Response (200):** `UserProgressResponse`\n- `points` (int) – Total points.\n- `streak` (int) – Updated current streak.\n- `maxStreak` (int) – Highest streak ever.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+                "description": "Get the daily wheel layout plus the user's claim status for today. Call this when\nthe daily-gift screen opens, to draw the wheel and decide whether the spin button is enabled.\n\n**Response (200):** `WheelConfigResponse`\n- `segments` (array of `WheelSegmentResponse`) – The wheel layout, in wheel order. The order is\n  stable across calls, so segment *i* is always the same wedge.\n  - `segmentId` (string) – Stable id of the wedge (e.g. `SEG_4`). Match the spin result against this.\n  - `coins` (int) – Coins this wedge pays. `0` for the item wedge.\n  - `payoutType` (enum) – `COINS` or `ITEM`.\n- `claimedToday` (boolean) – `true` if the user already spun today. Disable the spin button.\n- `lastClaim` (`WheelClaimResponse`, nullable) – The most recent claim, or `null` if the user has\n  never spun. Useful for showing \"you won X yesterday\".\n  - `segmentId`, `coinsAwarded`, `itemId`, `itemName`, `claimDate`, `claimedAt`.\n\nSegment weights are deliberately **not** exposed — the odds are server-side only.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
               },
               "response": [
                 {
@@ -809,14 +1002,14 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"points\": 150,\n  \"streak\": 6,\n  \"maxStreak\": 12\n}"
+                  "body": "{\n  \"segments\": [\n    {\n      \"segmentId\": \"SEG_1\",\n      \"coins\": 1,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_2\",\n      \"coins\": 5,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_3\",\n      \"coins\": 10,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_4\",\n      \"coins\": 20,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_5\",\n      \"coins\": 50,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_6\",\n      \"coins\": 100,\n      \"payoutType\": \"COINS\"\n    },\n    {\n      \"segmentId\": \"SEG_ITEM\",\n      \"coins\": 0,\n      \"payoutType\": \"ITEM\"\n    }\n  ],\n  \"claimedToday\": true,\n  \"lastClaim\": {\n    \"segmentId\": \"SEG_4\",\n    \"coinsAwarded\": 20,\n    \"itemId\": null,\n    \"itemName\": null,\n    \"claimDate\": \"2026-07-22\",\n    \"claimedAt\": \"2026-07-22T09:14:03.221Z\"\n  }\n}"
                 }
               ]
             },
             {
-              "name": "Reset Streak",
+              "name": "Spin Wheel",
               "request": {
-                "method": "PATCH",
+                "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
@@ -824,35 +1017,114 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/streak/reset",
+                  "raw": "{{baseUrl}}/v1/gamification/wheel/spin",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "streak",
-                    "reset"
+                    "gamification",
+                    "wheel",
+                    "spin"
                   ]
                 },
-                "description": "Reset the user's current streak to 0. Max streak is preserved.\n\n**Request Body:** None (empty).\n\n**Response (200):** `UserProgressResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
-              }
+                "description": "Spin the daily wheel. Once per calendar day, in the user's own timezone.\n\n**The server decides the outcome.** The client sends no body and picks nothing — it animates the\nwheel so it lands on the `segmentId` the response returns. Never award coins or items client-side.\n\n**Response (200):** `WheelSpinResponse`\n- `segmentId` (string) – Which wedge to land the animation on. Always one of the `segmentId`s from\n  `GET /wheel/config`.\n- `payoutType` (enum) – `COINS` or `ITEM`. **Branch on this, not on the segment's configured type.**\n- `coinsAwarded` (int) – Coins credited. `0` when `payoutType` is `ITEM`.\n- `newBalance` (long) – Wallet balance after the spin. Use it directly; no need to re-fetch progress.\n- `item` (`ItemResponse`, nullable) – The won item when `payoutType` is `ITEM`, otherwise `null`.\n\n**Item wedge:** the item is picked at random from the items the user does **not** already own, and it\nis added to the inventory for free (it does not cost points). If the user already owns every item,\nthe spin resolves to a coin wedge instead — the response will say `SEG_4` / `COINS`, never\n`SEG_ITEM` with a null item.\n\n**Possible Errors:**\n- `DAILY_GIFT_ALREADY_CLAIMED` (409) – Already spun today. `info.claimDate` is the day in question.\n  Nothing is credited on a rejected spin.\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+              },
+              "response": [
+                {
+                  "name": "Success - Coins",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"segmentId\": \"SEG_2\",\n  \"payoutType\": \"COINS\",\n  \"coinsAwarded\": 5,\n  \"newBalance\": 180,\n  \"item\": null\n}"
+                },
+                {
+                  "name": "Success - Item",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"segmentId\": \"SEG_ITEM\",\n  \"payoutType\": \"ITEM\",\n  \"coinsAwarded\": 0,\n  \"newBalance\": 175,\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  }\n}"
+                },
+                {
+                  "name": "Already Claimed",
+                  "status": "Conflict",
+                  "code": 409,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Daily gift already claimed for this day.\",\n  \"statusCode\": 409,\n  \"errorCode\": \"DAILY_GIFT_ALREADY_CLAIMED\",\n  \"info\": {\n    \"claimDate\": \"2026-07-22\"\n  },\n  \"timestamp\": \"2026-07-22T09:20:11.4821\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Store",
+          "item": [
+            {
+              "name": "Get All Items",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/items",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "items"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "FRAME",
+                      "description": "Optional filter: FRAME, SKIN, THEME, or ICON"
+                    }
+                  ]
+                },
+                "description": "List all store items, optionally filtered by type.\n\n**Query Parameters:**\n- `type` (enum, optional) – One of: `FRAME`, `SKIN`, `THEME`, `ICON`. Omit for all.\n\n**Response (200):** Array of `ItemResponse`\n- `id` (UUID), `name`, `description`, `image`, `info`, `price` (int), `version`, `type` (enum).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  }\n]"
+                }
+              ]
             },
             {
-              "name": "Award Points",
+              "name": "Get Inventory",
               "request": {
-                "method": "PATCH",
+                "method": "GET",
                 "header": [
                   {
                     "key": "Authorization",
@@ -860,35 +1132,38 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"points\": 50\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/points/award",
+                  "raw": "{{baseUrl}}/v1/store/inventory",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "points",
-                    "award"
+                    "store",
+                    "inventory"
                   ]
                 },
-                "description": "Award points to the user (adds to total).\n\n**Request Body:**\n- `points` (int, required) – Must be positive (> 0).\n\n**Response (200):** `UserProgressResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Points must be positive."
-              }
+                "description": "List the authenticated user's owned items.\n\n**Response (200):** Array of `UserItemResponse`\n- `id` (UUID) – Ownership record ID.\n- `item` (`ItemResponse`) – The owned item details.\n- `boughtAt` (ISO datetime) – When it was purchased.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440011\",\n    \"item\": {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n      \"name\": \"Aurora Frame\",\n      \"description\": \"A glowing animated frame for your avatar\",\n      \"image\": \"https://cdn.example.com/frames/aurora.png\",\n      \"info\": \"Rarity: epic\",\n      \"price\": 200,\n      \"version\": \"1.0\",\n      \"type\": \"FRAME\"\n    },\n    \"boughtAt\": \"2026-07-22T10:00:00Z\"\n  }\n]"
+                }
+              ]
             },
             {
-              "name": "Deduct Points",
+              "name": "Buy Item",
               "request": {
-                "method": "PATCH",
+                "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
@@ -896,30 +1171,155 @@
                     "type": "text"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"points\": 10\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "{{baseUrl}}/v1/users/me/points/deduct",
+                  "raw": "{{baseUrl}}/v1/store/items/{{itemId}}/buy",
                   "host": [
                     "{{baseUrl}}"
                   ],
                   "path": [
                     "v1",
-                    "users",
-                    "me",
-                    "points",
-                    "deduct"
+                    "store",
+                    "items",
+                    "{{itemId}}",
+                    "buy"
                   ]
                 },
-                "description": "Deduct points from the user (subtracts from total).\n\n**Request Body:**\n- `points` (int, required) – Must be positive (> 0).\n\n**Response (200):** `UserProgressResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Points must be positive.\n- `INSUFFICIENT_POINTS` (400) – User doesn't have enough points."
-              }
+                "description": "Purchase an item with wallet points. The price is deducted from the wallet and the item is added to the user's inventory.\n\n**Path Parameters:**\n- `itemId` (UUID, required) – Item to buy.\n\n**Request Body:** None (empty).\n\n**Response (200):** `UserItemResponse` — The newly created ownership record.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `ITEM_NOT_FOUND` (404) – Item does not exist.\n- `ITEM_ALREADY_OWNED` (409) – User already owns this item.\n- `INSUFFICIENT_POINTS` (400) – Wallet balance is below the item price."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440011\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Aurora Frame\",\n    \"description\": \"A glowing animated frame for your avatar\",\n    \"image\": \"https://cdn.example.com/frames/aurora.png\",\n    \"info\": \"Rarity: epic\",\n    \"price\": 200,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"boughtAt\": \"2026-07-22T10:00:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Equipped",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/equipped",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "equipped"
+                  ]
+                },
+                "description": "List the authenticated user's currently equipped items (one slot per type).\n\n**Response (200):** Array of `EquippedItemResponse`\n- `type` (ItemType) – The equipped slot's type: `FRAME`, `SKIN`, `THEME`, `ICON`.\n- `item` (`ItemResponse`) – The equipped item details.\n- `equippedAt` (ISO datetime) – When it was equipped.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"type\": \"FRAME\",\n    \"item\": {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n      \"name\": \"Gold Frame\",\n      \"description\": \"A shiny gold frame for your profile.\",\n      \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n      \"info\": null,\n      \"price\": 100,\n      \"version\": \"1.0\",\n      \"type\": \"FRAME\"\n    },\n    \"equippedAt\": \"2026-07-22T12:00:00Z\"\n  }\n]"
+                }
+              ]
+            },
+            {
+              "name": "Equip Item",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/items/{{itemId}}/equip",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "items",
+                    "{{itemId}}",
+                    "equip"
+                  ]
+                },
+                "description": "Equip an owned item. One slot exists per `ItemType` (`FRAME`, `SKIN`, `THEME`, `ICON`), so equipping an item replaces the previously equipped item of the same type. Equipping the same item again is a no-op.\n\n**Path Parameters:**\n- `itemId` (UUID, required) – The owned item to equip.\n\n**Request Body:** None (empty).\n\n**Response (200):** `EquippedItemResponse` — the equipped slot.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `USER_NOT_FOUND` (404) – User not found.\n- `ITEM_NOT_FOUND` (404) – Item does not exist.\n- `ITEM_NOT_OWNED` (409) – User does not own this item."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"type\": \"FRAME\",\n  \"item\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440010\",\n    \"name\": \"Gold Frame\",\n    \"description\": \"A shiny gold frame for your profile.\",\n    \"image\": \"https://res.cloudinary.com/demo/image/upload/v1/ezdo/store/gold_frame.png\",\n    \"info\": null,\n    \"price\": 100,\n    \"version\": \"1.0\",\n    \"type\": \"FRAME\"\n  },\n  \"equippedAt\": \"2026-07-22T12:00:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Unequip Item",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/store/equipped/{{itemType}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "store",
+                    "equipped",
+                    "{{itemType}}"
+                  ]
+                },
+                "description": "Clear the equipped slot of a type. Idempotent – calling it for an empty slot succeeds.\n\n**Path Parameters:**\n- `itemType` (enum, required) – One of: `FRAME`, `SKIN`, `THEME`, `ICON`.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+              },
+              "response": [
+                {
+                  "name": "No Content",
+                  "status": "No Content",
+                  "code": 204,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": ""
+                }
+              ]
             }
           ]
         }
@@ -1154,7 +1554,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"DRAFTED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"DRAFTED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
             }
           ]
         },
@@ -1259,7 +1659,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"SCHEDULED\",\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"dependsOnTaskIds\": [],\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Category Name\"\n      }\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
+              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"ACTIVE\",\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"dependsOnTaskIds\": [],\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Category Name\"\n      }\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"firstCompletedAt\": null,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
             }
           ]
         },
@@ -1310,7 +1710,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ],\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Category Name\"\n  }\n}"
+              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ],\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Category Name\"\n  }\n}"
             }
           ]
         },
@@ -1357,7 +1757,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"task-uuid-here\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"SCHEDULED\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 50,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"dependsOnTaskIds\": []\n}"
+              "body": "{\n  \"id\": \"task-uuid-here\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"DRAFTED\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 50,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"dependsOnTaskIds\": []\n}"
             }
           ]
         },
@@ -1374,7 +1774,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": null\n  },\n  \"sessions\": [\n    {\n      \"zoneId\": \"optional-zone-uuid\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\"\n    },\n    {\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\"\n    }\n  ]\n}",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": null\n  },\n  \"sessions\": [\n    {\n      \"zoneId\": \"optional-zone-uuid\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\"\n    },\n    {\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1405,7 +1805,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [],\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"optional-zone-uuid\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    }\n  ]\n}"
+              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"status\": \"ACTIVE\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [],\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": \"optional-zone-uuid\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": null\n    }\n  ]\n}"
             }
           ]
         },
@@ -1422,7 +1822,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": null,\n        \"categoryId\": \"cat-uuid-1\"\n      },\n      \"sessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"categoryId\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}",
+              "raw": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": null,\n        \"categoryId\": \"cat-uuid-1\"\n      },\n      \"sessions\": [\n        {\n          \"zoneId\": \"zone-uuid-here\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"categoryId\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1454,7 +1854,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
+              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
             }
           ]
         },
@@ -1501,7 +1901,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
             }
           ]
         },
@@ -1518,7 +1918,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sessions\": [\n    {\n      \"zoneId\": \"zone-uuid-here\",\n      \"start\": \"2026-07-30T14:00:00\",\n      \"end\": \"2026-07-30T15:00:00\",\n      \"status\": \"SCHEDULED\"\n    },\n    {\n      \"start\": \"2026-07-31T09:00:00\",\n      \"end\": \"2026-07-31T10:00:00\"\n    }\n  ]\n}",
+              "raw": "{\n  \"sessions\": [\n    {\n      \"zoneId\": \"zone-uuid-here\",\n      \"start\": \"2026-07-30T14:00:00\",\n      \"end\": \"2026-07-30T15:00:00\"\n    },\n    {\n      \"start\": \"2026-07-31T09:00:00\",\n      \"end\": \"2026-07-31T10:00:00\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1550,7 +1950,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"new-session-uuid-1\",\n    \"start\": \"2026-07-30T14:00:00\",\n    \"end\": \"2026-07-30T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"zone-uuid-here\",\n    \"taskId\": \"task-uuid-here\"\n  },\n  {\n    \"id\": \"new-session-uuid-2\",\n    \"start\": \"2026-07-31T09:00:00\",\n    \"end\": \"2026-07-31T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"task-uuid-here\"\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"new-session-uuid-1\",\n    \"start\": \"2026-07-30T14:00:00\",\n    \"end\": \"2026-07-30T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": \"zone-uuid-here\",\n    \"taskId\": \"task-uuid-here\"\n  },\n  {\n    \"id\": \"new-session-uuid-2\",\n    \"start\": \"2026-07-31T09:00:00\",\n    \"end\": \"2026-07-31T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": null,\n    \"taskId\": \"task-uuid-here\"\n  }\n]"
             }
           ]
         },
@@ -1592,7 +1992,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"status\": \"COMPLETED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
+              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1612,6 +2012,110 @@
             },
             "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `ACTIVE`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
           }
+        },
+        {
+          "name": "Complete Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "complete"
+              ]
+            },
+            "description": "Mark a task as done. This is the **only** way a task's status becomes `COMPLETED` — a task whose\nsessions all happen to be finished still reads `ACTIVE` until this is called.\n\n**What it does**\n- Every session of the task still `SCHEDULED` becomes `COMPLETED`, and each awards its points the\n  first time it closes (same rule as completing a session individually).\n- Sessions already `COMPLETED` or `CANCELLED` are left untouched. Cancelled sessions never pay.\n- **Idempotent** — completing an already-completed task returns 200 with nothing closed and nothing\n  awarded. There is no 409. A double tap is safe; do not show an error.\n\n**Response (200):** `TaskCompleteResponse`\n- `task` (`TaskInfoResponse`) - the task in its new state; `task.status` is `COMPLETED`.\n- `completedSessions` (array) - **only the sessions this call closed**, sorted by start time. Empty\n  when the task was already complete. These are the ones to animate.\n- `reward` (`CompletionReward`) - the same object session completion returns, but **aggregated over\n  the whole call**: `reward.points.amount` is the total for all sessions closed, and the streak\n  reports at most one advance (it moves once per day regardless of how many sessions close). Show a\n  single celebration, not one per session. There is no `pointsAwarded` field - use\n  `reward.points.amount`.\n\n**Task status values:** `DRAFTED` (no sessions), `ACTIVE` (has non-cancelled sessions), `COMPLETED`\n(this endpoint), `CANCELLED` (all sessions cancelled). `SCHEDULED` is no longer a task status.\n\n**Completion reverses implicitly.** Adding a session to a completed task\n(`POST /v1/tasks/{taskId}/sessions`) or un-completing one of its sessions\n(`POST /v1/sessions/{sessionId}/uncomplete`) reopens it to `ACTIVE`. Neither call is rejected and\nneither response includes the task, so **refetch `GET /v1/tasks/{taskId}` after either** or your\ncached status is stale. No points are taken back; re-completing pays only for sessions never\ncompleted before.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) - Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) - Task not found or not owned by the user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    }\n  ],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": true,\n      \"amount\": 50,\n      \"oldValue\": 150,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": true,\n      \"oldValue\": 5,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+            },
+            {
+              "name": "Already Completed (no-op)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": false,\n      \"amount\": 0,\n      \"oldValue\": 200,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": false,\n      \"oldValue\": 6,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Uncomplete Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/uncomplete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "uncomplete"
+              ]
+            },
+            "description": "Revoke a task's completion — the explicit counterpart to `POST /v1/tasks/{taskId}/complete`.\n\nUse this when the user says \"actually, I'm not done with this.\" Without it the only way to reopen a\ntask is a side effect of session-level calls (adding a session, or un-completing one), which forces\nthe app to fake session data to express a task-level intent.\n\n**What it does**\n- Clears the task's completion. `status` reverts to its derived value.\n- **Sessions are left exactly as they are.** The sessions the completion closed stay `COMPLETED` —\n  un-complete individually the ones that should reopen. Reopening restores editability, it does not\n  rewind history: the server never recorded which sessions a completion closed, so un-completing all\n  of them would wrongly reopen ones finished beforehand.\n- **No points are taken back.** Re-completing later awards only sessions never completed before,\n  which is usually nothing.\n- **Idempotent** — un-completing an open task returns 200 and changes nothing.\n\n**Response (200):** `TaskInfoResponse` — the same object as `GET /v1/tasks/{taskId}`, with `status`\nalready updated, so there is nothing to refetch.\n\nThe status it falls back to is derived, so it is not always `ACTIVE`: a task with no sessions returns\nto `DRAFTED`, and one whose sessions were all cancelled returns to `CANCELLED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) - Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) - Task not found or not owned by the user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"ACTIVE\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 25,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+            },
+            {
+              "name": "Success - task had no sessions",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Task with no sessions yet\",\n  \"description\": null,\n  \"estimatedDuration\": 60,\n  \"status\": \"DRAFTED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 10,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+            }
+          ]
         },
         {
           "name": "Move Task",
@@ -1851,7 +2355,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-22T09:00:00\",\n    \"end\": \"2026-07-22T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-22T09:00:00\",\n    \"end\": \"2026-07-22T10:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"start\": \"2026-07-22T14:00:00\",\n    \"end\": \"2026-07-22T15:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": null,\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  }\n]"
             }
           ]
         },
@@ -1907,7 +2411,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"2026-07-20\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n      \"start\": \"2026-07-20T09:00:00\",\n      \"end\": \"2026-07-20T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n    }\n  ],\n  \"2026-07-22\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:30:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    },\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440004\",\n      \"start\": \"2026-07-22T14:00:00\",\n      \"end\": \"2026-07-22T15:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440005\"\n    }\n  ]\n}"
+              "body": "{\n  \"2026-07-20\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n      \"start\": \"2026-07-20T09:00:00\",\n      \"end\": \"2026-07-20T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\"\n    }\n  ],\n  \"2026-07-22\": [\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440003\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:30:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": null\n    },\n    {\n      \"id\": \"550e8400-e29b-41d4-a716-446655440004\",\n      \"start\": \"2026-07-22T14:00:00\",\n      \"end\": \"2026-07-22T15:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": \"550e8400-e29b-41d4-a716-446655440005\"\n    }\n  ]\n}"
             }
           ]
         },
@@ -2010,7 +2514,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"firstCompletedAt\": null,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -2027,7 +2531,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"COMPLETED\"\n}",
+              "raw": "{\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2045,7 +2549,7 @@
                 "{{sessionId}}"
               ]
             },
-            "description": "Update a session's time range and optionally its status.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Request Body:**\n- `start` (ISO datetime, required) – New start time.\n- `end` (ISO datetime, required) – New end time (must be after `start`).\n- `status` (string, optional) – `SCHEDULED`, `COMPLETED`, or `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
+            "description": "Update a session's time range. **`status` is ignored** — editing a session never changes its status.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Request Body:**\n- `start` (ISO datetime, required) – New start time.\n- `end` (ISO datetime, required) – New end time (must be after `start`).\n- `status` – **Ignored by the server.** Omit it. Use `POST /sessions/{id}/complete`, `/uncomplete` or `/cancel` to change status.\n\n**Response (200):** Updated `SessionResponse` — `status` and `firstCompletedAt` come back unchanged.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – Request body validation failed.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user."
           },
           "response": [
             {
@@ -2058,7 +2562,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T10:00:00\",\n  \"end\": \"2026-07-21T12:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"firstCompletedAt\": null,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -2092,7 +2596,7 @@
                 }
               ]
             },
-            "description": "Update only the status of a session.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Query Parameters:**\n- `status` (string, required) – New status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – `status` query parameter is required.\n- `TYPE_MISMATCH` (400) – Invalid status value.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
+            "description": "**DEPRECATED — will be removed.** Use the dedicated endpoints instead: `POST /sessions/{id}/complete`, `POST /sessions/{id}/uncomplete`, `POST /sessions/{id}/cancel`.\n\nThis endpoint only forwards to those three. Note it **discards the reward payload** that `complete` returns, so points/streak animations are impossible through this route.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Query Parameters:**\n- `status` (string, required) – New status. One of: `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n\n**Response (200):** Updated `SessionResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `MISSING_PARAMETER` (400) – `status` query parameter is required.\n- `TYPE_MISMATCH` (400) – Invalid status value.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Invalid status transition (see Sessions lifecycle)."
           },
           "response": [
             {
@@ -2105,7 +2609,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"COMPLETED\",\n  \"locked\": false,\n  \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -2132,8 +2636,22 @@
                 "complete"
               ]
             },
-            "description": "Mark a `SCHEDULED` session as completed.\n\n**Transition:** `SCHEDULED → COMPLETED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** Updated `SessionResponse` with `status: COMPLETED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be completed from its current status (e.g. already cancelled)."
-          }
+            "description": "Mark a `SCHEDULED` session as completed and award the gamification reward.\n\n**Transition:** `SCHEDULED → COMPLETED`.\n\n**Path Parameters:**\n- `sessionId` (UUID, required) – Session identifier.\n\n**Response (200):** `SessionCompleteResponse`\n- `session` (`SessionResponse`) – The completed session with `status: COMPLETED`.\n- `reward` (`SessionCompletionReward`) – Points and streak deltas produced by this completion:\n  - `points.awarded` (bool) – True only on the first-ever completion of this session and only if the task has `estimatedPoints > 0`.\n  - `points.amount`, `points.oldValue`, `points.newValue` – Points credited and wallet balance before/after.\n  - `streak.updated` (bool) – True if the effective streak changed.\n  - `streak.oldValue`, `streak.newValue`, `streak.maxStreakBroken`, `streak.maxStreakOld`, `streak.maxStreakNew`.\n\nRe-completing the same session awards nothing (`points.awarded: false`, `streak.updated: false`).\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `SESSION_NOT_FOUND` (404) – Session not found or does not belong to user.\n- `INVALID_OPERATION` (400) – Session cannot be completed from its current status (e.g. already cancelled)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"session\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-22T09:00:00\",\n    \"end\": \"2026-07-22T10:00:00\",\n    \"status\": \"COMPLETED\",\n    \"locked\": false,\n    \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n  },\n  \"reward\": {\n    \"points\": {\n      \"awarded\": true,\n      \"amount\": 25,\n      \"oldValue\": 150,\n      \"newValue\": 175\n    },\n    \"streak\": {\n      \"updated\": true,\n      \"oldValue\": 5,\n      \"newValue\": 6,\n      \"maxStreakBroken\": true,\n      \"maxStreakOld\": 6,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Uncomplete Session",
@@ -2223,7 +2741,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": true,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": true,\n  \"firstCompletedAt\": null,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -2263,7 +2781,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"start\": \"2026-07-21T09:00:00\",\n  \"end\": \"2026-07-21T11:00:00\",\n  \"status\": \"SCHEDULED\",\n  \"locked\": false,\n  \"firstCompletedAt\": null,\n  \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n  \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\"\n}"
             }
           ]
         },
@@ -2902,7 +3420,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\",\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n    \"start\": \"2026-07-21T09:00:00\",\n    \"end\": \"2026-07-21T11:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"locked\": false,\n    \"firstCompletedAt\": null,\n    \"zoneId\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"taskId\": \"550e8400-e29b-41d4-a716-446655440099\",\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  }\n]"
             }
           ]
         },
@@ -3153,6 +3671,302 @@
                 }
               ],
               "body": "\"2026-07-28T10:30:00\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Device Tokens",
+      "item": [
+        {
+          "name": "Register Device Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens"
+              ]
+            },
+            "description": "Register or update a device token for push notifications. Upsert keyed by `deviceId`.\n\n**Request Body:**\n- `deviceId` (string, required) – Unique device identifier.\n- `fcmToken` (string, required) – FCM registration token.\n- `deviceType` (string, optional) – One of: `ANDROID`, `IOS`, `WEB`.\n\n**Response (200):** `DeviceTokenResponse`\n- `id` (UUID), `deviceId`, `deviceType`, `createdAt`, `updatedAt`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – `deviceId` or `fcmToken` is blank.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": \"device-123\",\n  \"fcmToken\": \"fcm-registration-token-here\",\n  \"deviceType\": \"ANDROID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440020\",\n  \"deviceId\": \"device-123\",\n  \"deviceType\": \"ANDROID\",\n  \"createdAt\": \"2026-07-22T10:00:00Z\",\n  \"updatedAt\": \"2026-07-22T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Devices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens"
+              ]
+            },
+            "description": "List all registered devices (push tokens) for the authenticated user.\n\n**Response (200):** Array of `DeviceTokenResponse`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440020\",\n    \"deviceId\": \"device-123\",\n    \"deviceType\": \"ANDROID\",\n    \"createdAt\": \"2026-07-22T10:00:00Z\",\n    \"updatedAt\": \"2026-07-22T10:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Remove Device Token",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens/{{deviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens",
+                "{{deviceId}}"
+              ]
+            },
+            "description": "Remove a single device token by its device ID.\n\n**Path Parameters:**\n- `deviceId` (string, required) – The device identifier.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Remove All Device Tokens",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/device-tokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "device-tokens"
+              ]
+            },
+            "description": "Remove all device tokens for the authenticated user (sign out everywhere).\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "API Keys",
+      "item": [
+        {
+          "name": "Create API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api-keys"
+              ]
+            },
+            "description": "Generate a new long-lived API key for MCP client authentication.\n\n**Request Body:**\n- `name` (string, required, max 100) – A label to identify the key.\n\n**Response (200):** `ApiKeyResponse` — the full `keyValue` is returned ONLY once; it cannot be retrieved again later.\n- `id` (UUID), `name`, `keyValue`, `createdAt`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (422) – `name` is blank or too long.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Claude Desktop\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440030\",\n  \"name\": \"Claude Desktop\",\n  \"keyValue\": \"ezdo_5f6a8c1d2e3f4a5b6c7d8e9f\",\n  \"createdAt\": \"2026-07-22T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List API Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api-keys"
+              ]
+            },
+            "description": "List all active API keys for the authenticated user. The full key value is never returned – only a display prefix.\n\n**Response (200):** Array of `ApiKeySummaryResponse`\n- `id` (UUID), `name`, `keyPrefix` (first chars + \"...\"), `createdAt`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440030\",\n    \"name\": \"Claude Desktop\",\n    \"keyPrefix\": \"ezdo_5f6a8c1d...\",\n    \"createdAt\": \"2026-07-22T10:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Revoke API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/api-keys/{{keyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "api-keys",
+                "{{keyId}}"
+              ]
+            },
+            "description": "Revoke (soft-delete) an API key. Any MCP client using it immediately stops authenticating.\n\n**Path Parameters:**\n- `keyId` (UUID, required) – The key to revoke.\n\n**Response (204):** No content.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `ILLEGAL_ARGUMENT` (400) – Key not found or not owned by user."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
             }
           ]
         }
@@ -3796,6 +4610,22 @@
     {
       "key": "templateOverrideId",
       "value": ""
+    },
+    {
+      "key": "itemId",
+      "value": ""
+    },
+    {
+      "key": "deviceId",
+      "value": ""
+    },
+    {
+      "key": "keyId",
+      "value": ""
+    },
+    {
+      "key": "itemType",
+      "value": "FRAME"
     }
   ]
 }
