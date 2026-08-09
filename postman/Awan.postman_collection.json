@@ -1446,7 +1446,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"DRAFTED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"DRAFTED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
             }
           ]
         },
@@ -1551,7 +1551,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"SCHEDULED\",\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"dependsOnTaskIds\": [],\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Category Name\"\n      }\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
+              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"ACTIVE\",\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"dependsOnTaskIds\": [],\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Category Name\"\n      }\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
             }
           ]
         },
@@ -1602,7 +1602,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ],\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Category Name\"\n  }\n}"
+              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ],\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Category Name\"\n  }\n}"
             }
           ]
         },
@@ -1649,7 +1649,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"task-uuid-here\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"SCHEDULED\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 50,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"dependsOnTaskIds\": []\n}"
+              "body": "{\n  \"id\": \"task-uuid-here\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"DRAFTED\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 50,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"dependsOnTaskIds\": []\n}"
             }
           ]
         },
@@ -1697,7 +1697,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"status\": \"SCHEDULED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [],\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"optional-zone-uuid\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    }\n  ]\n}"
+              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"status\": \"ACTIVE\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [],\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": \"optional-zone-uuid\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"zoneId\": null\n    }\n  ]\n}"
             }
           ]
         },
@@ -1746,7 +1746,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"SCHEDULED\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
+              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
             }
           ]
         },
@@ -1884,7 +1884,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"status\": \"COMPLETED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
+              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"estimatedDuration\": 90,\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"categoryId\": \"new-category-uuid\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1904,6 +1904,110 @@
             },
             "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `ACTIVE`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
           }
+        },
+        {
+          "name": "Complete Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "complete"
+              ]
+            },
+            "description": "Mark a task as done. This is the **only** way a task's status becomes `COMPLETED` — a task whose\nsessions all happen to be finished still reads `ACTIVE` until this is called.\n\n**What it does**\n- Every session of the task still `SCHEDULED` becomes `COMPLETED`, and each awards its points the\n  first time it closes (same rule as completing a session individually).\n- Sessions already `COMPLETED` or `CANCELLED` are left untouched. Cancelled sessions never pay.\n- **Idempotent** — completing an already-completed task returns 200 with nothing closed and nothing\n  awarded. There is no 409. A double tap is safe; do not show an error.\n\n**Response (200):** `TaskCompleteResponse`\n- `task` (`TaskInfoResponse`) - the task in its new state; `task.status` is `COMPLETED`.\n- `completedSessions` (array) - **only the sessions this call closed**, sorted by start time. Empty\n  when the task was already complete. These are the ones to animate.\n- `reward` (`CompletionReward`) - the same object session completion returns, but **aggregated over\n  the whole call**: `reward.points.amount` is the total for all sessions closed, and the streak\n  reports at most one advance (it moves once per day regardless of how many sessions close). Show a\n  single celebration, not one per session. There is no `pointsAwarded` field - use\n  `reward.points.amount`.\n\n**Task status values:** `DRAFTED` (no sessions), `ACTIVE` (has non-cancelled sessions), `COMPLETED`\n(this endpoint), `CANCELLED` (all sessions cancelled). `SCHEDULED` is no longer a task status.\n\n**Completion reverses implicitly.** Adding a session to a completed task\n(`POST /v1/tasks/{taskId}/sessions`) or un-completing one of its sessions\n(`POST /v1/sessions/{sessionId}/uncomplete`) reopens it to `ACTIVE`. Neither call is rejected and\nneither response includes the task, so **refetch `GET /v1/tasks/{taskId}` after either** or your\ncached status is stale. No points are taken back; re-completing pays only for sessions never\ncompleted before.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) - Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) - Task not found or not owned by the user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    }\n  ],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": true,\n      \"amount\": 50,\n      \"oldValue\": 150,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": true,\n      \"oldValue\": 5,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+            },
+            {
+              "name": "Already Completed (no-op)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": false,\n      \"amount\": 0,\n      \"oldValue\": 200,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": false,\n      \"oldValue\": 6,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Uncomplete Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/tasks/{{taskId}}/uncomplete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "uncomplete"
+              ]
+            },
+            "description": "Revoke a task's completion — the explicit counterpart to `POST /v1/tasks/{taskId}/complete`.\n\nUse this when the user says \"actually, I'm not done with this.\" Without it the only way to reopen a\ntask is a side effect of session-level calls (adding a session, or un-completing one), which forces\nthe app to fake session data to express a task-level intent.\n\n**What it does**\n- Clears the task's completion. `status` reverts to its derived value.\n- **Sessions are left exactly as they are.** The sessions the completion closed stay `COMPLETED` —\n  un-complete individually the ones that should reopen. Reopening restores editability, it does not\n  rewind history: the server never recorded which sessions a completion closed, so un-completing all\n  of them would wrongly reopen ones finished beforehand.\n- **No points are taken back.** Re-completing later awards only sessions never completed before,\n  which is usually nothing.\n- **Idempotent** — un-completing an open task returns 200 and changes nothing.\n\n**Response (200):** `TaskInfoResponse` — the same object as `GET /v1/tasks/{taskId}`, with `status`\nalready updated, so there is nothing to refetch.\n\nThe status it falls back to is derived, so it is not always `ACTIVE`: a task with no sessions returns\nto `DRAFTED`, and one whose sessions were all cancelled returns to `CANCELLED`.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) - Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) - Task not found or not owned by the user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"ACTIVE\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 25,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+            },
+            {
+              "name": "Success - task had no sessions",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Task with no sessions yet\",\n  \"description\": null,\n  \"estimatedDuration\": 60,\n  \"status\": \"DRAFTED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 10,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+            }
+          ]
         },
         {
           "name": "Move Task",

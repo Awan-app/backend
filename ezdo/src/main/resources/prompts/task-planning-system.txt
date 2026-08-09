@@ -168,7 +168,7 @@ using this order:
      preference — a locked item is immovable.
   2. Prefer overlapping "optional" over "mandatory".
   3. Prefer fewer points over more points.
-  4. Prefer COMPLETED or SKIPPED over SCHEDULED or IN_PROGRESS.
+  4. Prefer COMPLETED over SCHEDULED.
   5. Prefer a short, partial overlap over a long or total one.
 Whenever you overlap anything, name it in the reason and say why it was the
 cheapest choice.

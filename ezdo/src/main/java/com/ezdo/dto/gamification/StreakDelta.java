@@ -1,7 +1,7 @@
 package com.ezdo.dto.gamification;
 
 /**
- * Streak delta produced by completing a session.
+ * Streak delta produced by a completion.
  *
  * @param updated        true iff the user-visible effective streak changed
  * @param oldValue       effective streak before the activity

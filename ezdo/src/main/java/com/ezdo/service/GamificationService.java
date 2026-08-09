@@ -1,7 +1,7 @@
 package com.ezdo.service;
 
 import com.ezdo.dto.gamification.PointsDelta;
-import com.ezdo.dto.gamification.SessionCompletionReward;
+import com.ezdo.dto.gamification.CompletionReward;
 import com.ezdo.dto.gamification.StreakDelta;
 import com.ezdo.dto.profile.UserProgressResponse;
 import com.ezdo.entity.Session;
@@ -31,7 +31,7 @@ public class GamificationService {
     private final UserClockService userClockService;
 
     @Transactional
-    public SessionCompletionReward onSessionCompleted(User user, Session session) {
+    public CompletionReward onSessionCompleted(User user, Session session) {
         Wallet wallet = user.getWallet();
         Streak streak = user.getStreak();
 
@@ -50,7 +50,7 @@ public class GamificationService {
         int newStreak = streak.effectiveStreak(today);
         int newMaxStreak = streak.getMaxStreak();
 
-        return new SessionCompletionReward(
+        return new CompletionReward(
             new PointsDelta(awarded, awarded ? points : 0, oldPoints, newPoints),
             new StreakDelta(
                 oldStreak != newStreak,
@@ -64,13 +64,13 @@ public class GamificationService {
     }
 
     @Transactional(readOnly = true)
-    public SessionCompletionReward currentResult(User user) {
+    public CompletionReward currentResult(User user) {
         Wallet wallet = user.getWallet();
         Streak streak = user.getStreak();
         long points = wallet.getPoints();
         int currentStreak = streak.effectiveStreak(userClockService.today(user));
         int maxStreak = streak.getMaxStreak();
-        return new SessionCompletionReward(
+        return new CompletionReward(
             new PointsDelta(false, 0, points, points),
             new StreakDelta(false, currentStreak, currentStreak, false, maxStreak, maxStreak)
         );

@@ -2,7 +2,10 @@ package com.ezdo.mapper;
 
 import com.ezdo.dto.CategoryResponse;
 import com.ezdo.dto.goal.TaskInfoResponse;
+import com.ezdo.entity.Session;
+import com.ezdo.entity.SessionStatus;
 import com.ezdo.entity.Task;
+import com.ezdo.entity.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +32,7 @@ public class TaskMapper {
             t.getTitle(),
             t.getDescription(),
             t.getEstimatedDuration(),
-            t.getStatus(),
+            deriveStatus(t),
             t.getMandatory(),
             t.getEstimatedPoints(),
             t.getAllowTaskSplitting(),
@@ -37,5 +40,16 @@ public class TaskMapper {
             category,
             depIds
         );
+    }
+
+    private TaskStatus deriveStatus(Task t) {
+        if (t.isCompleted()) return TaskStatus.COMPLETED;
+
+        Set<Session> sessions = t.getSessions();
+        if (sessions.isEmpty()) return TaskStatus.DRAFTED;
+        if (sessions.stream().allMatch(s -> s.getStatus() == SessionStatus.CANCELLED)) {
+            return TaskStatus.CANCELLED;
+        }
+        return TaskStatus.ACTIVE;
     }
 }

@@ -1,7 +1,7 @@
 package com.ezdo.dto.gamification;
 
 /**
- * Wallet point delta produced by completing a session.
+ * Wallet point delta produced by a completion.
  *
  * @param awarded   true iff this completion actually credited points
  * @param amount    number of points credited (0 when {@code awarded} is false)

@@ -8,5 +8,5 @@ import com.ezdo.dto.SessionResponse;
  */
 public record SessionCompleteResponse(
     SessionResponse session,
-    SessionCompletionReward reward
+    CompletionReward reward
 ) {}

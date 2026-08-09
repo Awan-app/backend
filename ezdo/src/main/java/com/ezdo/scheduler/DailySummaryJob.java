@@ -7,7 +7,7 @@ import com.ezdo.dto.email.SessionSummary;
 import com.ezdo.entity.Goal;
 import com.ezdo.entity.GoalStatus;
 import com.ezdo.entity.Session;
-import com.ezdo.entity.TaskStatus;
+import com.ezdo.entity.Task;
 import com.ezdo.entity.User;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.SessionRepository;
@@ -80,7 +80,8 @@ public class DailySummaryJob implements Job {
         LocalDateTime dayStart = date.atStartOfDay();
         LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
 
-        List<Session> sessions = sessionRepository.findByUserIdAndDate(user.getId(), dayStart, dayEnd);
+        List<Session> sessions = sessionRepository
+                .findByUserIdAndDateRangeWithTask(user.getId(), dayStart, dayEnd);
 
         List<SessionSummary> sessionSummaries = sessions.stream()
                 .sorted(Comparator.comparing(Session::getStart))
@@ -102,7 +103,7 @@ public class DailySummaryJob implements Job {
                 .map(g -> {
                     long total = g.getTasks().size();
                     long completed = g.getTasks().stream()
-                            .filter(t -> t.getStatus() == TaskStatus.COMPLETED)
+                            .filter(Task::isCompleted)
                             .count();
                     int progress = total == 0 ? 0 : (int) (completed * 100 / total);
                     return new GoalSummary(g.getTitle(), progress);
