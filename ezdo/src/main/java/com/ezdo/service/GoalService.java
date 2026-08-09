@@ -66,7 +66,6 @@ public class GoalService {
                 .estimatedPoints(dt.estimatedPoints() != null ? dt.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(dt.allowTaskSplitting()))
                 .category(category)
-                .status(TaskStatus.SCHEDULED)
                 .build();
             goal.getTasks().add(task);
             byTempId.put(dt.tempId(), task);
@@ -162,7 +161,6 @@ public class GoalService {
                 .estimatedPoints(item.estimatedPoints() != null ? item.estimatedPoints() : 0)
                 .allowTaskSplitting(Boolean.TRUE.equals(item.allowTaskSplitting()))
                 .category(category)
-                .status(TaskStatus.SCHEDULED)
                 .build());
         }
 

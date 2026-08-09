@@ -1,6 +1,5 @@
 package com.ezdo.dto.goal;
 
-import com.ezdo.entity.TaskStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
@@ -15,8 +14,6 @@ public record TaskUpdateRequest(
 
     @Min(1)
     Integer estimatedDuration,
-
-    TaskStatus status,
 
     Boolean mandatory,
 

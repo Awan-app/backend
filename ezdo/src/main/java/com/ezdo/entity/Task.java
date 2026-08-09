@@ -3,6 +3,7 @@ package com.ezdo.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -30,9 +31,8 @@ public class Task {
     @Column(nullable = false)
     private Integer estimatedDuration;
 
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private TaskStatus status = TaskStatus.SCHEDULED;
+    @Column(name = "completed_at")
+    private Instant completedAt;
 
     @Builder.Default
     private Boolean mandatory = false;
@@ -71,4 +71,17 @@ public class Task {
     @Builder.Default
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Session> sessions = new HashSet<>();
+
+    public boolean isCompleted() {
+        return completedAt != null;
+    }
+
+    /**
+     * Revokes an explicit completion. Called from every path that introduces an
+     * unresolved session, so the invariant "a completed task has no SCHEDULED
+     * sessions" holds without any operation having to be rejected.
+     */
+    public void reopen() {
+        completedAt = null;
+    }
 }

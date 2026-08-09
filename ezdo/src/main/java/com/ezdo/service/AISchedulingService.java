@@ -95,6 +95,8 @@ public class AISchedulingService {
                         .orElseThrow(() -> new ZoneNotFoundException(item.zoneId()));
             }
 
+            task.reopen();
+
             Session session = Session.builder()
                     .start(item.start())
                     .end(item.end())

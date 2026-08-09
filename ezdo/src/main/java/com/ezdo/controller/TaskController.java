@@ -7,6 +7,7 @@ import com.ezdo.dto.task.TaskDependencyRequest;
 import com.ezdo.dto.task.TaskMoveRequest;
 import com.ezdo.dto.SessionResponse;
 import com.ezdo.dto.task.AddSessionsRequest;
+import com.ezdo.dto.task.TaskCompleteResponse;
 import com.ezdo.dto.task.TasksWithSessionsRequest;
 import com.ezdo.dto.task.TasksWithSessionsResponse;
 import com.ezdo.dto.task.TaskWithSessionsRequest;
@@ -107,6 +108,18 @@ public class TaskController {
                                    @PathVariable UUID taskId,
                                    @Valid @RequestBody TaskUpdateRequest request) {
         return taskService.updateTask(userId, taskId, request);
+    }
+
+    @PostMapping("/{taskId}/complete")
+    public TaskCompleteResponse complete(@AuthenticationPrincipal UUID userId,
+                                         @PathVariable UUID taskId) {
+        return taskService.completeTask(userId, taskId);
+    }
+
+    @PostMapping("/{taskId}/uncomplete")
+    public TaskInfoResponse uncomplete(@AuthenticationPrincipal UUID userId,
+                                       @PathVariable UUID taskId) {
+        return taskService.uncompleteTask(userId, taskId);
     }
 
     @PatchMapping("/{taskId}/move")

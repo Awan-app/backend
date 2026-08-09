@@ -139,6 +139,8 @@ public class GoalSchedulingService {
                     Zone zone = zoneRepository.findByIdAndUserId(zoneId, userId)
                             .orElseThrow(() -> new ZoneNotFoundException(zoneId));
 
+                    task.reopen();
+
                     Session session = Session.builder()
                             .start(chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()))
                             .end(chunk.getStartingGrain().getDate().atTime(chunk.getStartingGrain().getStartTime()).plusMinutes((long) chunk.getDurationInGrains() * 15))

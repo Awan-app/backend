@@ -3,7 +3,7 @@ package com.ezdo.service;
 import com.ezdo.dto.SessionRequest;
 import com.ezdo.dto.SessionResponse;
 import com.ezdo.dto.gamification.SessionCompleteResponse;
-import com.ezdo.dto.gamification.SessionCompletionReward;
+import com.ezdo.dto.gamification.CompletionReward;
 import com.ezdo.entity.Preferences;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.SessionStatus;
@@ -140,7 +140,7 @@ public class SessionService {
 
         // Rewards fire once per session, ever. Since a session can be un-completed
         // and completed again, this stamp is what stops the toggle from farming.
-        SessionCompletionReward reward;
+        CompletionReward reward;
         if (session.getFirstCompletedAt() == null) {
             session.setFirstCompletedAt(Instant.now());
             reward = gamificationService.onSessionCompleted(findUser(userId), session);
@@ -161,6 +161,7 @@ public class SessionService {
 
         validateTransition(session.getStatus(), SessionStatus.SCHEDULED);
         session.setStatus(SessionStatus.SCHEDULED);
+        session.getTask().reopen();
         sessionSchedulerService.scheduleReminder(session, userId);
         return sessionMapper.toResponse(session);
     }
