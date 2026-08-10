@@ -141,6 +141,10 @@ ezdo:
     api-key: ${EZDO_CLOUDINARY_API_KEY:}
     api-secret: ${EZDO_CLOUDINARY_API_SECRET:}
 
+  mcp:
+    base-url: ${EZDO_MCP_BASE_URL:}
+    client-id: ${EZDO_MCP_CLIENT_ID:awan-mcp}
+
 timefold:
   solver:
     termination:
