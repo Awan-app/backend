@@ -45,4 +45,8 @@ public class Preferences {
     @Column(name = "daily_summary_enabled")
     @Builder.Default
     private Boolean dailySummaryEnabled = true;
+
+    @Column(name = "notifications_enabled")
+    @Builder.Default
+    private Boolean notificationsEnabled = true;
 }

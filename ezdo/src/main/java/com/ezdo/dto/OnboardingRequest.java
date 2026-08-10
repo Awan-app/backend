@@ -34,11 +34,16 @@ public record OnboardingRequest(
         @NotNull(message = "Sleep time is required")
         LocalTime sleepTime,
 
-        SchedulingType schedulingType
+        SchedulingType schedulingType,
+        
+        Boolean notificationsEnabled
 ) {
     public OnboardingRequest {
         if (schedulingType == null) {
             schedulingType = SchedulingType.BALANCED;
+        }
+        if (notificationsEnabled == null) {
+            notificationsEnabled = true;
         }
     }
 }
