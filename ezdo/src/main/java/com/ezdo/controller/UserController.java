@@ -101,4 +101,14 @@ public class UserController {
     ) {
         return ResponseEntity.ok(userService.updateSchedulingType(userId, request));
     }
+
+    // FOR TESTING PURPOSES ONLY — sets the user's point balance to an absolute
+    // value. Not part of the production API.
+    @PatchMapping("/me/points")
+    public ResponseEntity<Map<String, Long>> setPoints(
+        @AuthenticationPrincipal UUID userId,
+        @Valid @RequestBody SetPointsRequest request
+    ) {
+        return ResponseEntity.ok(Map.of("points", userService.setPoints(userId, request.points())));
+    }
 }

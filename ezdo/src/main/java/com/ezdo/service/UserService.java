@@ -29,6 +29,7 @@ public class UserService {
     private final StoreService storeService;
     private final CloudinaryService cloudinaryService;
     private final DailySummarySchedulerService dailySummarySchedulerService;
+    private final WalletService walletService;
 
     private static final long MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/png", "image/webp");
@@ -204,5 +205,10 @@ public class UserService {
 
     private Preferences findPreferences(UUID userId) {
         return findUser(userId).getPreferences();
+    }
+
+    @Transactional
+    public long setPoints(UUID userId, long points) {
+        return walletService.setPoints(findUser(userId), points).getPoints();
     }
 }
