@@ -1424,7 +1424,21 @@
               ]
             },
             "description": "List user's goals with pagination and filtering.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `status` | `ACTIVE` / `ACHIEVED` | No | — | Filter by goal status. Omit for all. |\n| `includeInbox` | boolean | No | `false` | Include the Inbox goal in results. |\n| `expand` | boolean | No | `false` | Include full task objects instead of just task IDs. |\n| `page` | int | No | `0` | Page number (0-indexed). |\n| `size` | int | No | `20` | Page size (items per page). |\n| `sort` | string | No | — | Sort field and direction (e.g., `createdAt,desc`). |\n\n**Response (200):** Spring Data `Page<GoalInfoResponse>`\n- `content` (array) – List of goals.\n- `totalElements` (long) – Total count.\n- `totalPages` (int) – Total pages.\n- `number` (int) – Current page number.\n- `size` (int) – Page size.\n- `first` / `last` (boolean) – Navigation flags.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TYPE_MISMATCH` (400) – Invalid enum value for status."
-          }
+          },
+          "response": [
+            {
+              "name": "Success (expand=true)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": \"goal-uuid-here\",\n      \"title\": \"Learn Spring Boot\",\n      \"description\": \"Master Spring Boot and build a REST API\",\n      \"status\": \"ACTIVE\",\n      \"targetDate\": \"2026-12-31\",\n      \"createdAt\": \"2026-08-10T05:51:57.217171Z\",\n      \"inbox\": false,\n      \"tasks\": [\n        {\n          \"id\": \"task-uuid-2\",\n          \"title\": \"Build a sample REST API\",\n          \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n          \"estimatedDuration\": 120,\n          \"status\": \"DRAFTED\",\n          \"completedAt\": null,\n          \"mandatory\": false,\n          \"estimatedPoints\": 50,\n          \"allowTaskSplitting\": true,\n          \"goalId\": \"goal-uuid-here\",\n          \"category\": null,\n          \"dependsOnTaskIds\": [\n            \"task-uuid-1\"\n          ]\n        },\n        {\n          \"id\": \"task-uuid-1\",\n          \"title\": \"Study Spring Data JPA\",\n          \"description\": \"Learn JPA repositories and query methods\",\n          \"estimatedDuration\": 90,\n          \"status\": \"DRAFTED\",\n          \"completedAt\": null,\n          \"mandatory\": false,\n          \"estimatedPoints\": 75,\n          \"allowTaskSplitting\": true,\n          \"goalId\": \"goal-uuid-here\",\n          \"category\": {\n            \"id\": \"cat-uuid\",\n            \"name\": \"Learning\"\n          },\n          \"dependsOnTaskIds\": []\n        }\n      ]\n    }\n  ],\n  \"empty\": false,\n  \"first\": true,\n  \"last\": true,\n  \"number\": 0,\n  \"numberOfElements\": 1,\n  \"pageable\": {\n    \"offset\": 0,\n    \"pageNumber\": 0,\n    \"pageSize\": 20,\n    \"paged\": true,\n    \"sort\": {\n      \"empty\": true,\n      \"sorted\": false,\n      \"unsorted\": true\n    },\n    \"unpaged\": false\n  },\n  \"size\": 20,\n  \"sort\": {\n    \"empty\": true,\n    \"sorted\": false,\n    \"unsorted\": true\n  },\n  \"totalElements\": 1,\n  \"totalPages\": 1\n}"
+            }
+          ]
         },
         {
           "name": "Get Inbox",
@@ -1480,7 +1494,21 @@
               ]
             },
             "description": "Get a single goal by ID.\n\n**Path Parameters:**\n- `goalId` (UUID, required) – Goal identifier.\n\n**Query Parameters:**\n| Parameter | Type | Required | Default | Description |\n|---|---|---|---|---|\n| `expand` | boolean | No | `false` | Include full task objects instead of just task IDs. |\n\n**Response (200):** `GoalInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `GOAL_NOT_FOUND` (404) – Goal doesn't exist or doesn't belong to user."
-          }
+          },
+          "response": [
+            {
+              "name": "Success (expand=true)",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"goal-uuid-here\",\n  \"title\": \"Learn Spring Boot\",\n  \"description\": \"Master Spring Boot and build a REST API\",\n  \"status\": \"ACTIVE\",\n  \"targetDate\": \"2026-12-31\",\n  \"createdAt\": \"2026-08-10T05:51:57.217171Z\",\n  \"inbox\": false,\n  \"tasks\": [\n    {\n      \"id\": \"task-uuid-2\",\n      \"title\": \"Build a sample REST API\",\n      \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n      \"estimatedDuration\": 120,\n      \"status\": \"DRAFTED\",\n      \"completedAt\": null,\n      \"mandatory\": false,\n      \"estimatedPoints\": 50,\n      \"allowTaskSplitting\": true,\n      \"goalId\": \"goal-uuid-here\",\n      \"category\": null,\n      \"dependsOnTaskIds\": [\n        \"task-uuid-1\"\n      ]\n    },\n    {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Study Spring Data JPA\",\n      \"description\": \"Learn JPA repositories and query methods\",\n      \"estimatedDuration\": 90,\n      \"status\": \"DRAFTED\",\n      \"completedAt\": null,\n      \"mandatory\": false,\n      \"estimatedPoints\": 75,\n      \"allowTaskSplitting\": true,\n      \"goalId\": \"goal-uuid-here\",\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Learning\"\n      },\n      \"dependsOnTaskIds\": []\n    }\n  ]\n}"
+            }
+          ]
         },
         {
           "name": "Get Goal Tasks",
@@ -1506,7 +1534,21 @@
               ]
             },
             "description": "List all tasks belonging to a specific goal.\n\n**Path Parameters:**\n- `goalId` (UUID, required) – Goal identifier.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `GOAL_NOT_FOUND` (404) – Goal not found or does not belong to user."
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"DRAFTED\",\n    \"completedAt\": null,\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": null,\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  },\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 90,\n    \"status\": \"COMPLETED\",\n    \"completedAt\": \"2026-08-10T05:51:57.748666Z\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 75,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Learning\"\n    },\n    \"dependsOnTaskIds\": []\n  }\n]"
+            }
+          ]
         },
         {
           "name": "Bulk Add Tasks",
@@ -1554,7 +1596,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"DRAFTED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"DRAFTED\",\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
+              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study JPA basics\",\n    \"description\": \"Understand ORM and JPA annotations\",\n    \"estimatedDuration\": 60,\n    \"status\": \"DRAFTED\",\n    \"completedAt\": null,\n    \"mandatory\": true,\n    \"estimatedPoints\": 30,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"DRAFTED\",\n    \"completedAt\": null,\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": null,\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
             }
           ]
         },
@@ -1659,7 +1701,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"ACTIVE\",\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"dependsOnTaskIds\": [],\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Category Name\"\n      }\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"firstCompletedAt\": null,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
+              "body": "[\n  {\n    \"task\": {\n      \"id\": \"task-uuid-1\",\n      \"title\": \"Task A\",\n      \"description\": null,\n      \"estimatedDuration\": 60,\n      \"status\": \"ACTIVE\",\n      \"completedAt\": null,\n      \"mandatory\": false,\n      \"estimatedPoints\": 10,\n      \"allowTaskSplitting\": false,\n      \"goalId\": \"goal-uuid-here\",\n      \"category\": {\n        \"id\": \"cat-uuid\",\n        \"name\": \"Category Name\"\n      },\n      \"dependsOnTaskIds\": []\n    },\n    \"sessions\": [\n      {\n        \"id\": \"session-uuid-1\",\n        \"start\": \"2026-07-22T09:00:00\",\n        \"end\": \"2026-07-22T10:00:00\",\n        \"status\": \"SCHEDULED\",\n        \"locked\": false,\n        \"firstCompletedAt\": null,\n        \"zoneId\": \"zone-uuid-1\",\n        \"taskId\": \"task-uuid-1\"\n      }\n    ]\n  }\n]"
             }
           ]
         },
@@ -1710,7 +1752,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ],\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Category Name\"\n  }\n}"
+              "body": "{\n  \"2026-07-22\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Task A\",\n        \"description\": null,\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"completedAt\": null,\n        \"mandatory\": false,\n        \"estimatedPoints\": 10,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"category\": null,\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-22T09:00:00\",\n          \"end\": \"2026-07-22T10:00:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    }\n  ],\n  \"2026-07-23\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Task B\",\n        \"description\": null,\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"completedAt\": null,\n        \"mandatory\": false,\n        \"estimatedPoints\": 10,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"category\": null,\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-2\",\n          \"start\": \"2026-07-23T09:00:00\",\n          \"end\": \"2026-07-23T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-1\",\n          \"taskId\": \"task-uuid-2\"\n        }\n      ]\n    }\n  ]\n}"
             }
           ]
         },
@@ -1757,7 +1799,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"task-uuid-here\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"DRAFTED\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 50,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"dependsOnTaskIds\": []\n}"
+              "body": "{\n  \"id\": \"task-uuid-here\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"DRAFTED\",\n  \"completedAt\": null,\n  \"mandatory\": true,\n  \"estimatedPoints\": 50,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
             }
           ]
         },
@@ -1805,7 +1847,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"status\": \"ACTIVE\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"dependsOnTaskIds\": [],\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    }\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": \"optional-zone-uuid\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": null\n    }\n  ]\n}"
+              "body": "{\n  \"task\": {\n    \"id\": \"task-uuid-here\",\n    \"title\": \"Prepare presentation\",\n    \"description\": \"Create slides and rehearse\",\n    \"estimatedDuration\": 120,\n    \"status\": \"ACTIVE\",\n    \"completedAt\": null,\n    \"mandatory\": true,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Category Name\"\n    },\n    \"dependsOnTaskIds\": []\n  },\n  \"sessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": \"optional-zone-uuid\",\n      \"taskId\": \"task-uuid-here\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"SCHEDULED\",\n      \"locked\": false,\n      \"firstCompletedAt\": null,\n      \"zoneId\": null,\n      \"taskId\": \"task-uuid-here\"\n    }\n  ]\n}"
             }
           ]
         },
@@ -1854,7 +1896,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        }\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"dependsOnTaskIds\": [],\n        \"category\": null\n      },\n      \"sessions\": []\n    }\n  ]\n}"
+              "body": "{\n  \"tasks\": [\n    {\n      \"task\": {\n        \"id\": \"task-uuid-1\",\n        \"title\": \"Design database schema\",\n        \"description\": \"Create ERD and define tables\",\n        \"estimatedDuration\": 90,\n        \"status\": \"ACTIVE\",\n        \"completedAt\": null,\n        \"mandatory\": true,\n        \"estimatedPoints\": 40,\n        \"allowTaskSplitting\": false,\n        \"goalId\": \"goal-uuid-here\",\n        \"category\": {\n          \"id\": \"cat-uuid-1\",\n          \"name\": \"Development\"\n        },\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": [\n        {\n          \"id\": \"session-uuid-1\",\n          \"start\": \"2026-07-30T09:00:00\",\n          \"end\": \"2026-07-30T10:30:00\",\n          \"status\": \"SCHEDULED\",\n          \"locked\": false,\n          \"firstCompletedAt\": null,\n          \"zoneId\": \"zone-uuid-here\",\n          \"taskId\": \"task-uuid-1\"\n        }\n      ]\n    },\n    {\n      \"task\": {\n        \"id\": \"task-uuid-2\",\n        \"title\": \"Set up CI/CD pipeline\",\n        \"description\": \"Configure GitHub Actions\",\n        \"estimatedDuration\": 60,\n        \"status\": \"ACTIVE\",\n        \"completedAt\": null,\n        \"mandatory\": false,\n        \"estimatedPoints\": 25,\n        \"allowTaskSplitting\": true,\n        \"goalId\": \"goal-uuid-here\",\n        \"category\": null,\n        \"dependsOnTaskIds\": []\n      },\n      \"sessions\": []\n    }\n  ]\n}"
             }
           ]
         },
@@ -1977,7 +2019,21 @@
               ]
             },
             "description": "Get a single task by ID.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Query Parameters:** None.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user."
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"task-uuid-1\",\n  \"title\": \"Study JPA basics\",\n  \"description\": \"Understand ORM and JPA annotations\",\n  \"estimatedDuration\": 60,\n  \"status\": \"DRAFTED\",\n  \"completedAt\": null,\n  \"mandatory\": true,\n  \"estimatedPoints\": 30,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"goal-uuid-here\",\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Learning\"\n  },\n  \"dependsOnTaskIds\": []\n}"
+            }
+          ]
         },
         {
           "name": "Update Task",
@@ -2011,7 +2067,21 @@
               ]
             },
             "description": "Update an existing task. Only provided fields are updated.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body (all optional):**\n- `title` (string) – Max 255 chars.\n- `description` (string) – Max 2000 chars.\n- `estimatedDuration` (int) – Minutes.\n- `status` (enum) – `ACTIVE`, `SCHEDULED`, `COMPLETED`, `CANCELLED`.\n- `mandatory` (boolean) – Is mandatory.\n- `estimatedPoints` (int) – Points.\n- `allowTaskSplitting` (boolean) – Can split.\n- `categoryId` (UUID, optional) – New category ID. Set to `null` to remove category.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `VALIDATION_ERROR` (422) – Request body validation failed."
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"task-uuid-1\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 90,\n  \"status\": \"DRAFTED\",\n  \"completedAt\": null,\n  \"mandatory\": false,\n  \"estimatedPoints\": 75,\n  \"allowTaskSplitting\": true,\n  \"goalId\": \"goal-uuid-here\",\n  \"category\": {\n    \"id\": \"cat-uuid\",\n    \"name\": \"Learning\"\n  },\n  \"dependsOnTaskIds\": []\n}"
+            }
+          ]
         },
         {
           "name": "Complete Task",
@@ -2049,7 +2119,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    }\n  ],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": true,\n      \"amount\": 50,\n      \"oldValue\": 150,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": true,\n      \"oldValue\": 5,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"completedAt\": \"2026-07-22T09:14:03.221Z\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [\n    {\n      \"id\": \"session-uuid-1\",\n      \"start\": \"2026-07-22T09:00:00\",\n      \"end\": \"2026-07-22T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    },\n    {\n      \"id\": \"session-uuid-2\",\n      \"start\": \"2026-07-23T09:00:00\",\n      \"end\": \"2026-07-23T10:00:00\",\n      \"status\": \"COMPLETED\",\n      \"locked\": false,\n      \"firstCompletedAt\": \"2026-07-22T09:14:03.221Z\",\n      \"zoneId\": null,\n      \"taskId\": \"{{taskId}}\"\n    }\n  ],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": true,\n      \"amount\": 50,\n      \"oldValue\": 150,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": true,\n      \"oldValue\": 5,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
             },
             {
               "name": "Already Completed (no-op)",
@@ -2061,7 +2131,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": false,\n      \"amount\": 0,\n      \"oldValue\": 200,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": false,\n      \"oldValue\": 6,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
+              "body": "{\n  \"task\": {\n    \"id\": \"{{taskId}}\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 120,\n    \"status\": \"COMPLETED\",\n    \"completedAt\": \"2026-07-22T09:14:03.221Z\",\n    \"mandatory\": true,\n    \"estimatedPoints\": 25,\n    \"allowTaskSplitting\": false,\n    \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"category\": null,\n    \"dependsOnTaskIds\": []\n  },\n  \"completedSessions\": [],\n  \"reward\": {\n    \"points\": {\n      \"awarded\": false,\n      \"amount\": 0,\n      \"oldValue\": 200,\n      \"newValue\": 200\n    },\n    \"streak\": {\n      \"updated\": false,\n      \"oldValue\": 6,\n      \"newValue\": 6,\n      \"maxStreakBroken\": false,\n      \"maxStreakOld\": 7,\n      \"maxStreakNew\": 7\n    }\n  }\n}"
             }
           ]
         },
@@ -2101,7 +2171,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"ACTIVE\",\n  \"mandatory\": true,\n  \"estimatedPoints\": 25,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Study Spring Data JPA\",\n  \"description\": \"Learn JPA repositories and query methods\",\n  \"estimatedDuration\": 120,\n  \"status\": \"ACTIVE\",\n  \"completedAt\": null,\n  \"mandatory\": true,\n  \"estimatedPoints\": 25,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
             },
             {
               "name": "Success - task had no sessions",
@@ -2113,7 +2183,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Task with no sessions yet\",\n  \"description\": null,\n  \"estimatedDuration\": 60,\n  \"status\": \"DRAFTED\",\n  \"mandatory\": false,\n  \"estimatedPoints\": 10,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+              "body": "{\n  \"id\": \"{{taskId}}\",\n  \"title\": \"Task with no sessions yet\",\n  \"description\": null,\n  \"estimatedDuration\": 60,\n  \"status\": \"DRAFTED\",\n  \"completedAt\": null,\n  \"mandatory\": false,\n  \"estimatedPoints\": 10,\n  \"allowTaskSplitting\": false,\n  \"goalId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
             }
           ]
         },
@@ -2150,7 +2220,33 @@
               ]
             },
             "description": "Move a task to a different goal.\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Request Body:**\n- `goalId` (UUID, required) – Target goal ID.\n\n**Constraints:**\n- A task **with dependency links** cannot be moved. Remove dependencies first.\n- Dependencies are same-goal only.\n\n**Response (200):** `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user.\n- `GOAL_NOT_FOUND` (404) – Target goal not found.\n- `INVALID_OPERATION` (400) – Task has dependency links."
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"task-uuid-3\",\n  \"title\": \"Set up CI/CD pipeline\",\n  \"description\": \"Configure GitHub Actions\",\n  \"estimatedDuration\": 60,\n  \"status\": \"DRAFTED\",\n  \"completedAt\": null,\n  \"mandatory\": false,\n  \"estimatedPoints\": 25,\n  \"allowTaskSplitting\": true,\n  \"goalId\": \"target-goal-uuid-here\",\n  \"category\": null,\n  \"dependsOnTaskIds\": []\n}"
+            },
+            {
+              "name": "Blocked - task has dependency links",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Cannot move a task that has dependency links (dependencies are same-goal only); remove them first\",\n  \"statusCode\": 400,\n  \"errorCode\": \"INVALID_OPERATION\",\n  \"info\": {},\n  \"timestamp\": \"2026-08-10T08:52:38.322077875\"\n}"
+            }
+          ]
         },
         {
           "name": "Delete Task",
@@ -2278,7 +2374,21 @@
               ]
             },
             "description": "List all tasks that `{{taskId}}` depends on (prerequisites).\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user."
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"task-uuid-1\",\n    \"title\": \"Study Spring Data JPA\",\n    \"description\": \"Learn JPA repositories and query methods\",\n    \"estimatedDuration\": 90,\n    \"status\": \"DRAFTED\",\n    \"completedAt\": null,\n    \"mandatory\": false,\n    \"estimatedPoints\": 75,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": {\n      \"id\": \"cat-uuid\",\n      \"name\": \"Learning\"\n    },\n    \"dependsOnTaskIds\": []\n  }\n]"
+            }
+          ]
         },
         {
           "name": "List Dependents",
@@ -2304,7 +2414,21 @@
               ]
             },
             "description": "List all tasks that depend on `{{taskId}}` (blocked by this task).\n\n**Path Parameters:**\n- `taskId` (UUID, required) – Task identifier.\n\n**Query Parameters:** None.\n\n**Response (200):** Array of `TaskInfoResponse`\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `TASK_NOT_FOUND` (404) – Task not found or does not belong to user."
-          }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"task-uuid-2\",\n    \"title\": \"Build a sample REST API\",\n    \"description\": \"Apply JPA knowledge in a Spring Boot project\",\n    \"estimatedDuration\": 120,\n    \"status\": \"DRAFTED\",\n    \"completedAt\": null,\n    \"mandatory\": false,\n    \"estimatedPoints\": 50,\n    \"allowTaskSplitting\": true,\n    \"goalId\": \"goal-uuid-here\",\n    \"category\": null,\n    \"dependsOnTaskIds\": [\n      \"task-uuid-1\"\n    ]\n  }\n]"
+            }
+          ]
         }
       ]
     },

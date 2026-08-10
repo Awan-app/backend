@@ -33,6 +33,7 @@ public class TaskMapper {
             t.getDescription(),
             t.getEstimatedDuration(),
             deriveStatus(t),
+            t.getCompletedAt(),
             t.getMandatory(),
             t.getEstimatedPoints(),
             t.getAllowTaskSplitting(),
