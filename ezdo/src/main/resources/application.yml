@@ -114,7 +114,12 @@ ezdo:
     project-id: ${EZDO_FIREBASE_PROJECT_ID:}
     allowed-sign-in-providers: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:google.com,apple.com}
   mail:
+    provider: ${EZDO_MAIL_PROVIDER:smtp}
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
+    gmail:
+      client-id: ${EZDO_GMAIL_CLIENT_ID:}
+      client-secret: ${EZDO_GMAIL_CLIENT_SECRET:}
+      refresh-token: ${EZDO_GMAIL_REFRESH_TOKEN:}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
     plan:

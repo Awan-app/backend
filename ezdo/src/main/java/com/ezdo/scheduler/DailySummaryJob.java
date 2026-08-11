@@ -9,6 +9,7 @@ import com.ezdo.entity.GoalStatus;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.Task;
 import com.ezdo.entity.User;
+import com.ezdo.exception.EmailDeliveryException;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
@@ -129,8 +130,12 @@ public class DailySummaryJob implements Job {
                 totalFocusMinutes);
 
         // Send email
-        emailService.sendDailySummaryEmail(user.getEmail(), email);
-        log.info("Sent daily summary email to user {}", user.getId());
+        try {
+            emailService.sendDailySummaryEmail(user.getEmail(), email);
+            log.info("Sent daily summary email to user {}", user.getId());
+        } catch (EmailDeliveryException e) {
+            log.error("Daily summary email failed for user {}", user.getId(), e);
+        }
 
 //        // Send push notification to all user devices if enabled
 //        if (Boolean.TRUE.equals(user.getPreferences().getNotificationsEnabled())) {

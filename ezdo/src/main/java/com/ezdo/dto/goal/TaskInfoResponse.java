@@ -3,6 +3,7 @@ package com.ezdo.dto.goal;
 import com.ezdo.dto.CategoryResponse;
 import com.ezdo.entity.TaskStatus;
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ public record TaskInfoResponse(
     String description,
     Integer estimatedDuration,
     TaskStatus status,
+    Instant completedAt,
     Boolean mandatory,
     Integer estimatedPoints,
     Boolean allowTaskSplitting,
