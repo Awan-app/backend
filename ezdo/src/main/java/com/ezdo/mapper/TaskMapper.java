@@ -42,7 +42,7 @@ public class TaskMapper {
         );
     }
 
-    private TaskStatus deriveStatus(Task t) {
+    public TaskStatus deriveStatus(Task t) {
         if (t.isCompleted()) return TaskStatus.COMPLETED;
 
         Set<Session> sessions = t.getSessions();
