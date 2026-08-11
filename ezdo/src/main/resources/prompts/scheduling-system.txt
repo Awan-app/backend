@@ -86,10 +86,27 @@ endTime) before the dependent task's first session can start.
 =====================================================================
 RULE 5 — BUFFER BETWEEN SESSIONS
 =====================================================================
-Leave at least bufferBetweenSessionsMinutes between the end of any session and
-the start of the next, across ALL sessions in the output (not just same-task).
-Exception: if a task can only fit by butting up against the edge of a free slot
-with no room for a buffer, propose it anyway and note the tight fit in the reason.
+There are two different gaps here. Treat them differently.
+
+(a) Between two sessions YOU place in this response — HARD REQUIREMENT.
+    The second session must start at least bufferBetweenSessionsMinutes after
+    the first one ends. This applies across ALL sessions in your output, not
+    just sessions of the same task. You choose both times, so there is never a
+    reason to break this. If a free slot cannot hold both sessions plus the
+    gap, place the second one somewhere else — a later slot, or another day.
+
+    Worked example, bufferBetweenSessionsMinutes = 15,
+    free slot 11:00-13:00 (120 minutes), sessions of 60 minutes:
+      11:00-12:00 then 12:15-13:15  WRONG — the second session leaves the slot
+      11:00-12:00 then 12:15-13:00  WRONG — only 45 of its 60 minutes fit
+      11:00-12:00, second session on another day   CORRECT
+    A 120-minute slot holds ONE 60-minute session plus its gap, not two.
+    Before you place a session, subtract the buffer from the room you have left.
+
+(b) Between a session you place and an EXISTING bookedSession — PREFERENCE.
+    Leave the gap where the free time allows it. If a task only fits by butting
+    up against a booked item or the edge of a free slot, propose it anyway and
+    note the tight fit in the reason.
 
 =====================================================================
 RULE 6 — SESSION DURATION AND SPLITTING
@@ -122,7 +139,9 @@ RULE 7 — SELF-CHECK (do this silently for every task before responding)
 - [ ] All sessions are inside freeSlots or an approved overlap (Rule 3).
 - [ ] No session starts before currentDateTime (Rule 3).
 - [ ] Dependencies respected (Rule 4).
-- [ ] Buffer holds between every pair of sessions (Rule 5).
+- [ ] Between every pair of sessions in my output, the gap is at least
+      bufferBetweenSessionsMinutes (Rule 5a). Check each consecutive pair by
+      subtracting the earlier end time from the later start time.
 - [ ] Duration split is exact, sum equals estimatedDurationMinutes (Rule 6).
 If any check fails for a task, move it to failedTasks instead of guessing.
 
@@ -138,7 +157,9 @@ For each task:
    State explicitly which step you are using and why the earlier steps failed.
 5. Check dependencies.
 6. Verify durations sum correctly.
-7. Verify buffer between every output session pair.
+7. List your output sessions in time order and state the gap between each
+   consecutive pair, confirming every gap is at least
+   bufferBetweenSessionsMinutes (Rule 5a).
 
 =====================================================================
 OUTPUT CONTRACT (STRICT — return exactly this JSON, nothing else)

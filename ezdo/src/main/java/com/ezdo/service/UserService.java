@@ -9,6 +9,7 @@ import com.ezdo.exception.*;
 import com.ezdo.mapper.UserMapper;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.scheduler.DailySummarySchedulerService;
+import com.ezdo.scheduler.DailySpinSchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,8 @@ public class UserService {
     private final StoreService storeService;
     private final CloudinaryService cloudinaryService;
     private final DailySummarySchedulerService dailySummarySchedulerService;
+    private final DailySpinSchedulerService dailySpinSchedulerService;
+    private final WalletService walletService;
 
     private static final long MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_IMAGE_TYPES = List.of("image/jpeg", "image/png", "image/webp");
@@ -67,6 +70,7 @@ public class UserService {
 
         User saved = userRepository.save(user);
         dailySummarySchedulerService.syncDailySummary(saved);
+        dailySpinSchedulerService.syncDailySpin(saved);
 
         return profile(saved);
     }
@@ -136,6 +140,7 @@ public class UserService {
         preferences.setTimezone(request.timezone());
 
         userRepository.save(preferences.getUser());
+        dailySpinSchedulerService.syncDailySpin(preferences.getUser());
 
         return profile(preferences.getUser());
     }
@@ -204,5 +209,10 @@ public class UserService {
 
     private Preferences findPreferences(UUID userId) {
         return findUser(userId).getPreferences();
+    }
+
+    @Transactional
+    public long setPoints(UUID userId, long points) {
+        return walletService.setPoints(findUser(userId), points).getPoints();
     }
 }

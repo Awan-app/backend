@@ -20,4 +20,11 @@ public class WalletService {
         wallet.setPoints(wallet.getPoints() + amount);
         return wallet;
     }
+
+    @Transactional
+    public Wallet setPoints(User user, long points) {
+        Wallet wallet = user.getWallet();
+        wallet.setPoints(points);
+        return wallet;
+    }
 }

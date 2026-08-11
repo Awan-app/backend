@@ -43,6 +43,12 @@ services:
       SPRING_MAIL_AUTH: ${SPRING_MAIL_AUTH:-false}
       SPRING_MAIL_STARTTLS: ${SPRING_MAIL_STARTTLS:-false}
 
+      # Email transport: "smtp" (mailpit, local dev) or "gmail" (Gmail REST API, works where SMTP is blocked)
+      EZDO_MAIL_PROVIDER: ${EZDO_MAIL_PROVIDER:-smtp}
+      EZDO_GMAIL_CLIENT_ID: ${EZDO_GMAIL_CLIENT_ID:-}
+      EZDO_GMAIL_CLIENT_SECRET: ${EZDO_GMAIL_CLIENT_SECRET:-}
+      EZDO_GMAIL_REFRESH_TOKEN: ${EZDO_GMAIL_REFRESH_TOKEN:-}
+
       # AI (OpenAI-compatible — defaults to Groq with llama-3.3-70b)
       SPRING_OPENAI_API_KEY: ${SPRING_OPENAI_API_KEY}
       SPRING_OPENAI_BASE_URL: ${SPRING_OPENAI_BASE_URL:-https://api.groq.com/openai/v1}

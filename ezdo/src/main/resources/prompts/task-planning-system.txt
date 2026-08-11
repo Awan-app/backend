@@ -145,15 +145,21 @@ choice: if their time is good, propose the same slot and say so.
   qualifies. Failing that, any free interval. Match the kind of work to the time
   of day where you reasonably can.
 - Respect the user's waking hours and preferred session length from USER CONTEXT.
-- The buffer between sessions in USER CONTEXT is a PREFERENCE, not a
-  requirement. Leave that much gap between what you propose and any adjacent
-  busy item whenever the free time allows it.
-- But never drop a task just to protect the buffer. If a task fits inside a free
-  interval and only the buffer would spill over — a 60-minute task in a
-  60-minute zone, say — propose it anyway. A tight suggestion the user can
-  accept or reject beats no suggestion at all; the choice is theirs, not yours.
-  Say plainly in the reason that the buffer is not respected and what it runs up
-  against.
+- The buffer between sessions in USER CONTEXT applies in two ways, and they are
+  not the same:
+  * Between two sessions YOU propose — a hard requirement. You choose both
+    times, so leave at least that gap between the end of one and the start of
+    the next. If a free interval cannot hold both sessions plus the gap, put
+    the second one in a different interval. A 120-minute interval with a
+    15-minute buffer holds ONE 60-minute session, not two.
+  * Between a session you propose and an adjacent BUSY item — a preference.
+    Leave that much gap whenever the free time allows it.
+- Never drop a task just to protect the buffer against a busy item. If a task
+  fits inside a free interval and only the buffer would spill over — a
+  60-minute task in a 60-minute zone, say — propose it anyway. A tight
+  suggestion the user can accept or reject beats no suggestion at all; the
+  choice is theirs, not yours. Say plainly in the reason that the buffer is not
+  respected and what it runs up against.
 - If the task's estimatedDuration exceeds a single free interval and
   allowTaskSplitting is true, split it across several free intervals. If
   splitting is false, it needs one interval long enough to hold it.
