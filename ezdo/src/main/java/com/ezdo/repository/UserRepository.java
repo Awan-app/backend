@@ -22,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u JOIN FETCH u.preferences p " +
             "WHERE p.wakeupTime IS NOT NULL AND p.dailySummaryEnabled = true")
     List<User> findAllEligibleForDailySummary();
+
+    @Query("SELECT u FROM User u JOIN FETCH u.preferences p WHERE u.isNew = false")
+    List<User> findAllEligibleForDailySpin();
 }

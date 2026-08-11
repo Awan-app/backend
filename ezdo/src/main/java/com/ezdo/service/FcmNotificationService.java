@@ -1,6 +1,7 @@
 package com.ezdo.service;
 
 import com.ezdo.entity.DeviceToken;
+import com.ezdo.entity.NotificationType;
 import com.google.firebase.messaging.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class FcmNotificationService {
         if (tokens.isEmpty()) return false;
 
         Map<String, String> data = new HashMap<>();
-        data.put("type", "SESSION_REMINDER");
+        data.put("type", NotificationType.SESSION_REMINDER.name());
         data.put("sessionId", sessionId.toString());
         data.put("taskTitle", taskTitle);
         data.put("sessionTime", sessionTime);
@@ -51,7 +52,7 @@ public class FcmNotificationService {
         if (tokens.isEmpty()) return false;
 
         Map<String, String> data = new HashMap<>();
-        data.put("type", "DAILY_SUMMARY");
+        data.put("type", NotificationType.DAILY_SUMMARY.name());
         data.put("sessionCount", String.valueOf(sessionCount));
 
         String title = "Good morning, " + userName + "!";
@@ -60,6 +61,22 @@ public class FcmNotificationService {
                 : "Your day is clear today";
 
         return sendMulticastNotification(tokens, title, body, data, AndroidConfig.Priority.NORMAL, "daily_summary");
+    }
+
+    /**
+     * Send daily spin reminder to all user's devices using Multicast
+     */
+    public boolean sendDailySpinReminder(UUID userId) {
+        List<String> tokens = getUserTokens(userId);
+        if (tokens.isEmpty()) return false;
+
+        Map<String, String> data = new HashMap<>();
+        data.put("type", NotificationType.DAILY_SPIN_REMINDER.name());
+
+        String title = "Spin the Wheel!";
+        String body = "Your daily spin is ready. Spin the wheel to get your gift!";
+
+        return sendMulticastNotification(tokens, title, body, data, AndroidConfig.Priority.NORMAL, "daily_spin_reminder");
     }
 
     /**

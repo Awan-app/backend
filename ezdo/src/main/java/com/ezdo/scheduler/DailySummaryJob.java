@@ -137,12 +137,16 @@ public class DailySummaryJob implements Job {
             log.error("Daily summary email failed for user {}", user.getId(), e);
         }
 
-        // Send push notification to all user devices
-        fcmNotificationService.sendDailySummaryToUser(
-                user.getId(),
-                user.getFirstName(),
-                sessions.size()
-        );
+//        // Send push notification to all user devices if enabled
+//        if (Boolean.TRUE.equals(user.getPreferences().getNotificationsEnabled())) {
+//            fcmNotificationService.sendDailySummaryToUser(
+//                    user.getId(),
+//                    user.getFirstName(),
+//                    sessions.size()
+//            );
+//        } else {
+//            log.info("Skipping daily summary push notification for user {} because notifications are disabled", user.getId());
+//        }
     }
 
     private ZoneId resolveZone(User user) {

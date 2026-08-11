@@ -54,6 +54,12 @@ public class SessionReminderJob extends QuartzJobBean {
 
             // Safely navigate relationships (Ensure your repository uses JOIN FETCH if lazy-loading throws an exception)
             User user = session.getTask().getGoal().getUser();
+            
+            if (!Boolean.TRUE.equals(user.getPreferences().getNotificationsEnabled())) {
+                log.info("Skipping reminder for session {}: user has disabled notifications", sessionUuid);
+                return;
+            }
+
             String taskTitle = session.getTask().getTitle();
             String sessionTime = session.getStart().format(TIME_FORMATTER);
 

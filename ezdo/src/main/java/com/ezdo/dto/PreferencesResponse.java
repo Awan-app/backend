@@ -11,5 +11,6 @@ public record PreferencesResponse(
     LocalTime wakeupTime,
     LocalTime sleepTime,
     SchedulingType schedulingType,
-    Boolean dailySummaryEnabled
+    Boolean dailySummaryEnabled,
+    Boolean notificationsEnabled
 ) {}
