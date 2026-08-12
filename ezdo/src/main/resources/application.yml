@@ -113,7 +113,7 @@ ezdo:
     realm: ${KEYCLOAK_REALM:awan}
     admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
     admin-username: ${KEYCLOAK_ADMIN_USERNAME:admin}
-    admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+    admin-password: ${KEYCLOAK_ADMIN_PASSWORD:awan1234}
   jwt:
     secret: ${EZDO_JWT_SECRET:default-dev-secret-change-in-production-32chars!}
     access-token-expiry-seconds: 86400
