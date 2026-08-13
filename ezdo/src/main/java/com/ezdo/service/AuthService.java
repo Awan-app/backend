@@ -25,6 +25,7 @@ public class AuthService {
     private final CategorySeedService categorySeedService;
     private final KeycloakUserSyncService keycloakUserSyncService;
     private final UserProvisioningService userProvisioningService;
+    private final DeviceTokenService deviceTokenService;
 
     public OtpResponse requestOtp(OtpRequest request) {
         return otpService.requestOtp(EmailUtil.normalize(request.email()));
@@ -103,5 +104,6 @@ public class AuthService {
     @Transactional
     public void logout(UUID userId, LogoutRequest request) {
         refreshTokenService.revokeByUserAndDevice(userId, request.deviceId());
+        deviceTokenService.removeDeviceToken(userId, request.deviceId().toString());
     }
 }
