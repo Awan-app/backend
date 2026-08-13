@@ -3,6 +3,7 @@ package com.ezdo.repository;
 import com.ezdo.entity.Task;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -37,4 +38,12 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     List<Task> findByUserIdAndDateRange(@Param("userId") UUID userId,
                                         @Param("startDate") LocalDateTime startDate,
                                         @Param("endDate") LocalDateTime endDate);
+
+    @Modifying(flushAutomatically = true)
+    @Query("""
+        UPDATE Task t SET t.category = null
+        WHERE t.category.id = :categoryId
+          AND t.goal.user.id = :userId
+    """)
+    int nullifyCategoryId(@Param("userId") UUID userId, @Param("categoryId") UUID categoryId);
 }

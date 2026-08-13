@@ -1,16 +1,15 @@
 package com.ezdo.scheduler;
 
 import com.ezdo.entity.User;
-import com.ezdo.exception.UserNotFoundException;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.service.FcmNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
-public class DailySpinReminderJob implements Job {
+public class DailySpinReminderJob extends QuartzJobBean {
 
     private final UserRepository userRepository;
     private final FcmNotificationService fcmNotificationService;
@@ -30,14 +29,19 @@ public class DailySpinReminderJob implements Job {
 
     @Override
     @Transactional(readOnly = true)
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         if (userId == null || userId.isBlank()) {
+            log.error("DailySpinReminderJob executed without a valid userId in JobDataMap.");
             return;
         }
 
         UUID userUuid = UUID.fromString(userId);
-        User user = userRepository.findById(userUuid)
-                .orElseThrow(() -> new UserNotFoundException(userUuid));
+        User user = userRepository.findById(userUuid).orElse(null);
+
+        if (user == null) {
+            log.warn("User {} no longer exists; skipping daily spin reminder", userUuid);
+            return;
+        }
 
         if (user.getPreferences() == null) {
             return;
