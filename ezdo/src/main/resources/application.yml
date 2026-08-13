@@ -50,7 +50,7 @@ spring:
             threadCount: 10
             threadPriority: 5
           jobStore:
-            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore   # class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
 
             driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
             tablePrefix: QRTZ_

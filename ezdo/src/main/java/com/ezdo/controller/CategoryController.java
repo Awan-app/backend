@@ -42,10 +42,20 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> update(
+    public ResponseEntity<CategoryResponse> updateCategory(
             @AuthenticationPrincipal UUID userId,
             @PathVariable UUID id,
-            @Valid @RequestBody CategoryRequest request) {
+            @Valid @RequestBody CategoryRequest request
+    ) {
         return ResponseEntity.ok(categoryService.update(userId, id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable UUID id
+    ) {
+        categoryService.delete(userId, id);
+        return ResponseEntity.noContent().build();
     }
 }
