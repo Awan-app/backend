@@ -44,7 +44,8 @@ public class SessionReminderJob extends QuartzJobBean {
 
         try {
             // Fresh Lookup Pattern: Avoids stale data if the user/AI updated the task recently
-            Session session = sessionRepository.findById(sessionUuid)
+            // Safely navigate relationships using JOIN FETCH query
+            Session session = sessionRepository.findByIdWithUserAndPreferences(sessionUuid)
                     .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionUuid));
 
             if (session.getStatus() != SessionStatus.SCHEDULED) {
@@ -52,7 +53,6 @@ public class SessionReminderJob extends QuartzJobBean {
                 return;
             }
 
-            // Safely navigate relationships (Ensure your repository uses JOIN FETCH if lazy-loading throws an exception)
             User user = session.getTask().getGoal().getUser();
             
             if (!Boolean.TRUE.equals(user.getPreferences().getNotificationsEnabled())) {

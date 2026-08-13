@@ -19,10 +19,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +39,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
-public class DailySummaryJob implements Job {
+public class DailySummaryJob extends QuartzJobBean {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
@@ -52,15 +52,19 @@ public class DailySummaryJob implements Job {
 
     @Override
     @Transactional(readOnly = true)
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         if (userId == null || userId.isBlank()) {
             log.error("DailySummaryJob executed without a valid userId in JobDataMap.");
             return;
         }
 
         UUID userUuid = UUID.fromString(userId);
-        User user = userRepository.findById(userUuid)
-                .orElseThrow(() -> new JobExecutionException("User not found: " + userUuid));
+        User user = userRepository.findById(userUuid).orElse(null);
+
+        if (user == null) {
+            log.warn("User {} no longer exists; skipping daily summary", userUuid);
+            return;
+        }
 
         if (user.getPreferences() == null || !Boolean.TRUE.equals(user.getPreferences().getDailySummaryEnabled())) {
             log.info("Skipping daily summary for user {} because daily summaries are disabled", userUuid);
