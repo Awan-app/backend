@@ -64,18 +64,18 @@ public class SessionReminderJob extends QuartzJobBean {
             String sessionTime = session.getStart().format(TIME_FORMATTER);
 
             // Fire the multicast push notification
-            boolean sent = fcmNotificationService.sendSessionReminderToUser(
-                    user.getId(),
-                    session.getId(),
-                    taskTitle,
-                    sessionTime
-            );
-
-            if (sent) {
-                log.info("Successfully sent reminder for session {} to user {}", sessionUuid, user.getId());
-            } else {
-                log.warn("Reminder job ran for session {}, but no FCM message was sent to user {}", sessionUuid, user.getId());
-            }
+//            boolean sent = fcmNotificationService.sendSessionReminderToUser(
+//                    user.getId(),
+//                    session.getId(),
+//                    taskTitle,
+//                    sessionTime
+//            );
+//
+//            if (sent) {
+//                log.info("Successfully sent reminder for session {} to user {}", sessionUuid, user.getId());
+//            } else {
+//                log.warn("Reminder job ran for session {}, but no FCM message was sent to user {}", sessionUuid, user.getId());
+//            }
 
         } catch (Exception e) {
             log.error("Failed to execute SessionReminderJob for session {}", sessionUuid, e);
