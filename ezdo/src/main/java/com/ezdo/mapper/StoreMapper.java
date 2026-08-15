@@ -24,6 +24,7 @@ public class StoreMapper {
                 .price(item.getPrice())
                 .version(item.getVersion())
                 .type(item.getType())
+                .rarity(item.getRarity())
                 .build();
     }
 

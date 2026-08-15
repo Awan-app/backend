@@ -38,4 +38,8 @@ public class Item {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ItemType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rarity")
+    private Rarity rarity;
 }
