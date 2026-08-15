@@ -60,7 +60,7 @@ spring:
   ai:
     mcp:
       server:
-        name: ezdo
+        name: awan
         version: 1.0.0
         protocol: STREAMABLE
         # By default, Spring AI MCP Starter configures an SSE endpoint at /mcp/sse
