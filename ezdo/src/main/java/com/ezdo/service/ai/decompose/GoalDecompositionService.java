@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class GoalDecompositionService {
     private final ConversationCodec codec;
     private final DecompositionPromptBuilder promptBuilder;
     private final ProposalMapper proposalMapper;
+    private final TransactionTemplate transactionTemplate;
     private final int maxTurns;
 
     public GoalDecompositionService(
@@ -63,6 +65,7 @@ public class GoalDecompositionService {
         ConversationCodec codec,
         DecompositionPromptBuilder promptBuilder,
         ProposalMapper proposalMapper,
+        TransactionTemplate transactionTemplate,
         @Value("${ezdo.ai.max-turns}") int maxTurns
     ) {
         this.sessionRepository = sessionRepository;
@@ -75,38 +78,50 @@ public class GoalDecompositionService {
         this.codec = codec;
         this.promptBuilder = promptBuilder;
         this.proposalMapper = proposalMapper;
+        this.transactionTemplate = transactionTemplate;
         this.maxTurns = maxTurns;
     }
 
-    @Transactional
+    /**
+     * Main chat entry point. Split into three phases to keep the DB connection
+     * held only during short read/write windows — never during the LLM call.
+     *
+     * <ol>
+     *   <li><b>Read phase</b> — load or create the session (short transaction)</li>
+     *   <li><b>AI phase</b> — RAG retrieval + LLM call (no transaction)</li>
+     *   <li><b>Write phase</b> — persist the updated transcript (short transaction)</li>
+     * </ol>
+     */
     public ChatReply processMessage(UUID userId, ChatMessage request) {
-        GoalDecompositionSession session = loadOrCreate(userId, request.sessionId());
+        // ── Phase 1: short read transaction ──────────────────────────────────
+        SessionSnapshot snapshot = loadSnapshot(userId, request.sessionId());
+
         List<ConversationMessage> transcript =
-            new ArrayList<>(codec.readTranscript(session.getMessages()));
+            new ArrayList<>(codec.readTranscript(snapshot.messages()));
 
         // Cap the conversation so an open-ended chat can't run up an unbounded bill.
         if (countUserTurns(transcript) >= maxTurns) {
-            return nudgeToFinalize(session, transcript);
+            return nudgeToFinalize(snapshot.sessionId(), snapshot.hasProposal(), transcript);
         }
 
         transcript.add(new ConversationMessage("user", List.of(new TextBlock(request.message()))));
 
+        // ── Phase 2: AI call — no transaction held ───────────────────────────
         AiUserPreferencesContext userContext = userContextService.buildFor(userId);
         List<RelatedGoalContext> relatedWork = relatedWorkService.findRelatedWork(userId, request.message());
         if (!relatedWork.isEmpty()) {
-            log.debug("Session {}: grounding turn with {} related goal(s)", session.getId(), relatedWork.size());
+            log.debug("Session {}: grounding turn with {} related goal(s)", snapshot.sessionId(), relatedWork.size());
         }
         List<ContentBlock> replyBlocks =
             generateReply(promptBuilder.build(transcript, userContext, relatedWork), userId);
         transcript.add(new ConversationMessage("assistant", replyBlocks));
 
         GoalProposal proposal = findProposal(replyBlocks);
-        if (proposal != null) {
-            session.setProposedGoal(codec.writeProposal(proposal));
-        }
 
-        persist(session, transcript);
-        return new ChatReply(session.getId(), replyBlocks, proposal != null, Instant.now());
+        // ── Phase 3: short write transaction ─────────────────────────────────
+        persistReply(snapshot.sessionId(), transcript, proposal);
+
+        return new ChatReply(snapshot.sessionId(), replyBlocks, proposal != null, Instant.now());
     }
 
     @Transactional
@@ -167,20 +182,42 @@ public class GoalDecompositionService {
         sessionRepository.save(session);
     }
 
-    // --- helpers -------------------------------------------------------------
+    // --- snapshot helpers (transaction boundaries) ----------------------------
 
-    private GoalDecompositionSession loadOrCreate(UUID userId, UUID sessionId) {
-        if (sessionId == null) {
-            User userRef = userRepository.getReferenceById(userId);
-            return sessionRepository.save(GoalDecompositionSession.builder()
-                .user(userRef)
-                .status(DecompositionStatus.IN_PROGRESS)
-                .build());
-        }
-        GoalDecompositionSession session = loadOwned(userId, sessionId);
-        requireInProgress(session);
-        return session;
+    /** Lightweight record to carry session state between phases without an open transaction. */
+    private record SessionSnapshot(UUID sessionId, String messages, boolean hasProposal) {}
+
+    SessionSnapshot loadSnapshot(UUID userId, UUID sessionId) {
+        return transactionTemplate.execute(status -> {
+            GoalDecompositionSession session;
+            if (sessionId == null) {
+                User userRef = userRepository.getReferenceById(userId);
+                session = sessionRepository.save(GoalDecompositionSession.builder()
+                    .user(userRef)
+                    .status(DecompositionStatus.IN_PROGRESS)
+                    .build());
+            } else {
+                session = loadOwned(userId, sessionId);
+                requireInProgress(session);
+            }
+            return new SessionSnapshot(session.getId(), session.getMessages(), session.getProposedGoal() != null);
+        });
     }
+
+    void persistReply(UUID sessionId, List<ConversationMessage> transcript, GoalProposal proposal) {
+        transactionTemplate.executeWithoutResult(status -> {
+            GoalDecompositionSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new GoalDecompositionSessionNotFoundException(sessionId));
+            if (proposal != null) {
+                session.setProposedGoal(codec.writeProposal(proposal));
+            }
+            session.setMessages(codec.writeTranscript(transcript));
+            session.setUpdatedAt(Instant.now());
+            sessionRepository.save(session);
+        });
+    }
+
+    // --- helpers -------------------------------------------------------------
 
     private GoalDecompositionSession loadOwned(UUID userId, UUID sessionId) {
         return sessionRepository.findByIdAndUserId(sessionId, userId)
@@ -222,9 +259,14 @@ public class GoalDecompositionService {
         try {
             return codec.parseBlocks(callModel(messages, userId));
         } catch (ResultParseException first) {
-            log.warn("Model reply was not valid blocks, retrying once", first);
+            log.warn("Model reply was not valid blocks, retrying with correction hint", first);
             try {
-                return codec.parseBlocks(callModel(messages, userId));
+                // Append a correction hint so the model doesn't repeat the same malformed output.
+                List<Message> corrected = new ArrayList<>(messages);
+                corrected.add(new org.springframework.ai.chat.messages.UserMessage(
+                    "Your previous reply was not valid JSON matching the required {\"blocks\":[...]} schema. "
+                        + "Please reply again with ONLY a valid JSON object, no markdown fences or extra text."));
+                return codec.parseBlocks(callModel(corrected, userId));
             } catch (ResultParseException second) {
                 log.warn("Model reply still invalid after retry, falling back to text", second);
                 return List.of(new TextBlock(
@@ -245,20 +287,14 @@ public class GoalDecompositionService {
         }
     }
 
-    private ChatReply nudgeToFinalize(GoalDecompositionSession session,
+    private ChatReply nudgeToFinalize(UUID sessionId, boolean hasProposal,
                                       List<ConversationMessage> transcript) {
         List<ContentBlock> blocks = List.of(new TextBlock(
             "We've talked through a lot already. If a proposed plan looks good, confirm it; "
                 + "otherwise start a new conversation to explore a different direction."));
         transcript.add(new ConversationMessage("assistant", blocks));
-        persist(session, transcript);
-        return new ChatReply(session.getId(), blocks, session.getProposedGoal() != null, Instant.now());
-    }
-
-    private void persist(GoalDecompositionSession session, List<ConversationMessage> transcript) {
-        session.setMessages(codec.writeTranscript(transcript));
-        session.setUpdatedAt(Instant.now());
-        sessionRepository.save(session);
+        persistReply(sessionId, transcript, null);
+        return new ChatReply(sessionId, blocks, hasProposal, Instant.now());
     }
 
     private int countUserTurns(List<ConversationMessage> transcript) {

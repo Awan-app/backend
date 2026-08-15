@@ -90,8 +90,10 @@ public class RelatedWorkService {
                 continue;
             }
             List<Task> tasks = tasksByGoal.getOrDefault(goal.getId(), List.of());
+            // Sort incomplete tasks first so they survive the maxTasksPerGoal cap —
+            // those are the ones the AI must see to avoid re-proposing existing work.
             List<Task> ordered = tasks.stream()
-                .sorted(Comparator.comparing(Task::isCompleted).reversed()
+                .sorted(Comparator.comparing(Task::isCompleted)
                     .thenComparing(Task::getTitle, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
 
