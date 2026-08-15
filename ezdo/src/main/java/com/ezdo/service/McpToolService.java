@@ -54,7 +54,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class McpToolService {
 
-    private static final int MAX_DATE_RANGE_DAYS = 90;
+    private static final int MAX_DATE_RANGE_DAYS = 30;
 
     private final GoalService goalService;
     private final TaskService taskService;
@@ -435,8 +435,8 @@ public class McpToolService {
                 title,
                 description,
                 estimatedDuration,
-                null,   // mandatory — default
-                null,   // estimatedPoints — default
+                true,   // mandatory — default
+                5,   // estimatedPoints — default
                 null,   // allowTaskSplitting — default
                 goalUuid,
                 categoryUuid
@@ -917,7 +917,7 @@ public class McpToolService {
 
 
     @McpTool(name = "bulkUpdateSessions",
-            title = "Bulk Update Sessions",
+            title = "Update Sessions",
             description = "Update multiple sessions at once — mark them COMPLETED or CANCELLED. " +
                     "Use this for recovery workflows: mark all yesterday's missed sessions as CANCELLED in one call, " +
                     "then create new ones via addSessionToTask. " +
