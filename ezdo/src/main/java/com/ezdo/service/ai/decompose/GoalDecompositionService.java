@@ -1,6 +1,7 @@
 package com.ezdo.service.ai.decompose;
 
 import com.ezdo.dto.ai.AiUserPreferencesContext;
+import com.ezdo.dto.ai.RelatedGoalContext;
 import com.ezdo.dto.ai.decompose.*;
 import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.dto.goal.GoalInfoResponse;
@@ -18,6 +19,7 @@ import com.ezdo.repository.GoalDecompositionSessionRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.service.GoalService;
 import com.ezdo.service.ai.UserContextService;
+import com.ezdo.service.ai.rag.RelatedWorkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -42,6 +44,7 @@ public class GoalDecompositionService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final UserContextService userContextService;
+    private final RelatedWorkService relatedWorkService;
     private final ChatClient chatClient;
     private final ConversationCodec codec;
     private final DecompositionPromptBuilder promptBuilder;
@@ -54,6 +57,7 @@ public class GoalDecompositionService {
         UserRepository userRepository,
         CategoryRepository categoryRepository,
         UserContextService userContextService,
+        RelatedWorkService relatedWorkService,
         @Qualifier("planningModel2")
         ChatClient chatClient,
         ConversationCodec codec,
@@ -66,6 +70,7 @@ public class GoalDecompositionService {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.userContextService = userContextService;
+        this.relatedWorkService = relatedWorkService;
         this.chatClient = chatClient;
         this.codec = codec;
         this.promptBuilder = promptBuilder;
@@ -87,8 +92,12 @@ public class GoalDecompositionService {
         transcript.add(new ConversationMessage("user", List.of(new TextBlock(request.message()))));
 
         AiUserPreferencesContext userContext = userContextService.buildFor(userId);
+        List<RelatedGoalContext> relatedWork = relatedWorkService.findRelatedWork(userId, request.message());
+        if (!relatedWork.isEmpty()) {
+            log.debug("Session {}: grounding turn with {} related goal(s)", session.getId(), relatedWork.size());
+        }
         List<ContentBlock> replyBlocks =
-            generateReply(promptBuilder.build(transcript, userContext), userId);
+            generateReply(promptBuilder.build(transcript, userContext, relatedWork), userId);
         transcript.add(new ConversationMessage("assistant", replyBlocks));
 
         GoalProposal proposal = findProposal(replyBlocks);

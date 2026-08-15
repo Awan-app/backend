@@ -20,6 +20,14 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     @EntityGraph(attributePaths = {"sessions", "dependsOn", "category"})
     List<Task> findByGoalIdAndGoalUserId(UUID goalId, UUID userId);
 
+    @Query("""
+        SELECT t FROM Task t
+        JOIN FETCH t.goal g
+        WHERE g.id IN :goalIds
+        ORDER BY t.title ASC
+    """)
+    List<Task> findAllByGoalIdIn(@Param("goalIds") List<UUID> goalIds);
+
     @Query("select d.id from Task t join t.dependsOn d where t.id = :taskId")
     Set<UUID> findDependsOnIds(@Param("taskId") UUID taskId);
 

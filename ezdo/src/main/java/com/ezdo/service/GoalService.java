@@ -12,7 +12,9 @@ import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.TaskRepository;
 import com.ezdo.repository.UserRepository;
 import com.ezdo.util.DependencyGraphValidator;
+import com.ezdo.service.ai.rag.GoalIndexChangedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class GoalService {
     private final CategoryRepository categoryRepository;
     private final GoalMapper goalMapper;
     private final TaskMapper taskMapper;
+    private final ApplicationEventPublisher events;
 
     @Transactional
     public GoalInfoResponse createGoal(UUID userId, GoalCreateRequest request) {
@@ -81,7 +84,9 @@ public class GoalService {
             }
         }
 
-        return goalMapper.toInfoResponse(goalRepository.save(goal), !request.tasks().isEmpty());
+        Goal saved = goalRepository.save(goal);
+        events.publishEvent(GoalIndexChangedEvent.changed(saved.getId()));
+        return goalMapper.toInfoResponse(saved, !request.tasks().isEmpty());
     }
 
     @Transactional(readOnly = true)
@@ -119,7 +124,9 @@ public class GoalService {
         if (req.description() != null) goal.setDescription(req.description());
         if (req.status() != null) goal.setStatus(req.status());
         if (req.targetDate() != null) goal.setTargetDate(req.targetDate());
-        return goalMapper.toInfoResponse(goalRepository.save(goal), false);
+        Goal saved = goalRepository.save(goal);
+        events.publishEvent(GoalIndexChangedEvent.changed(saved.getId()));
+        return goalMapper.toInfoResponse(saved, false);
     }
 
     @Transactional
@@ -130,6 +137,7 @@ public class GoalService {
         }
 
         goalRepository.delete(goal); // cascades tasks via orphanRemoval
+        events.publishEvent(GoalIndexChangedEvent.deleted(goalId));
     }
 
     @Transactional
@@ -189,9 +197,12 @@ public class GoalService {
 
         DependencyGraphValidator.assertNoCycles(graph);
 
-        return taskRepository.saveAll(newByTempId.values()).stream()
+        List<TaskInfoResponse> created = taskRepository.saveAll(newByTempId.values()).stream()
             .map(taskMapper::toInfoResponse)
             .toList();
+        // Task titles are part of the goal's embedded text, so adding tasks changes it.
+        events.publishEvent(GoalIndexChangedEvent.changed(goalId));
+        return created;
     }
 
     private UUID parseUuidOrNull(String s) {

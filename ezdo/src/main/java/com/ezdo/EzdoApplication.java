@@ -1,11 +1,9 @@
 package com.ezdo;
 
-import org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(exclude = {OpenAiEmbeddingAutoConfiguration.class})
+@SpringBootApplication
 public class EzdoApplication {
 
 	public static void main(String[] args) {

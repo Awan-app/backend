@@ -1,8 +1,10 @@
 package com.ezdo.service.ai.decompose;
 
 import com.ezdo.dto.ai.AiUserPreferencesContext;
+import com.ezdo.dto.ai.RelatedGoalContext;
 import com.ezdo.dto.ai.decompose.*;
 import com.ezdo.service.ai.UserContextRenderer;
+import com.ezdo.service.ai.rag.RelatedWorkRenderer;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -45,9 +47,13 @@ public class DecompositionPromptBuilder {
         }
     }
 
-    public List<Message> build(List<ConversationMessage> transcript, AiUserPreferencesContext context) {
+    public List<Message> build(List<ConversationMessage> transcript,
+                               AiUserPreferencesContext context,
+                               List<RelatedGoalContext> relatedWork) {
         List<Message> messages = new ArrayList<>();
-        messages.add(new SystemMessage(systemPrompt + UserContextRenderer.render(context)));
+        messages.add(new SystemMessage(systemPrompt
+            + UserContextRenderer.render(context)
+            + RelatedWorkRenderer.render(relatedWork)));
         for (ConversationMessage turn : transcript) {
             if ("assistant".equalsIgnoreCase(turn.role())) {
                 messages.add(new AssistantMessage(codec.writeBlocks(turn.blocks())));
