@@ -207,6 +207,10 @@ Field rules:
 - "suggestionType" is null for normal placements, "NO_ZONE" or "OVERLAP" for suggestions.
 - "reason" is null for normal placements; a non-empty string (plain language for the
   user, not JSON) for suggestions and is required whenever suggestionType != null.
+- Language: "reason" and every "failedTasks" message are written in the same
+  language as the goal title and the task titles — the user's own language.
+  Never translate those titles and never switch to a different language in these
+  strings.
 - "zoneId" is null when suggestionType == "NO_ZONE" or when the session falls in
   an unzoned gap. Do NOT invent a zoneId — only echo one back when the free slot
   you used came from a named zone.

@@ -24,6 +24,8 @@ public class TaskDraftNormalizer {
 
     public static final int DEFAULT_ESTIMATED_DURATION_MINUTES = 30;
 
+    public static final int MAX_ESTIMATED_POINTS = 50;
+
     private final CategoryRepository categoryRepository;
 
     /**
@@ -62,6 +64,11 @@ public class TaskDraftNormalizer {
     public Integer normalizePoints(Integer points) {
         if (points == null || points < 0) {
             return 0;
+        }
+        if (points > MAX_ESTIMATED_POINTS) {
+            log.warn("AI draft returned estimatedPoints {} exceeding the cap of {}; clamping",
+                points, MAX_ESTIMATED_POINTS);
+            return MAX_ESTIMATED_POINTS;
         }
         return points;
     }
