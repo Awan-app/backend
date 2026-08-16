@@ -54,7 +54,7 @@ public class GoalDecompositionService {
         UserRepository userRepository,
         CategoryRepository categoryRepository,
         UserContextService userContextService,
-        @Qualifier("planningModel")
+        @Qualifier("planningModel2")
         ChatClient chatClient,
         ConversationCodec codec,
         DecompositionPromptBuilder promptBuilder,
