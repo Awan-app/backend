@@ -2,6 +2,11 @@ server:
   port: 8080
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://awan-auth-server-production.up.railway.app/realms/awan}
   application:
     name: ezdo
   mail:
@@ -45,7 +50,7 @@ spring:
             threadCount: 10
             threadPriority: 5
           jobStore:
-            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore   # class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
 
             driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
             tablePrefix: QRTZ_
@@ -55,6 +60,12 @@ spring:
   ai:
     model:
       embedding: google-genai
+    mcp:
+      server:
+        name: awan
+        version: 1.0.0
+        protocol: STREAMABLE
+        # By default, Spring AI MCP Starter configures an SSE endpoint at /mcp/sse
     openai:
       api-key: ${SPRING_OPENAI_API_KEY:}
       base-url: ${SPRING_OPENAI_BASE_URL:https://opencode.ai/zen/v1}
@@ -99,6 +110,13 @@ logging:
             bind: TRACE
 
 ezdo:
+  keycloak:
+    issuer-uri: ${KEYCLOAK_ISSUER_URI:https://awan-auth-server-production.up.railway.app/realms/awan}
+    admin-url: ${KEYCLOAK_ADMIN_URL:https://awan-auth-server-production.up.railway.app}
+    realm: ${KEYCLOAK_REALM:awan}
+    admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
+    admin-username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    admin-password: ${KEYCLOAK_ADMIN_PASSWORD:awan1234}
   jwt:
     secret: ${EZDO_JWT_SECRET:default-dev-secret-change-in-production-32chars!}
     access-token-expiry-seconds: 86400
@@ -117,7 +135,12 @@ ezdo:
     project-id: ${EZDO_FIREBASE_PROJECT_ID:}
     allowed-sign-in-providers: ${EZDO_FIREBASE_ALLOWED_PROVIDERS:google.com,apple.com}
   mail:
+    provider: ${EZDO_MAIL_PROVIDER:smtp}
     from: ${EZDO_MAIL_FROM:noreply@awan.com}
+    gmail:
+      client-id: ${EZDO_GMAIL_CLIENT_ID:}
+      client-secret: ${EZDO_GMAIL_CLIENT_SECRET:}
+      refresh-token: ${EZDO_GMAIL_REFRESH_TOKEN:}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
     rag:
@@ -137,6 +160,10 @@ ezdo:
     cloud-name: ${EZDO_CLOUDINARY_CLOUD_NAME:}
     api-key: ${EZDO_CLOUDINARY_API_KEY:}
     api-secret: ${EZDO_CLOUDINARY_API_SECRET:}
+
+  mcp:
+    base-url: ${EZDO_MCP_BASE_URL:}
+    client-id: ${EZDO_MCP_CLIENT_ID:awan-mcp}
 
 timefold:
   solver:

@@ -24,4 +24,11 @@ public interface ZoneRepository extends JpaRepository<Zone , UUID> {
     """)
     Optional<Zone> findByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
+    @Query("""
+        SELECT z FROM Zone z
+        WHERE z.category.id = :categoryId
+          AND z.category.user.id = :userId
+    """)
+    List<Zone> findByCategoryIdAndUserId(@Param("categoryId") UUID categoryId, @Param("userId") UUID userId);
+
 }

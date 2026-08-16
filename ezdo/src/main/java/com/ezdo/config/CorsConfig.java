@@ -46,6 +46,15 @@ public class CorsConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
+
+        // MCP endpoints — allow Claude and Keycloak origins
+        CorsConfiguration mcpConfig = new CorsConfiguration();
+        mcpConfig.setAllowedOrigins(List.of("*"));
+        mcpConfig.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+        mcpConfig.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        mcpConfig.setAllowCredentials(false);
+        source.registerCorsConfiguration("/mcp/**", mcpConfig);
+
         return source;
     }
 }

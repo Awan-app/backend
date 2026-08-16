@@ -44,7 +44,8 @@ public class SessionReminderJob extends QuartzJobBean {
 
         try {
             // Fresh Lookup Pattern: Avoids stale data if the user/AI updated the task recently
-            Session session = sessionRepository.findById(sessionUuid)
+            // Safely navigate relationships using JOIN FETCH query
+            Session session = sessionRepository.findByIdWithUserAndPreferences(sessionUuid)
                     .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionUuid));
 
             if (session.getStatus() != SessionStatus.SCHEDULED) {
@@ -52,24 +53,29 @@ public class SessionReminderJob extends QuartzJobBean {
                 return;
             }
 
-            // Safely navigate relationships (Ensure your repository uses JOIN FETCH if lazy-loading throws an exception)
             User user = session.getTask().getGoal().getUser();
+            
+            if (!Boolean.TRUE.equals(user.getPreferences().getNotificationsEnabled())) {
+                log.info("Skipping reminder for session {}: user has disabled notifications", sessionUuid);
+                return;
+            }
+
             String taskTitle = session.getTask().getTitle();
             String sessionTime = session.getStart().format(TIME_FORMATTER);
 
             // Fire the multicast push notification
-            boolean sent = fcmNotificationService.sendSessionReminderToUser(
-                    user.getId(),
-                    session.getId(),
-                    taskTitle,
-                    sessionTime
-            );
-
-            if (sent) {
-                log.info("Successfully sent reminder for session {} to user {}", sessionUuid, user.getId());
-            } else {
-                log.warn("Reminder job ran for session {}, but no FCM message was sent to user {}", sessionUuid, user.getId());
-            }
+//            boolean sent = fcmNotificationService.sendSessionReminderToUser(
+//                    user.getId(),
+//                    session.getId(),
+//                    taskTitle,
+//                    sessionTime
+//            );
+//
+//            if (sent) {
+//                log.info("Successfully sent reminder for session {} to user {}", sessionUuid, user.getId());
+//            } else {
+//                log.warn("Reminder job ran for session {}, but no FCM message was sent to user {}", sessionUuid, user.getId());
+//            }
 
         } catch (Exception e) {
             log.error("Failed to execute SessionReminderJob for session {}", sessionUuid, e);

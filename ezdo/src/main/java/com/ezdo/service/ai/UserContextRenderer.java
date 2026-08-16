@@ -57,8 +57,8 @@ public final class UserContextRenderer {
                 .append(ctx.bufferBetweenSessions()).append(" minutes.\n");
         }
 
-        sb.append("Categories — use the EXACT id and name below for a task's \"category\", ")
-            .append("or null if none fit. Never invent an id or name not listed here:\n");
+        sb.append("Categories — when you set a task's \"category\", use the EXACT id and name ")
+            .append("from the list below. Never invent an id or name not listed here:\n");
         if (ctx.categories() == null || ctx.categories().isEmpty()) {
             sb.append("- (this user has no categories yet; every task's category must be null)\n");
         } else {

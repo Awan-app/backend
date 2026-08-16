@@ -644,6 +644,59 @@
                   "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"email\": \"user@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"birthDate\": \"2002-06-16\",\n  \"points\": 150,\n  \"streak\": 5,\n  \"maxStreak\": 12,\n  \"profilePictureUrl\": \"https://res.cloudinary.com/demo/image/upload/v1754200000/profile_pictures/user_550e8400-e29b-41d4-a716-446655440000.jpg\",\n  \"isNew\": false,\n  \"preferences\": {\n    \"timezone\": \"America/New_York\",\n    \"preferredSessionDuration\": 45,\n    \"bufferBetweenSessions\": 5,\n    \"wakeupTime\": \"07:00:00\",\n    \"sleepTime\": \"23:00:00\",\n    \"schedulingType\": \"BALANCED\",\n    \"dailySummaryEnabled\": true\n  },\n  \"equippedItems\": []\n}"
                 }
               ]
+            },
+            {
+              "name": "Set Points",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"points\": 1500\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/users/me/points",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "users",
+                    "me",
+                    "points"
+                  ]
+                },
+                "description": "FOR TESTING PURPOSES ONLY – sets the user's point balance to an absolute value, not a delta.\n\n**Request Body:**\n- `points` (long, required, ≥ 0) – Exact new point balance.\n\n**Response (200):**\n- `points` (long) – The new wallet balance.\n\n**Possible Errors:**\n- `AUTHENTICATION_FAILED` (401) – Missing/invalid/expired JWT token.\n- `VALIDATION_ERROR` (400) – Negative points."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {},
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json",
+                      "type": "text"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"points\": 1500\n}"
+                }
+              ]
             }
           ]
         },

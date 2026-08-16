@@ -9,6 +9,7 @@ import com.ezdo.entity.GoalStatus;
 import com.ezdo.entity.Session;
 import com.ezdo.entity.Task;
 import com.ezdo.entity.User;
+import com.ezdo.exception.EmailDeliveryException;
 import com.ezdo.repository.GoalRepository;
 import com.ezdo.repository.SessionRepository;
 import com.ezdo.repository.UserRepository;
@@ -18,10 +19,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @DisallowConcurrentExecution
-public class DailySummaryJob implements Job {
+public class DailySummaryJob extends QuartzJobBean {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
@@ -51,15 +52,19 @@ public class DailySummaryJob implements Job {
 
     @Override
     @Transactional(readOnly = true)
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         if (userId == null || userId.isBlank()) {
             log.error("DailySummaryJob executed without a valid userId in JobDataMap.");
             return;
         }
 
         UUID userUuid = UUID.fromString(userId);
-        User user = userRepository.findById(userUuid)
-                .orElseThrow(() -> new JobExecutionException("User not found: " + userUuid));
+        User user = userRepository.findById(userUuid).orElse(null);
+
+        if (user == null) {
+            log.warn("User {} no longer exists; skipping daily summary", userUuid);
+            return;
+        }
 
         if (user.getPreferences() == null || !Boolean.TRUE.equals(user.getPreferences().getDailySummaryEnabled())) {
             log.info("Skipping daily summary for user {} because daily summaries are disabled", userUuid);
@@ -129,15 +134,23 @@ public class DailySummaryJob implements Job {
                 totalFocusMinutes);
 
         // Send email
-        emailService.sendDailySummaryEmail(user.getEmail(), email);
-        log.info("Sent daily summary email to user {}", user.getId());
+        try {
+            emailService.sendDailySummaryEmail(user.getEmail(), email);
+            log.info("Sent daily summary email to user {}", user.getId());
+        } catch (EmailDeliveryException e) {
+            log.error("Daily summary email failed for user {}", user.getId(), e);
+        }
 
-        // Send push notification to all user devices
-        fcmNotificationService.sendDailySummaryToUser(
-                user.getId(),
-                user.getFirstName(),
-                sessions.size()
-        );
+//        // Send push notification to all user devices if enabled
+//        if (Boolean.TRUE.equals(user.getPreferences().getNotificationsEnabled())) {
+//            fcmNotificationService.sendDailySummaryToUser(
+//                    user.getId(),
+//                    user.getFirstName(),
+//                    sessions.size()
+//            );
+//        } else {
+//            log.info("Skipping daily summary push notification for user {} because notifications are disabled", user.getId());
+//        }
     }
 
     private ZoneId resolveZone(User user) {

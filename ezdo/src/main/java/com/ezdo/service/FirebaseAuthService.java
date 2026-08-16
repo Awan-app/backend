@@ -42,6 +42,7 @@ public class FirebaseAuthService {
     private final UserProvisioningService userProvisioningService;
     private final AuthService authService;
     private final CategorySeedService categorySeedService;
+    private final KeycloakUserSyncService keycloakUserSyncService;
 
     @Value("${ezdo.firebase.allowed-sign-in-providers}")
     private List<String> allowedSignInProviders;
@@ -94,6 +95,8 @@ public class FirebaseAuthService {
 
         if (isNewUser) {
             categorySeedService.seedDefaults(user);
+            // Sync to Keycloak so the user can authenticate via MCP/OAuth
+            keycloakUserSyncService.createUser(email);
         }
 
         return authService.issueTokens(user, request.deviceId());

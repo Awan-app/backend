@@ -1,6 +1,7 @@
 package com.ezdo.dto.store;
 
 import com.ezdo.entity.ItemType;
+import com.ezdo.entity.Rarity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,5 @@ public class ItemResponse {
     private Integer price;
     private String version;
     private ItemType type;
+    private Rarity rarity;
 }

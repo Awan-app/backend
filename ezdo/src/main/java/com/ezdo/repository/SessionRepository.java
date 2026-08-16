@@ -33,6 +33,16 @@ public interface SessionRepository extends JpaRepository<Session , UUID> {
 
     @Query("""
         SELECT s FROM Session s
+        JOIN FETCH s.task t
+        JOIN FETCH t.goal g
+        JOIN FETCH g.user u
+        LEFT JOIN FETCH u.preferences p
+        WHERE s.id = :id
+    """)
+    Optional<Session> findByIdWithUserAndPreferences(@Param("id") UUID id);
+
+    @Query("""
+        SELECT s FROM Session s
         JOIN s.zone z
         LEFT JOIN z.template t
         LEFT JOIN z.templateOverride o

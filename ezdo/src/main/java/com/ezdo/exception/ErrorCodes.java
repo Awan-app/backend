@@ -94,4 +94,7 @@ public class ErrorCodes {
     public static final String PROFILE_PICTURE_EMPTY = "PROFILE_PICTURE_EMPTY";
     public static final String PROFILE_PICTURE_TOO_LARGE = "PROFILE_PICTURE_TOO_LARGE";
     public static final String CLOUDINARY_UPLOAD_FAILED = "CLOUDINARY_UPLOAD_FAILED";
+
+    // Mail
+    public static final String EMAIL_SEND_FAILED = "EMAIL_SEND_FAILED";
 }

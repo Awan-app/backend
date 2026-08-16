@@ -23,7 +23,9 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final CategorySeedService categorySeedService;
+    private final KeycloakUserSyncService keycloakUserSyncService;
     private final UserProvisioningService userProvisioningService;
+    private final DeviceTokenService deviceTokenService;
 
     public OtpResponse requestOtp(OtpRequest request) {
         return otpService.requestOtp(EmailUtil.normalize(request.email()));
@@ -53,6 +55,8 @@ public class AuthService {
 
         if (isNewUser) {
             categorySeedService.seedDefaults(user);
+            // Sync to Keycloak so the user can authenticate via MCP/OAuth
+            keycloakUserSyncService.createUser(email);
         }
 
         return issueTokens(user, request.deviceId());
@@ -100,5 +104,6 @@ public class AuthService {
     @Transactional
     public void logout(UUID userId, LogoutRequest request) {
         refreshTokenService.revokeByUserAndDevice(userId, request.deviceId());
+        deviceTokenService.removeDeviceToken(userId, request.deviceId().toString());
     }
 }

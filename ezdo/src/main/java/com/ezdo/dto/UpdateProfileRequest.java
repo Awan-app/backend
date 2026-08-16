@@ -31,5 +31,7 @@ public record UpdateProfileRequest(
 
     SchedulingType schedulingType,
 
-    Boolean dailySummaryEnabled
+    Boolean dailySummaryEnabled,
+
+    Boolean notificationsEnabled
 ) {}

@@ -45,6 +45,12 @@ services:
       SPRING_MAIL_AUTH: ${SPRING_MAIL_AUTH:-false}
       SPRING_MAIL_STARTTLS: ${SPRING_MAIL_STARTTLS:-false}
 
+      # Email transport: "smtp" (mailpit, local dev) or "gmail" (Gmail REST API, works where SMTP is blocked)
+      EZDO_MAIL_PROVIDER: ${EZDO_MAIL_PROVIDER:-smtp}
+      EZDO_GMAIL_CLIENT_ID: ${EZDO_GMAIL_CLIENT_ID:-}
+      EZDO_GMAIL_CLIENT_SECRET: ${EZDO_GMAIL_CLIENT_SECRET:-}
+      EZDO_GMAIL_REFRESH_TOKEN: ${EZDO_GMAIL_REFRESH_TOKEN:-}
+
       # AI (OpenAI-compatible — defaults to Groq with llama-3.3-70b)
       SPRING_OPENAI_API_KEY: ${SPRING_OPENAI_API_KEY}
       SPRING_OPENAI_BASE_URL: ${SPRING_OPENAI_BASE_URL:-https://api.groq.com/openai/v1}
@@ -106,6 +112,44 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
 
+  keycloak-db:
+    image: mysql:8.4
+    container_name: keycloak-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+      MYSQL_ROOT_PASSWORD: ${KEYCLOAK_DB_ROOT_PASSWORD:-keycloak}
+    volumes:
+      - keycloak_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: keycloak
+    restart: unless-stopped
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://keycloak-db:3306/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+      KC_HTTP_PORT: 9090
+      KC_HOSTNAME_STRICT: false
+    ports:
+      - "9090:9090"
+
 volumes:
   mysql_data:
+  keycloak_db_data:
   qdrant_data:

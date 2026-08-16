@@ -34,7 +34,8 @@ public class UserMapper {
                 p.getWakeupTime(),
                 p.getSleepTime(),
                 p.getSchedulingType(),
-                p.getDailySummaryEnabled()
+                p.getDailySummaryEnabled(),
+                p.getNotificationsEnabled()
             );
         }
 
@@ -97,6 +98,9 @@ public class UserMapper {
         }
         if (request.dailySummaryEnabled() != null) {
             p.setDailySummaryEnabled(request.dailySummaryEnabled());
+        }
+        if (request.notificationsEnabled() != null) {
+            p.setNotificationsEnabled(request.notificationsEnabled());
         }
     }
 }

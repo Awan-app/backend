@@ -5,6 +5,7 @@ import com.ezdo.dto.ai.decompose.TaskProposal;
 import com.ezdo.dto.goal.DraftTaskRequest;
 import com.ezdo.dto.goal.GoalCreateRequest;
 import com.ezdo.exception.InvalidDecompositionException;
+import com.ezdo.service.ai.TaskDraftNormalizer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -22,6 +23,12 @@ import java.util.List;
 public class ProposalMapper {
 
     private static final int MAX_TASKS = 50;
+
+    private final TaskDraftNormalizer normalizer;
+
+    public ProposalMapper(TaskDraftNormalizer normalizer) {
+        this.normalizer = normalizer;
+    }
 
     public GoalCreateRequest toCreateRequest(GoalProposal proposal) {
         if (proposal == null) {
@@ -62,7 +69,7 @@ public class ProposalMapper {
             t.description(),
             t.estimatedDuration(),
             t.mandatory(),
-            t.estimatedPoints(),
+            normalizer.normalizePoints(t.estimatedPoints()),
             t.allowTaskSplitting(),
             t.dependsOnTempIds(),
             t.category() != null ? t.category().id() : null
