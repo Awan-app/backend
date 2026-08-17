@@ -91,4 +91,11 @@ public class GamificationService {
         }
         return streakRepository.findActivityDates(userId, startDate, endDate);
     }
+
+    @Transactional(readOnly = true)
+    public LocalDate getLastActivityDate(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        return user.getStreak().getLastActivityDate();
+    }
 }

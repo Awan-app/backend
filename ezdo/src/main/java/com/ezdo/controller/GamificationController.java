@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,6 +40,12 @@ public class GamificationController {
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         return ResponseEntity.ok(gamificationService.getActivityDates(userId, startDate, endDate));
+    }
+
+    @GetMapping("/last-activity-date")
+    public ResponseEntity<Map<String, LocalDate>> getLastActivityDate(@AuthenticationPrincipal UUID userId) {
+        LocalDate date = gamificationService.getLastActivityDate(userId);
+        return ResponseEntity.ok(Map.of("lastActivityDate", date));
     }
 
     @GetMapping("/wheel/config")
