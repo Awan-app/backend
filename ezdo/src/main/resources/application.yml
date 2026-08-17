@@ -58,6 +58,8 @@ spring:
             misfireThreshold: 60000
 
   ai:
+    model:
+      embedding: google-genai
     mcp:
       server:
         name: awan
@@ -79,12 +81,13 @@ spring:
         embedding:
           api-key: ${SPRING_GENAI_API_KEY:}
           text:
-            model: text-embedding-004
-#    vectorstore:
-#      qdrant:
-#        host: localhost
-#        port: 6334
-#        collection-name: ezdo-memory
+            model: gemini-embedding-001
+    vectorstore:
+      qdrant:
+        host: ${SPRING_AI_VECTORSTORE_QDRANT_HOST:localhost}
+        port: ${SPRING_AI_VECTORSTORE_QDRANT_PORT:6334}
+        collection-name: ${SPRING_AI_VECTORSTORE_QDRANT_COLLECTION_NAME:ezdo-memory}
+        initialize-schema: true
 
   servlet:
     multipart:
@@ -140,6 +143,12 @@ ezdo:
       refresh-token: ${EZDO_GMAIL_REFRESH_TOKEN:}
   ai:
     max-turns: ${EZDO_AI_MAX_TURNS:20}
+    rag:
+      enabled: ${EZDO_AI_RAG_ENABLED:true}
+      top-k: ${EZDO_AI_RAG_TOP_K:3}
+      similarity-threshold: ${EZDO_AI_RAG_SIMILARITY_THRESHOLD:0.55}
+      max-tasks-per-goal: ${EZDO_AI_RAG_MAX_TASKS:25}
+      backfill-on-startup: ${EZDO_AI_RAG_BACKFILL:false}
     plan:
       max-tasks: ${EZDO_AI_PLAN_MAX_TASKS:25}
       max-sessions-per-task: ${EZDO_AI_PLAN_MAX_SESSIONS:10}

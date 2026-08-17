@@ -20,7 +20,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariable("code", code);
         String htmlContent = templateEngine.process("email/otp-email", context);
-        emailSender.send(toEmail, "Your EZDO verification code", htmlContent);
+        emailSender.send(toEmail, "Your Awan verification code", htmlContent);
     }
 
     public void sendDailySummaryEmail(String toEmail, MorningSummaryEmail email) {

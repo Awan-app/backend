@@ -3,6 +3,7 @@ package com.ezdo.exception;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -128,6 +129,19 @@ public class GlobalExceptionHandler {
             "Authentication failed",
             HttpStatus.UNAUTHORIZED.value(),
             ErrorCodes.AUTHENTICATION_FAILED,
+            Map.of()
+        );
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleOptimisticLockingFailure(
+        OptimisticLockingFailureException e
+    ) {
+        log.warn("Concurrent modification of a versioned row", e);
+        return buildErrorResponse(
+            "This was modified by another request at the same time. Reload and try again",
+            HttpStatus.CONFLICT.value(),
+            ErrorCodes.CONCURRENT_MODIFICATION,
             Map.of()
         );
     }

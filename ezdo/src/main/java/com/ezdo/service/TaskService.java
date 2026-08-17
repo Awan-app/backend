@@ -23,7 +23,9 @@ import com.ezdo.mapper.TaskMapper;
 import com.ezdo.repository.*;
 import com.ezdo.scheduler.SessionSchedulerService;
 import com.ezdo.util.DateRangeValidator;
+import com.ezdo.service.ai.rag.GoalIndexChangedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +49,7 @@ public class TaskService {
     private final SessionMapper sessionMapper;
     private final SessionSchedulerService sessionSchedulerService;
     private final GamificationService gamificationService;
+    private final ApplicationEventPublisher events;
 
     @Transactional
     public TaskInfoResponse createTask(UUID userId, TaskCreateRequest request) {
@@ -76,7 +79,9 @@ public class TaskService {
             .category(category)
             .build();
 
-        return taskMapper.toInfoResponse(taskRepository.save(task));
+        Task created = taskRepository.save(task);
+        events.publishEvent(GoalIndexChangedEvent.changed(goal.getId()));
+        return taskMapper.toInfoResponse(created);
     }
 
     @Transactional
@@ -129,6 +134,7 @@ public class TaskService {
 
         Task saved = taskRepository.save(task);
         scheduleReminders(userId, saved.getSessions());
+        events.publishEvent(GoalIndexChangedEvent.changed(goal.getId()));
         return new TaskWithSessionsResponse(
             taskMapper.toInfoResponse(saved),
             saved.getSessions().stream().map(sessionMapper::toResponse).toList()
@@ -193,6 +199,11 @@ public class TaskService {
 
         List<Task> saved = taskRepository.saveAll(tasks);
         saved.forEach(t -> scheduleReminders(userId, t.getSessions()));
+
+        saved.stream()
+            .map(t -> t.getGoal().getId())
+            .distinct()
+            .forEach(goalId -> events.publishEvent(GoalIndexChangedEvent.changed(goalId)));
         return new TasksWithSessionsResponse(
             saved.stream()
                 .map(t -> new TaskWithSessionsResponse(
@@ -318,6 +329,8 @@ public class TaskService {
         if (request.estimatedPoints() != null) task.setEstimatedPoints(request.estimatedPoints());
         if (request.allowTaskSplitting() != null) task.setAllowTaskSplitting(request.allowTaskSplitting());
         if (request.categoryId() != null) task.setCategory(categoryRepository.findByIdAndUserId(request.categoryId(), userId).orElseThrow(() -> new CategoryNotFoundException(request.categoryId())));
+
+        events.publishEvent(GoalIndexChangedEvent.changed(task.getGoal().getId()));
         return taskMapper.toInfoResponse(task);
     }
 
@@ -337,7 +350,11 @@ public class TaskService {
         Goal newGoal = goalRepository.findByIdAndUserId(request.goalId(), userId)
             .orElseThrow(() -> new GoalNotFoundException(request.goalId()));
 
+        UUID previousGoalId = task.getGoal().getId();
         task.setGoal(newGoal);
+
+        events.publishEvent(GoalIndexChangedEvent.changed(previousGoalId));
+        events.publishEvent(GoalIndexChangedEvent.changed(newGoal.getId()));
         return taskMapper.toInfoResponse(task);
     }
 
@@ -355,7 +372,9 @@ public class TaskService {
             }
         }
         task.getSessions().forEach(s -> sessionSchedulerService.cancelReminder(s.getId()));
+        UUID goalId = task.getGoal().getId();
         taskRepository.delete(task);
+        events.publishEvent(GoalIndexChangedEvent.changed(goalId));
     }
 
     @Transactional
