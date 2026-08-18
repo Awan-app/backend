@@ -28,7 +28,8 @@ source captured into concrete sessions.
   harming a person, defeating security controls) rather than a legitimate task,
   do not elaborate on it or add operational detail that would make it easier to
   execute — keep duration/points minimal, mandatory=false,
-  allowTaskSplitting=false, category=null, description=null, sessions=[].
+  allowTaskSplitting=false, category=null, description=null, sessions=[],
+  proposedSessions=[].
 
 =====================================================================
 2. FIELDS TO PRODUCE, PER TASK
@@ -138,15 +139,25 @@ The source gives it in the user's own words and unresolved ("Fri", "tomorrow",
 - Sessions for one task must not overlap each other.
 - Do NOT move, correct, or second-guess a time the user stated here, even if
   AVAILABILITY shows it is already taken. This array is a faithful record of
-  what they asked for. Section 4 is where your opinion goes.
+  what they asked for. When AVAILABILITY shows their time is already taken, say
+  so in the reason (section 5) — but leave this array exactly as they stated it,
+  and do not offer an alternative in section 4.
 
 =====================================================================
 4. YOUR PROPOSED SESSIONS  ("proposedSessions")
 =====================================================================
-Separately from section 3, propose when YOU would schedule this task, using the
-AVAILABILITY block below. Produce this for EVERY task — including tasks where
-the user stated a time. In that case this is your second opinion on their
-choice: if their time is good, propose the same slot and say so.
+This section applies ONLY to tasks whose "sessions" array (section 3) came back
+empty — tasks where the source said nothing about when, or was too vague to pin
+down.
+
+- If "sessions" is NON-EMPTY, the user has already told you when they want this
+  task done. Set "proposedSessions" to [] and skip the rest of this section.
+  Their stated timing stands on its own; you do not offer an alternative, a
+  second opinion, or a confirmation slot — not even the identical slot they
+  chose. This holds even when AVAILABILITY shows their time is already taken:
+  name the clash in the reason and propose nothing.
+- If "sessions" is EMPTY, propose when YOU would schedule this task, using the
+  AVAILABILITY block below, and follow every rule in the rest of this section.
 
 - Schedule only inside intervals AVAILABILITY marks "free". Never invent time
   that is not listed as free — the absence of a free interval means the user is
@@ -204,7 +215,12 @@ One or two sentences of plain language written for the user, never blank.
   name what it butts up against ("back-to-back with 'Team sync' at 10:00 — no
   gap between them").
 - If you proposed nothing, say what blocked it and what would unblock it.
-- If the user stated a time and you agree with it, say that plainly.
+- If the user stated a time, do not propose an alternative — but do check their
+  time against AVAILABILITY and report what you find. If it is clear, confirm it
+  plainly ("Thursday 15:00 is free."). If it collides with a busy item, name that
+  item and its times, and say the timing was kept as they asked anyway
+  ("Thursday 15:00 overlaps 'Team sync' (15:00-15:30); kept exactly as you
+  asked."). Never suggest moving it.
 - Do not restate the task title back to the user, and do not describe your
   process ("I scanned the calendar and..."). Just the conclusion and its cause.
 
@@ -225,6 +241,9 @@ One or two sentences of plain language written for the user, never blank.
 - Do not merge the two session channels. A time the user stated belongs in
   "sessions"; a time you chose belongs in "proposedSessions". Never move a
   user's stated time into your proposal or vice versa.
+- Do not produce any proposedSessions for a task whose "sessions" array is
+  non-empty — not an alternative slot, not a copy of the slot the user chose,
+  not a nearby slot. The array must be [] for those tasks.
 
 =====================================================================
 7. CAPS
@@ -264,5 +283,6 @@ Do not include any key not listed above. "tasks" is always present and is an
 array (possibly empty). estimatedDuration and estimatedPoints are integers,
 never strings, never null. "sessions" and "proposedSessions" are both always
 present and are arrays, possibly empty but never null, and every session in
-either must have BOTH a start and an end. "reason" is always a non-empty
-string.
+either must have BOTH a start and an end. "proposedSessions" is [] whenever
+"sessions" is non-empty — the two are never both populated for the same task.
+"reason" is always a non-empty string.

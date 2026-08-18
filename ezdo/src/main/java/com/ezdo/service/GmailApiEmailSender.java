@@ -80,7 +80,7 @@ public class GmailApiEmailSender implements EmailSender {
         try {
             MimeMessage message = new MimeMessage(jakarta.mail.Session.getInstance(new Properties()));
             MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
-            helper.setFrom(fromAddress, "Awan");
+            helper.setFrom(fromAddress);
             helper.setTo(toEmail);
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
